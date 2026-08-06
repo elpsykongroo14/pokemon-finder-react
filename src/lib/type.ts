@@ -1,7 +1,7 @@
 //Shared type definitions with no runtime behavior of their own, mirrors the same "one place to agree" idea as state.js applied to shapes instead of values.
 //nothing in this file exists after compilation, its purely something for the compiler to check other files against
 
-import { PokemonSprites } from "./sprites";
+import type { PokemonSprites } from "./sprites";
 
 //the shape of a full pokemon object as fetched from pokeAPI:
 export interface PokemonDetails {
