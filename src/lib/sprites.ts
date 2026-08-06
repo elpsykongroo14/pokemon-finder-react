@@ -28,5 +28,4 @@ export function getSpriteUrl(
   }
   return artwork?.front_default || sprites.front_default || null;
 }
-
 //{shiny = false}: SpritesOptions = {}, is an options object called instead of plain getSpriteUrl(sprites, true)
