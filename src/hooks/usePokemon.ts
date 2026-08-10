@@ -15,29 +15,28 @@ export function usePokemon(name: string): UsePokemonResult {
 
   useEffect(() => {
     if (!name.trim()) {
-      setData(null);
-      setError(null);
       return;
     }
 
     const controller = new AbortController();
 
-    setLoading(true);
-    setError(null);
-
-    fetchPokemon(name, { signal: controller.signal })
-      .then((result) => {
+    async function run() {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await fetchPokemon(name, { signal: controller.signal });
         setData(result);
-      })
-      .catch((err: unknown) => {
+      } catch (err: unknown) {
         if (err instanceof DOMException && err.name === "AbortError") return;
         const message =
           err instanceof Error ? err.message : "Something went wrong";
         setError(message);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    run();
 
     return () => {
       controller.abort();
