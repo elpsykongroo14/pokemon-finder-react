@@ -7,3 +7,13 @@ had to actually build the test runner first though, nothing was wired up yet. ad
 copied .env.test over unchanged (VITE_TCG_PROXY=https://fake-proxy.test) without it, fetchTCGCards's on api.test.ts fail loud guard fires during every test run since there's no real .env in a fresh checkout.
 
 two real decisions, not just copy paste: wrote the tests as .test.ts instead of .test.js, since this project has no allowJs/checkJs history to be incremental about the way the vanilla repo did meaning these test files are now actually type checked, unlike their .js ancestors. and updated the vi.resetModules() + dynamic import trick in api.test.ts from ./api.js to ./api.ts, matching the explicit extension import convention the vite react-ts template already uses (main.tsx imports './App.tsx' the same way).
+
+08-11-26 decomposing the display: components instead of render.ts functions
+
+built the five components that replace what render.ts used to do imperatively. TypeBadge/TypeBadgeList, StatBar/StatBarChart, SpriteDisplay, MetaInfo, composed under a PokemonCard container. typeColors and the mainStats/MAX_STAT ordering moved from render.ts's shared scope into the one component that actually uses each (TypeBadge, StatBarChart) instead of a shared module colocation over premature sharing, promote to lib/ only when a second consumer shows up. SpriteDisplay imports getSpriteUrl from lib/sprites.ts unchanged.
+
+StatBarChart computes highestValue with Math.max() directly in the render body instead of storing it in useState derived, not stored, recalculated fresh every render off of stats, no effect needed to keep it in sync. named this explicitly as the trap to avoid going forward: if a value can be computed from props/state you already have, don't give it its own useState.
+
+MetaInfo intentionally drops flavor text for now that lives on the /pokemon-species endpoint, which usePokemon doesn't fetch (only /pokemon). left a TODO rather than silently faking it or expanding the hook's scope mid component build.
+
+PokemonCard owns shiny toggle state via useState and drills it one level into SpriteDisplay. PokemonCard itself never reads shiny, purely a pass through first real feel of prop drilling. deliberately not reaching for Context yet even though the future phase's pain (favorites/team needing the same shiny state from a sibling branch) is visible from here; i will be letting the friction be felt before naming the fix.
