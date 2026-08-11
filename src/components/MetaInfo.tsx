@@ -9,6 +9,9 @@ interface MetaInfoProps {
   //before this component can accept a flavorText prop
 }
 
+//this one is almost a direct line fort line translation of renderMeta in the vanilla version
+//same math, same filtering logic,
+//the only real change is how the conditional "hidden ability" row gets attached
 export function MetaInfo({ height, weight, abilities }: MetaInfoProps) {
   const heightM = (height / 10).toFixed(1);
   const weightKg = (weight / 10).toFixed(1);
