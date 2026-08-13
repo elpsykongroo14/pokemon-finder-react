@@ -1,16 +1,14 @@
-import type { FavoritePokemon } from "../lib/type";
+//FavoritesList now reaches into the context directly instead of taking favorites/onRemove as props
+
+import { useFavorites } from "../hooks/useFavorites";
 
 interface FavoriteListProps {
-  favorites: FavoritePokemon[];
   onSelect: (name: string) => void;
-  onRemove: (name: string) => void;
 }
 
-export function FavoriteList({
-  favorites,
-  onSelect,
-  onRemove,
-}: FavoriteListProps) {
+export function FavoriteList({ onSelect }: FavoriteListProps) {
+  const { favorites, removeFavorite } = useFavorites();
+
   if (favorites.length === 0) {
     return <p className="status-message">No favorites yet.</p>;
   }
@@ -25,7 +23,7 @@ export function FavoriteList({
           </button>
           <button
             type="button"
-            onClick={() => onRemove(f.name)}
+            onClick={() => removeFavorite(f.name)}
             aria-label={`Remove ${f.name} from favorites`}
           >
             x
@@ -35,3 +33,7 @@ export function FavoriteList({
     </ul>
   );
 }
+
+//onSelect is still a plain prop, not pulled from Context. That's correct, not an oversight
+//"which pokemon to search for" is App's concern, not a globally shared piece of state
+//so it stays as ordinary prop-based inversion of control. Context replaces prop drilling; it isn't a replacement for props in general.

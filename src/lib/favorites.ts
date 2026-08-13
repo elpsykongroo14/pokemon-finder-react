@@ -1,37 +1,22 @@
-//setFavorites(...) needs a new array itself,
-//so the interface has to change shape even though
-//the underlying logic is identical to the one in the vanilla project
+//the reducer is whats going to own what changes so
+//favorites.ts only needs to own reading and writing localStorage
+//no need for array logic mixed in
 
-import type { PokemonDetails, FavoritePokemon } from "./type";
-import { getSpriteUrl } from "./sprites";
+import type { FavoritePokemon } from "./type";
 
 const FAVORITES_KEY = "pokemon_favorites";
 
-export function getFavorites(): FavoritePokemon[] {
-  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
+export function loadFavorites(): FavoritePokemon[] {
+  try {
+    //localStorage content is just a string a user could have corrupted
+    //JSON.parse on bad input throws,
+    //better to fall back to an empty list than crash the whole app on load.
+    return JSON.parse(localStorage.getItem(FAVORITES_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
 }
 
-export function addFavorite(pokemon: PokemonDetails): FavoritePokemon[] {
-  const favorites = getFavorites();
-  if (favorites.some((f) => f.name === pokemon.name)) return favorites;
-
-  const updated = [
-    ...favorites,
-    {
-      name: pokemon.name,
-      id: pokemon.id,
-      sprite: getSpriteUrl(pokemon.sprites),
-    },
-  ];
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-  return updated;
+export function saveFavorites(favorites: FavoritePokemon[]): void {
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
 }
-
-export function removeFavorite(name: string): FavoritePokemon[] {
-  const updated = getFavorites().filter((f) => f.name !== name);
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
-  return updated;
-}
-
-//vanilla's void functions become React's array returning
-//functions, because React needs the new value to hand to setState

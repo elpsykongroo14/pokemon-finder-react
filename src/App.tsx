@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SearchBar } from "./components/SearchBar";
 import { PokemonCard } from "./components/PokemonCard";
 import { usePokemon } from "./hooks/usePokemon";
+import { FavoriteList } from "./components/FavoritesList";
 import "./App.css";
 
 function App() {
@@ -17,19 +18,18 @@ function App() {
     <main className="app">
       <h1>Pokémon Finder</h1>
       <SearchBar onSubmit={setQuery} />
+      <FavoriteList onSelect={setQuery} />
 
       {loading && (
         <p role="status" className="status-message">
           Loading…
         </p>
       )}
-
       {error && (
         <p role="alert" className="status-message status-message--error">
           {error}
         </p>
       )}
-
       {!loading && !error && data && <PokemonCard pokemon={data} />}
 
       {!loading && !error && !data && (

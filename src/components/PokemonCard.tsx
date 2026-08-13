@@ -6,6 +6,8 @@ import { SpriteDisplay } from "./SpriteDisplay";
 import { TypeBadgeList } from "./TypeBadgeList";
 import { StatBarChart } from "./StatBarChart";
 import { MetaInfo } from "./MetaInfo";
+import { FavoriteButton } from "./FavoriteButton";
+import { useFavorites } from "../hooks/useFavorites";
 import type { PokemonDetails } from "../lib/type";
 
 interface PokemonCardProps {
@@ -14,11 +16,16 @@ interface PokemonCardProps {
 
 export function PokemonCard({ pokemon }: PokemonCardProps) {
   const [shiny, setShiny] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   return (
     <article className="pokemon-card">
       <header className="pokemon-card-header">
         <h2>{pokemon.name}</h2>
+        <FavoriteButton
+          isFavorite={isFavorite(pokemon.name)}
+          onToggle={() => toggleFavorite(pokemon)}
+        />
         <label className="shiny-toggle">
           <input
             type="checkbox"
