@@ -17,3 +17,15 @@ StatBarChart computes highestValue with Math.max() directly in the render body i
 MetaInfo intentionally drops flavor text for now that lives on the /pokemon-species endpoint, which usePokemon doesn't fetch (only /pokemon). left a TODO rather than silently faking it or expanding the hook's scope mid component build.
 
 PokemonCard owns shiny toggle state via useState and drills it one level into SpriteDisplay. PokemonCard itself never reads shiny, purely a pass through first real feel of prop drilling. deliberately not reaching for Context yet even though the future phase's pain (favorites/team needing the same shiny state from a sibling branch) is visible from here; i will be letting the friction be felt before naming the fix.
+
+08-13-6 favorites via context + useReducer
+
+built the "wrong" version first on purpose: lifted favorites into App with useState, threaded isFavorite/onToggleFavorite through PokemonCard into a new FavoriteButton purely as pass-through props. PokemonCard never read either value itself, just forwarded them, one hop was enough to feel the actual cost: a component's signature polluted by a concern it doesn't own, and any future nesting multiplies it. that's the argument for Context, not a "React best practices say so" default.
+
+refactored into src/context/FavoritesContext.tsx: createContext + useReducer + a useFavorites() hook that throws if called outside the provider instead of silently returning null. reducer (ADD/REMOVE) stays pure, no localStorage inside it. persistence moved to a useEffect keyed on the favorites array, since writing to storage is a side effect of state changing, not part of the state transition itself. lib/favorites.ts slimmed down to loadFavorites/saveFavorites, pure I/O only, wrapped the JSON.parse in try/catch since corrupted localStorage shouldn't crash the app on mount.
+
+useReducer(reducer, undefined, loadFavorites) uses the lazy initializer form, same reasoning as usePokemon's AbortController pattern: only pay the read cost once, on mount, not every render.
+
+context exposes named functions (toggleFavorite, removeFavorite) instead of raw dispatch, keeps the action shape as an internal detail of the provider. FavoriteButton stays a plain prop driven component, doesn't call useContext itself, only PokemonCard does since it's the one that owns the concern deliberately not sprinkling useContext into every component that touches favorites adjacent UI.
+
+decided against moving shiny into Context: single component concern, nothing else reads it yet, no felt friction to justify it. decided against Redux/Zustand for the same reasoning in reverse one shared slice, two consumers, changes only on click, Context+useReducer is correctly sized. no state library earns its cost here.
