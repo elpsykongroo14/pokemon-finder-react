@@ -1,8 +1,8 @@
-import { useEffect, useReducer, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import type { FavoritePokemon, PokemonDetails } from "../lib/type";
 import { getSpriteUrl } from "../lib/sprites";
-import { loadFavorites, saveFavorites } from "../lib/favorites";
 import { FavoritesContext } from "../hooks/useFavorites";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 type FavoritesAction =
   | { type: "ADD"; payload: PokemonDetails }
@@ -35,17 +35,13 @@ function favoritesReducer(
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   //this is the lazy initializer form, three argument version.
   //undefined is the "initial arg," and loadFavorites is a function React calls exactly once on mount, to compute the real initial stat
-  const [favorites, dispatch] = useReducer(
-    favoritesReducer,
-    undefined,
-    loadFavorites,
+  const [favorites, setFavorites] = useLocalStorage<FavoritePokemon[]>(
+    "pokemon_favorites",
+    [],
   );
-
-  //mixing localStorage.setItem into favoritesReducer would make it impossible to unit test without mocking browser APIs
-  //and would violate the reducer's one job (compute next state from current state + action)
-  useEffect(() => {
-    saveFavorites(favorites);
-  }, [favorites]);
+  function dispatch(action: FavoritesAction) {
+    setFavorites((prev) => favoritesReducer(prev, action));
+  }
 
   function isFavorite(name: string) {
     return favorites.some((f) => f.name === name);
