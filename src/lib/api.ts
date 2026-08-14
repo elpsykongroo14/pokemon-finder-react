@@ -75,9 +75,12 @@ export async function fetchPokemon(
 }
 
 //species
-export async function fetchSpecies(url: string): Promise<PokemonSpecies> {
+export async function fetchSpecies(
+  url: string,
+  options: { signal?: AbortSignal } = {},
+): Promise<PokemonSpecies> {
   if (speciesCache[url]) return speciesCache[url];
-  const data = await getJSON<PokemonSpecies>(url);
+  const data = await getJSON<PokemonSpecies>(url, { signal: options.signal });
   speciesCache[url] = data;
   return data;
 }
@@ -85,9 +88,10 @@ export async function fetchSpecies(url: string): Promise<PokemonSpecies> {
 //evolution chain
 export async function fetchEvolutionChain(
   url: string,
+  options: { signal?: AbortSignal } = {},
 ): Promise<EvolutionChain> {
   if (evoChainCache[url]) return evoChainCache[url];
-  const data = await getJSON<EvolutionChain>(url);
+  const data = await getJSON<EvolutionChain>(url, { signal: options.signal });
   evoChainCache[url] = data;
   return data;
 }
