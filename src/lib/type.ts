@@ -71,7 +71,7 @@ export interface PokemonSpecies {
 
 //evolution_details is deliberately omitted: buildEvolutionTree() in main.js only ever reads .species.name and .evoles_to,
 //walking the tree structurally. it never inspects why an evolution happens
-//so that data (which is the largest, messiest part of this endpoint) inst modeled
+//so that data (which is the largest, messiest part of this endpoint) isnt modeled
 export interface ChainLink {
   species: NamedAPIResource;
   evolves_to: ChainLink[];
