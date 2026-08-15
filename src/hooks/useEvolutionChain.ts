@@ -9,7 +9,7 @@ interface useEvolutionChainResult {
   error: string | null;
 }
 
-export function useEvolutionChainResult(
+export function useEvolutionChain(
   pokemon: PokemonDetails,
 ): useEvolutionChainResult {
   const [tree, setTree] = useState<EvolutionNode | null>(null);
@@ -54,3 +54,7 @@ export function useEvolutionChainResult(
 
   return { tree, loading, error };
 }
+
+//this is a two-step fetch chain, sequential on purpose.
+//fetchEvolutionChain can't run until fetchSpecies resolves,
+//because the evolution-chain URL lives inside the species response
