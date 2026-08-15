@@ -9,6 +9,7 @@ import { MetaInfo } from "./MetaInfo";
 import { FavoriteButton } from "./FavoriteButton";
 import { useFavorites } from "../hooks/useFavorites";
 import type { PokemonDetails } from "../lib/type";
+import { EvolutionSection } from "./evolutionSection";
 
 interface PokemonCardProps {
   pokemon: PokemonDetails;
@@ -48,6 +49,8 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
         weight={pokemon.weight}
         abilities={pokemon.abilities}
       />
+      {/*PokemonCard.tsx doesn't need to know anything changed underneath, it just hands its own pokemon prop to one more child, exactly the way it already hands slices of that same prop to SpriteDisplay, TypeBadgeList, and MetaInfo.*/}
+      <EvolutionSection pokemon={pokemon} />
     </article>
   );
 }
