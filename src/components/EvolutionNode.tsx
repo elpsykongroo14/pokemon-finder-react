@@ -2,18 +2,28 @@ import type { EvolutionNode as EvolutionNodeData } from "../lib/type";
 
 interface EvolutionNodeProps {
   data: EvolutionNodeData;
+  sprites: Record<string, string | null>;
 }
 
-export function EvolutionNode({ data }: EvolutionNodeProps) {
+export function EvolutionNode({ data, sprites }: EvolutionNodeProps) {
+  const spriteUrl = sprites[data.name] ?? null;
+
+  const stage = (
+    <div className="evolution-stage">
+      {spriteUrl ? (
+        <img src={spriteUrl} alt={data.name} />
+      ) : (
+        <div className="sprite-placeholder">No image</div>
+      )}
+      <span>{data.name}</span>
+    </div>
+  );
+
   //base case:
   //no further evolutions from here
   //draw the stage and stop
   if (data.children.length === 0) {
-    return (
-      <div className="evolution-stage">
-        <span>{data.name}</span>
-      </div>
-    );
+    return stage;
   }
 
   //recursive case:
@@ -21,13 +31,11 @@ export function EvolutionNode({ data }: EvolutionNodeProps) {
   //this line is where the recursion happens
   return (
     <div className="evolution-branch-row">
-      <div className="evolution-stage">
-        <span>{data.name}</span>
-      </div>
-      <div className="evolution-branch" />
+      {stage}
+      <div className="evolution-arrow" />
       <div className="evolution-branch-group">
         {data.children.map((child) => (
-          <EvolutionNode key={child.name} data={child} />
+          <EvolutionNode key={child.name} data={child} sprites={sprites} />
         ))}
       </div>
     </div>

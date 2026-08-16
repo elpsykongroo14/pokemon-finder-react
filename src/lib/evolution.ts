@@ -11,3 +11,9 @@ export function buildEvolutionTree(node: ChainLink): EvolutionNode {
     children: node.evolves_to.map(buildEvolutionTree),
   };
 }
+
+//walks the tree and returns every name in it, flattened.
+//this pokemon plus every descendant, in one array
+export function collectEvolutionNames(node: EvolutionNode): string[] {
+  return [node.name, ...node.children.flatMap(collectEvolutionNames)];
+}
