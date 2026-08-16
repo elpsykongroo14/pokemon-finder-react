@@ -29,3 +29,13 @@ useReducer(reducer, undefined, loadFavorites) uses the lazy initializer form, sa
 context exposes named functions (toggleFavorite, removeFavorite) instead of raw dispatch, keeps the action shape as an internal detail of the provider. FavoriteButton stays a plain prop driven component, doesn't call useContext itself, only PokemonCard does since it's the one that owns the concern deliberately not sprinkling useContext into every component that touches favorites adjacent UI.
 
 decided against moving shiny into Context: single component concern, nothing else reads it yet, no felt friction to justify it. decided against Redux/Zustand for the same reasoning in reverse one shared slice, two consumers, changes only on click, Context+useReducer is correctly sized. no state library earns its cost here.
+
+08-15-26 evolution chains and type effectiveness
+
+ported TYPE_CHART + computeDefensiveChart into lib/typeEffectiveness.ts, unchanged from render.ts, static game data, no API round trip needed, same reasoning as typeColors. buildEvolutionTree moved into lib/evolution.ts, pure ChainLink→EvolutionNode reshape, framework agnostic. added collectEvolutionNames alongside it, same recursive skeleton as buildEvolutionTree but flattening instead of nesting (flatMap vs map).
+
+EvolutionNode.tsx is the first recursive component in the project renders itself per child for branching chains (Eevee's 8). learned that a type and a value can share a name in the same file (interface EvolutionNode + function EvolutionNode coexist, separate TS namespaces) but aliased the import anyway for readability. base case (no children) and recursive case share one `stage` JSX block to avoid duplicating markup.
+
+wiring: added optional `{ signal }` to fetchSpecies/fetchEvolutionChain in api.ts, matching fetchPokemon's cancellation support needed once useEvolutionChain could fire a stale request race. useEvolutionChain does the two-step sequential fetch (species → chain, since the chain's URL only exists after species resolves), builds the tree, then batch-fetches every stage's sprite in parallel via Promise.all, and necessary since components can't await mid ender the way the old async renderEvolutionNode could. per stage sprite failures are swallowed individually so one broken stage doesn't kill the section.
+
+EvolutionSection owns the loading/error/no evolution/success branching and mounts into PokemonCard as one more pass through prop, same pattern as every other card section. three separate commits: pure logic, wiring, sprites kept intentionally split since only the last two touch anything network facing.
