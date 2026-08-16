@@ -7,7 +7,7 @@ interface EvolutionSectionProps {
 }
 
 export function EvolutionSection({ pokemon }: EvolutionSectionProps) {
-  const { tree, loading, error } = useEvolutionChain(pokemon);
+  const { tree, sprites, loading, error } = useEvolutionChain(pokemon);
 
   if (loading) {
     return (
@@ -34,7 +34,7 @@ export function EvolutionSection({ pokemon }: EvolutionSectionProps) {
 
   return (
     <div className="evolution-chain">
-      <EvolutionNode data={tree} />
+      <EvolutionNode data={tree} sprites={sprites} />
     </div>
   );
 }
