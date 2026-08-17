@@ -51,3 +51,6 @@ export function TeamReducer(state: TeamState, action: TeamAction): TeamState {
       return state;
   }
 }
+
+//a reducer must be a pure function
+//same input, same output, forever, with zero side effects (no timers, no fetches, no DOM)
