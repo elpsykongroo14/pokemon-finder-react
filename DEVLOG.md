@@ -39,3 +39,13 @@ EvolutionNode.tsx is the first recursive component in the project renders itself
 wiring: added optional `{ signal }` to fetchSpecies/fetchEvolutionChain in api.ts, matching fetchPokemon's cancellation support needed once useEvolutionChain could fire a stale request race. useEvolutionChain does the two-step sequential fetch (species → chain, since the chain's URL only exists after species resolves), builds the tree, then batch-fetches every stage's sprite in parallel via Promise.all, and necessary since components can't await mid ender the way the old async renderEvolutionNode could. per stage sprite failures are swallowed individually so one broken stage doesn't kill the section.
 
 EvolutionSection owns the loading/error/no evolution/success branching and mounts into PokemonCard as one more pass through prop, same pattern as every other card section. three separate commits: pure logic, wiring, sprites kept intentionally split since only the last two touch anything network facing.
+
+08-18-26, team builder: reducer level invariants
+
+built the team roster as useReducer, not another useLocalStorage backed dispatch like favorites state here is { members, error }, and error is transient UI state that has no business being written to disk on every toast, so persistence stays a useEffect keyed on state.members only, never the whole state object.
+
+max 6 and duplicate checks live in teamReducer itself, not the click handler a rejected ADD returns members untouched with error set, so "team full" is a state the reducer structurally refuses to produce rather than a fact every future call site has to remember to check.
+
+kept the auto-dismiss timer out of the reducer on purpose reducers stay pure, so the setTimeout(clearError, 3000) lives in TeamButton's useEffect instead, cleaned up on every re fire so a second rejection can't have its timer clear a newer error message.
+
+TeamSlots always renders exactly 6 <li>s (filled or empty) instead of team.map(), direct port of renderTeam()'s fixed slot layout from the vanilla version a roster with capacity reads differently than an unbounded list, same data shape as favorites but a different UI metaphor on purpose.
