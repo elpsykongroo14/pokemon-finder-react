@@ -16,3 +16,38 @@
 .status-message--error {
   color: #e8754a;
 }
+
+.team-slots {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.team-slot {
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1d24;
+}
+
+.team-slot--empty {
+  color: #6b7080;
+}
+
+.team-slot--filled {
+  position: relative;
+  flex-direction: column;
+}
+
+.remove-team {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 10px;
+}

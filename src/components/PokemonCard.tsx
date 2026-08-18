@@ -1,5 +1,4 @@
-//the container whos job is:
-//hold the shiny toggle state, and pass the right slices of pokemon down to each child.
+//the container
 
 import { useState } from "react";
 import { SpriteDisplay } from "./SpriteDisplay";
@@ -10,6 +9,7 @@ import { FavoriteButton } from "./FavoriteButton";
 import { useFavorites } from "../hooks/useFavorites";
 import type { PokemonDetails } from "../lib/type";
 import { EvolutionSection } from "./evolutionSection";
+import { TeamButton } from "../context/TeamButton";
 
 interface PokemonCardProps {
   pokemon: PokemonDetails;
@@ -27,6 +27,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
           isFavorite={isFavorite(pokemon.name)}
           onToggle={() => toggleFavorite(pokemon)}
         />
+        <TeamButton pokemon={pokemon} />
         <label className="shiny-toggle">
           <input
             type="checkbox"

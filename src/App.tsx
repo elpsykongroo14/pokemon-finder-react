@@ -3,6 +3,7 @@ import { SearchBar } from "./components/SearchBar";
 import { PokemonCard } from "./components/PokemonCard";
 import { usePokemon } from "./hooks/usePokemon";
 import { FavoriteList } from "./components/FavoritesList";
+import { TeamSLots } from "./context/TeamSlots";
 import "./App.css";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       <h1>Pokémon Finder</h1>
       <SearchBar onSubmit={setQuery} />
       <FavoriteList onSelect={setQuery} />
+      <TeamSLots onSelect={setQuery} />
 
       {loading && (
         <p role="status" className="status-message">
