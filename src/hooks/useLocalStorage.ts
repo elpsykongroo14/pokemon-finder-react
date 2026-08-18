@@ -4,12 +4,16 @@
 
 import { useState, useEffect, type Dispatch, type SetStateAction } from "react";
 
+//<T> makes it generic. T could be FavoritePokemon[] today or string[] for history,
+//the hook doesn't care, it just persists whatever it's handed
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
 ): [T, Dispatch<SetStateAction<T>>] {
   const [value, setValue] = useState<T>(() => {
     try {
+      //the lazy initializer does double duty.
+      //it reads from localStorage and falls back to initialValue and guards against a corrupt/missing entry with try/catch
       const stored = localStorage.getItem(key);
       return stored !== null ? (JSON.parse(stored) as T) : initialValue;
     } catch {
