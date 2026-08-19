@@ -49,3 +49,15 @@ max 6 and duplicate checks live in teamReducer itself, not the click handler a r
 kept the auto-dismiss timer out of the reducer on purpose reducers stay pure, so the setTimeout(clearError, 3000) lives in TeamButton's useEffect instead, cleaned up on every re fire so a second rejection can't have its timer clear a newer error message.
 
 TeamSlots always renders exactly 6 <li>s (filled or empty) instead of team.map(), direct port of renderTeam()'s fixed slot layout from the vanilla version a roster with capacity reads differently than an unbounded list, same data shape as favorites but a different UI metaphor on purpose.
+
+08-18-26 compare mode: derived state closes the p1Bar/p2Bar bug for good
+
+the bug in the vanilla project never really "forgot a null check" it was that highlightStats() stored highlight state in DOM classNames that had to be kept in sync by hand, across two separate querySelectorAll index lookups, and one branch got the sync right while the other didn't.
+
+so nothing about "which stat wins" gets a useState anywhere. compareStat(left, right) is a pure function in lib/, called directly inside CompareStatRow's render body recomputed from the two props it's given, every render, with nowhere for it to disagree with the values it's rendering next to. no useEffect syncing a winner flag after the fact, which is exactly the pattern that would've reintroduced the same bug shape with hooks instead of DOM classes.
+
+matching is by stat name (stats.find(s => s.stat.name === statName)) in both CompareStatsChart branches, not by array index, the actual mechanism behind the original bug (bars assumed to line up positionally between two separate DOM queries) isn't fixed here so much as it's not expressible in this code at all.
+
+promoted STAT_ORDER/STAT_LABELS out of StatBarChart into lib/stats.ts once CompareStatsChart needed the same constants, getOrderedStats stayed behind in lib/stats.ts but isn't used by compare mode, since CompareStatsChart works off raw find() by name instead not everything tied to a promoted constant has to move with it.
+
+self compare guard (isSelfCompare) is a boolean computed from data/compareData at render, not a shared error div getting hidden/unhidden defensively like vanilla's errorDiv
