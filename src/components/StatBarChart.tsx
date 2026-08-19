@@ -1,28 +1,6 @@
 import { StatBar } from "./StatBar";
 import type { PokemonStat } from "../lib/type";
-
-{
-  /*
-    STAT_ORDER and MAX_STAT pulled straight from mainStats and MAX_STAT in render.ts from the vanilla project
-*/
-}
-const STAT_ORDER = [
-  "hp",
-  "attack",
-  "defense",
-  "speed",
-  "special-attack",
-  "special-defense",
-] as const;
-
-const STAT_LABELS: Record<string, string> = {
-  hp: "HP",
-  attack: "Attack",
-  defense: "Defense",
-  speed: "Speed",
-  "special-attack": "Sp. Atk",
-  "special-defense": "Sp. Def",
-};
+import { STAT_LABELS, getOrderedStats } from "../lib/stats";
 
 const MAX_STAT = 225;
 
@@ -31,9 +9,7 @@ interface StatBarChartProps {
 }
 
 export function StatBarChart({ stats }: StatBarChartProps) {
-  const orderedStats = STAT_ORDER.map((name) =>
-    stats.find((s) => s.stat.name === name),
-  ).filter((s): s is PokemonStat => s !== undefined);
+  const orderedStats = getOrderedStats(stats);
 
   const highestValue = Math.max(...orderedStats.map((s) => s.base_stat));
 
