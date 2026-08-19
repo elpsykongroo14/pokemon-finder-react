@@ -3,18 +3,18 @@ import { compareStat } from "../lib/statComparison";
 interface compareStatRowProps {
   label: string;
   leftValue: number;
-  rightvalue: number;
+  rightValue: number;
 }
 
-export function compareStatRow({
+export function CompareStatRow({
   label,
   leftValue,
-  rightvalue,
+  rightValue,
 }: compareStatRowProps) {
   //recomputed from scratch every render, straight off the two props
   //never stored, so theres no window where this can disagree with leftValue/rightValue
 
-  const winner = compareStat(leftValue, rightvalue);
+  const winner = compareStat(leftValue, rightValue);
 
   return (
     <div className="compare-stat-row">
@@ -33,7 +33,7 @@ export function compareStatRow({
               : ""
         }`}
       >
-        {rightvalue}
+        {rightValue}
       </span>
     </div>
   );
