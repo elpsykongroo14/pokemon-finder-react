@@ -19,11 +19,17 @@ export function CompareStatRow({
   return (
     <div className="compare-stat-row">
       <span
-        className={`compare-stat-value${winner === "left" ? "stat-win" : winner === "right" ? "stat-lose" : ""}`}
+        className={`compare-stat-value${
+          winner === "left"
+            ? " stat-win"
+            : winner === "right"
+              ? " stat-lose"
+              : ""
+        }`}
       >
         {leftValue}
       </span>
-      <span className={`compare-stat-label`}>{label}</span>
+      <span className="compare-stat-label">{label}</span>
       <span
         className={`compare-stat-value${
           winner === "right"
