@@ -51,3 +51,69 @@
   right: 2px;
   font-size: 10px;
 }
+
+.card-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.compare-button[aria-pressed="true"] {
+  border-color: #5b8dee;
+  color: #5b8dee;
+}
+
+.compare-panel {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.compare-heads {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.compare-column {
+  flex: 1;
+  text-align: center;
+}
+
+.compare-stats-chart {
+  margin-top: 16px;
+}
+
+.compare-stat-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.compare-stat-row > .compare-stat-value:first-child {
+  text-align: right;
+}
+.compare-stat-row > .compare-stat-value:last-child {
+  text-align: left;
+}
+
+.compare-stat-label {
+  color: #6b7080;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.compare-stat-value {
+  font-weight: 600;
+}
+
+.stat-win {
+  color: #5b8dee;
+}
+
+.stat-lose {
+  color: #6b7080;
+}

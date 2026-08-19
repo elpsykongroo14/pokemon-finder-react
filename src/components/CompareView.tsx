@@ -26,7 +26,7 @@ export function CompareView({ primary, secondary }: CompareViewProps) {
           <h3>{primary.name}</h3>
           <TypeBadgeList types={primary.types} />
         </div>
-        <div className="compare-columnn">
+        <div className="compare-column">
           <SpriteDisplay
             sprites={secondary.sprites}
             name={secondary.name}
