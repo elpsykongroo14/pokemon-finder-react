@@ -3,7 +3,7 @@
 import { useFavorites } from "../hooks/useFavorites";
 
 interface FavoriteListProps {
-  onSelect: (name: string) => void;
+  onSelect?: (name: string) => void;
 }
 
 export function FavoriteList({ onSelect }: FavoriteListProps) {
@@ -17,7 +17,7 @@ export function FavoriteList({ onSelect }: FavoriteListProps) {
     <ul className="favorites-list">
       {favorites.map((f) => (
         <li key={f.name}>
-          <button type="button" onClick={() => onSelect(f.name)}>
+          <button type="button" onClick={() => onSelect?.(f.name)}>
             {f.sprite && <img src={f.sprite} alt="" width={32} height={32} />}
             {f.name}
           </button>
