@@ -5,7 +5,7 @@ import { useTeam } from "../hooks/useTeam";
 import { MAX_TEAM } from "../lib/teamReducer";
 
 interface TeamSLotsProps {
-  onSelect: (name: string) => void;
+  onSelect?: (name: string) => void;
 }
 
 export function TeamSLots({ onSelect }: TeamSLotsProps) {
@@ -26,7 +26,7 @@ export function TeamSLots({ onSelect }: TeamSLotsProps) {
 
         return (
           <li key={member.name} className="team-slot team-slot--filled">
-            <button type="button" onClick={() => onSelect(member.name)}>
+            <button type="button" onClick={() => onSelect?.(member.name)}>
               {member.name}
             </button>
             <button
