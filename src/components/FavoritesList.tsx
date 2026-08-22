@@ -1,12 +1,9 @@
 //FavoritesList now reaches into the context directly instead of taking favorites/onRemove as props
 
+import { Link } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
 
-interface FavoriteListProps {
-  onSelect?: (name: string) => void;
-}
-
-export function FavoriteList({ onSelect }: FavoriteListProps) {
+export function FavoritesList() {
   const { favorites, removeFavorite } = useFavorites();
 
   if (favorites.length === 0) {
@@ -17,10 +14,13 @@ export function FavoriteList({ onSelect }: FavoriteListProps) {
     <ul className="favorites-list">
       {favorites.map((f) => (
         <li key={f.name}>
-          <button type="button" onClick={() => onSelect?.(f.name)}>
-            {f.sprite && <img src={f.sprite} alt="" width={32} height={32} />}
+          <Link
+            to={`/pokemon/${encodeURIComponent(f.name)}`}
+            className="favorite-link"
+          >
+            {f.sprite && <img src={f.sprite} alt="" width={32} height={32} />}{" "}
             {f.name}
-          </button>
+          </Link>
           <button
             type="button"
             onClick={() => removeFavorite(f.name)}

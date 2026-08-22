@@ -117,3 +117,26 @@
 .stat-lose {
   color: #6b7080;
 }
+
+.main-nav {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.main-nav a {
+  color: #6b7080;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.main-nav a.active {
+  color: #5b8dee;
+}
+
+.favorite-link {
+  color: #d8dce8;
+  text-decoration: none;
+}
