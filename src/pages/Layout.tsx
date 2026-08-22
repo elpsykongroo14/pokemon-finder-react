@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
-import { FavoriteList } from "../components/FavoritesList";
+import { FavoritesList } from "../components/FavoritesList";
 
 export function Layout() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export function Layout() {
       </nav>
 
       <SearchBar onSubmit={handleSearch} />
-      <FavoriteList />
+      <FavoritesList />
 
       <Outlet />
       {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. Everything above it title, nav, search, favorites, persists across every navigation; only this slot swaps.*/}

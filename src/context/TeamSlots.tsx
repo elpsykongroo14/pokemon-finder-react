@@ -1,14 +1,11 @@
 //TeamSLots.tsx is the roster display
 //mirroring FavoritesList.tsx
 //this always renders exactly MAX_TEAM (6) <li>s, filled or empty, instead of team.map(...)
+import { Link } from "react-router-dom";
 import { useTeam } from "../hooks/useTeam";
 import { MAX_TEAM } from "../lib/teamReducer";
 
-interface TeamSLotsProps {
-  onSelect?: (name: string) => void;
-}
-
-export function TeamSLots({ onSelect }: TeamSLotsProps) {
+export function TeamSLots() {
   const { team, removeFromTeam } = useTeam();
 
   return (
@@ -26,9 +23,9 @@ export function TeamSLots({ onSelect }: TeamSLotsProps) {
 
         return (
           <li key={member.name} className="team-slot team-slot--filled">
-            <button type="button" onClick={() => onSelect?.(member.name)}>
+            <Link to={`/pokemon/${encodeURIComponent(member.name)}`}>
               {member.name}
-            </button>
+            </Link>
             <button
               type="button"
               className="remove-team"
