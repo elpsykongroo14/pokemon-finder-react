@@ -39,7 +39,7 @@ export function ComparePage() {
         </p>
       )}
 
-      {!loadingA && errorA && dataA && !b && (
+      {!loadingA && !errorA && dataA && !b && (
         <>
           <h3>Comparing {dataA.name} with...</h3>
           <SearchBar onSubmit={handlePickSecond} />
@@ -60,7 +60,7 @@ export function ComparePage() {
           )}
           {!loadingB && !errorB && dataB && isSelfCompare && (
             <p role="alert" className="status-message status-message--error">
-              {errorB}
+              Choose a different Pokémon to compare.
             </p>
           )}
           {!loadingB && !errorB && dataA && dataB && !isSelfCompare && (

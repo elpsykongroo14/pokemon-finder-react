@@ -16,7 +16,7 @@ export function PokemonPage() {
   return (
     <>
       {loading && (
-        <p role="status" className="status-name">
+        <p role="status" className="status-message">
           Loading…
         </p>
       )}
@@ -43,7 +43,7 @@ export function PokemonPage() {
         </>
       )}
 
-      {!loading && !error && !!data && (
+      {!loading && !error && !data && (
         <p className="status-message">No results for "{name}".</p>
       )}
     </>

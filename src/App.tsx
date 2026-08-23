@@ -12,10 +12,10 @@ function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/pokemon/page" element={<PokemonPage />} />
+        <Route path="/pokemon/:name" element={<PokemonPage />} />
         <Route path="/compare" element={<ComparePage />} />
         <Route path="/team" element={<TeamPage />} />
-        <Route path="/*" element={<NotFoundPage />} />
+        <Route path="*" element={<NotFoundPage />} />
         <Route />
       </Route>
     </Routes>
