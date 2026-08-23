@@ -39,12 +39,6 @@ export function Layout() {
         >
           Team
         </NavLink>
-        <NavLink
-          to="/library"
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          TCG Library
-        </NavLink>
       </nav>
 
       <SearchBar onSubmit={handleSearch} />
