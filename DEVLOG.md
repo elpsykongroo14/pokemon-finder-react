@@ -61,3 +61,23 @@ matching is by stat name (stats.find(s => s.stat.name === statName)) in both Com
 promoted STAT_ORDER/STAT_LABELS out of StatBarChart into lib/stats.ts once CompareStatsChart needed the same constants, getOrderedStats stayed behind in lib/stats.ts but isn't used by compare mode, since CompareStatsChart works off raw find() by name instead not everything tied to a promoted constant has to move with it.
 
 self compare guard (isSelfCompare) is a boolean computed from data/compareData at render, not a shared error div getting hidden/unhidden defensively like vanilla's errorDiv
+
+08-23-2026 Routing and Shareable URLs: goal is to replace manual popstate history hacking with React Router, make every view deep linkable
+
+ended up installing react-router-dom (v7 declarative mode),
+
+shipped:
+
+a route table:/, /pokemon/:name, /compare, /team, \* (404 page).
+
+A Layout component (title, nav, global, favorites) wraps all routes via a pathless layout route + <Outlet />.
+
+a PokemonPage that reads the selected Pokemon from useParams instead of local state.
+
+a comparePage that reads both compare slots from useSearchParams (?a=&b=) instead of a compareMode boolean + string state.
+
+FavoritesList/TeamSlots dropped their onSelect prop, naviguate via <Link> directly instead of a callback threaded down from App.
+
+Retired CompareButton's toggle API and replaced with a plain nav button (compare is now one way navigation not a toggle)
+
+key decisions: pokemon name is a path param (single required resource) compare targets are query params (optional, two independent slots). Declarative router mode kept, not framework/data mode, no reason to replace the existing usePokemon fetch hook pattern
