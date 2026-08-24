@@ -11,8 +11,8 @@
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
@@ -108,4 +108,239 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+/* TCG Library */
+
+.library-view {
+  margin-top: 16px;
+}
+
+.library-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.library-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.library-back {
+  color: #6b7080;
+  text-decoration: none;
+  font-size: 0.85em;
+}
+
+.library-back:hover {
+  color: #d8dce8;
+}
+
+.card-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.card-panel-title {
+  flex: 1;
+  margin: 0;
+  font-size: 0.95rem;
+  text-transform: capitalize;
+}
+
+.sort-select {
+  background: #22252e;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: #d8dce8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 14px;
+}
+
+.tcg-card {
+  background: #1a1d24;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
+}
+
+.tcg-card:hover {
+  border-color: #5b8dee;
+  transform: translateY(-3px);
+}
+
+.tcg-card-img-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.tcg-card-img-wrap img {
+  width: 100%;
+  max-width: 136px;
+  border-radius: 4px;
+}
+
+.tcg-card-info {
+  padding: 9px 11px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tcg-card-set {
+  font-size: 0.7rem;
+  color: #6b7080;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tcg-card-rarity {
+  font-size: 0.7rem;
+  color: #5b8dee;
+}
+
+.library-loading,
+.library-empty {
+  color: #6b7080;
+  text-align: center;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+}
+
+.tcg-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: #d8dce8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85em;
+}
+
+/* Modal (portal target: document.body) */
+
+.card-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.card-modal-content {
+  position: relative;
+  background: #1a1d24;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  width: min(820px, 92vw);
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #22252e;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: #d8dce8;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.card-modal-body {
+  display: flex;
+  overflow: hidden;
+}
+
+.card-modal-img-wrap {
+  background: #111318;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.card-modal-img-wrap img {
+  max-width: 100%;
+  max-height: 68vh;
+  border-radius: 8px;
+}
+
+.card-modal-info {
+  flex: 1;
+  padding: 28px 24px;
+  overflow-y: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card-modal-name {
+  margin: 0;
+  font-size: 1.1rem;
+  text-transform: capitalize;
+}
+
+.card-modal-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.meta-label {
+  font-size: 0.72rem;
+  color: #6b7080;
+  white-space: nowrap;
+}
+
+.meta-value {
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.card-modal-flavor {
+  font-size: 0.78rem;
+  color: #6b7080;
+  font-style: italic;
+  line-height: 1.65;
 }

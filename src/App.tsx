@@ -5,6 +5,7 @@ import { PokemonPage } from "./pages/PokemonPage";
 import { ComparePage } from "./pages/ComparePage";
 import { TeamPage } from "./pages/TeamPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { LibraryPage } from "./pages/LibraryPage";
 import "./App.css";
 
 function App() {
@@ -15,6 +16,8 @@ function App() {
         <Route path="/pokemon/:name" element={<PokemonPage />} />
         <Route path="/compare" element={<ComparePage />} />
         <Route path="/team" element={<TeamPage />} />
+        <Route path="/library" element={<LibraryPage />} />
+        <Route path="/library/:name" element={<LibraryPage />} />
         <Route path="*" element={<NotFoundPage />} />
         <Route />
       </Route>

@@ -39,6 +39,12 @@ export function Layout() {
         >
           Team
         </NavLink>
+        <NavLink
+          to="/library"
+          className={({ isActive }) => (isActive ? "active" : undefined)}
+        >
+          Library
+        </NavLink>
       </nav>
 
       <SearchBar onSubmit={handleSearch} />

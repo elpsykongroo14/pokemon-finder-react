@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { usePokemon } from "../hooks/usePokemon";
 import { PokemonCard } from "../components/PokemonCard";
 
@@ -38,6 +38,13 @@ export function PokemonPage() {
             >
               ⚔️ Compare
             </button>
+
+            <Link
+              to={`/Library/${encodeURIComponent(data.name)}`}
+              className="tcg-btn"
+            >
+              View Cards
+            </Link>
           </div>
           <PokemonCard pokemon={data} />
         </>
