@@ -118,6 +118,7 @@ export async function fetchAllpokemonNames(): Promise<string[]> {
 interface TCGSearchOptions {
   orderBy?: string;
   pageSize?: number;
+  signal?: AbortSignal;
 }
 
 interface TCGCardsResponse {
@@ -126,7 +127,11 @@ interface TCGCardsResponse {
 
 export async function fetchTCGCards(
   pokemonName: string,
-  { orderBy = "-set.releaseDate", pageSize = 250 }: TCGSearchOptions = {},
+  {
+    orderBy = "-set.releaseDate",
+    pageSize = 250,
+    signal,
+  }: TCGSearchOptions = {},
 ): Promise<TCGCard[]> {
   //fail loud and specific here, right  where the assumption is used -
   //without this, a missing env var silently becomes the literal string
@@ -161,18 +166,21 @@ export async function fetchTCGCards(
   const url = `${TCG_PROXY}/?${params}`;
 
   //TCG api wraps results in a 'data' array
-  const data = await getJSON<TCGCardsResponse>(url);
+  const data = await getJSON<TCGCardsResponse>(url, { signal });
   return data.data || [];
 }
 
-export async function fetchTCGCardsBatch(names: string[]): Promise<TCGCard[]> {
+export async function fetchTCGCardsBatch(
+  names: string[],
+  options: { signal?: AbortSignal } = {},
+): Promise<TCGCard[]> {
   //this fires multiple requests in parallel using Promise.all
   //and flattens the results into one array
   //used by library featured Cards display
 
   const results = await Promise.all(
     names.map((name) =>
-      fetchTCGCards(name, { pageSize: 60 })
+      fetchTCGCards(name, { pageSize: 60, signal: options.signal })
         //if one name fails, return empty array instead of crashing whole batch
         //.catch() on individual promises
         .catch(() => [] as TCGCard[]),
