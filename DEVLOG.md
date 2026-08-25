@@ -81,3 +81,19 @@ FavoritesList/TeamSlots dropped their onSelect prop, naviguate via <Link> direct
 Retired CompareButton's toggle API and replaced with a plain nav button (compare is now one way navigation not a toggle)
 
 key decisions: pokemon name is a path param (single required resource) compare targets are query params (optional, two independent slots). Declarative router mode kept, not framework/data mode, no reason to replace the existing usePokemon fetch hook pattern
+
+08-24-2026 TCG library: reducer + portal, and the view toggle finally dies
+
+library became real routes instead of a hidden view: /library (featured, shuffled) and /library/:name (search). replaces showLibrary/hideLibrary/restoreLibraryState entirely, router already does what that pushState hand rolling was doing.
+
+useTCGLibrary hook: useReducer owns {cards, status, error} since a fetch resolves all three atomically, sortMode stays a separate useState next to it since it changes independently of any fetch. sorted cards are useMemo'd off cards+sortMode, never stored derived state killed the p1Bar/p2Bar bug back in compare mode, same rule applies here.
+
+hit a real bug before writing the effect: fetchTCGCardsBatch swallows every per card error into [], so checking err instanceof AbortError in the catch block would never fire on a cancelled featured cards batch. switched to checking controller.signal.aborted right after each await instead of trusting the error type, more robust in general, not just a workaround for this one function.
+
+added {signal} to fetchTCGCards/fetchTCGCardsBatch in api.ts, matching fetchPokemon/fetchSpecies, wasn't needed in vanilla since nothing there could unmount mid fetch.
+
+modal is Modal.tsx (generic, createPortal into document.body) wrapping TCGCardModal (the pokemon specific content). escape key + body scroll lock are both useEffect cleanup functions now instead of manual .hidden toggling, closing the modal = unmounting = cleanup runs itself. getCardMetaRows moved to lib/tcg.ts as a pure function returning data instead of building an innerHTML string, means escapeHTML's job disappears entirely, JSX escapes {value} by default.
+
+deliberately dropped the IntersectionObserver batching from renderCardGrid. that existed to stop 250 sequential appendChild calls from janking the thread, react's reconciler doesn't have that cost profile, loading="lazy" on the imgs is doing the actual heavy lifting either way. noted as a tradeoff to revisit with virtualization if card counts ever grow past a few hundred, not assumed away.
+
+SearchBar got a placeholder prop instead of a new search component, first real payoff of building it generic back then.
