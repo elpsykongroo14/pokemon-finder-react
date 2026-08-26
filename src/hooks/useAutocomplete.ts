@@ -13,11 +13,20 @@ interface UseAutocompleteResults {
   dismiss: () => void;
 }
 
-export function UseAutocomplete(query: string): UseAutocompleteResults {
+export function useAutocomplete(query: string): UseAutocompleteResults {
   const [allNames, setAllNames] = useState<string[]>([]);
   const [dismissed, setDismissed] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [preview, setPreview] = useState<PokemonDetails | null>(null);
+
+  //track the previous query to detect when the user types a new character
+  //any new keystroke un dismisses, the user typing again means they want to see suggestions
+  //even if they hit escape a moment ago
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    setDismissed(false); //resets synchronously in the same render pass
+  }
 
   //empty dependency array: this runs on mount, same as the vanilla main.ts did on page load
   //fetchAllpokemonNames already catches internally (allNamesCache in lib/api.ts) so even if useAutocomplete were ever used in two places at once,
@@ -41,18 +50,15 @@ export function UseAutocomplete(query: string): UseAutocompleteResults {
     [debouncedQuery, allNames],
   );
 
-  //any new keystroke un dismisses, the user typing again means they want to see suggestions
-  //even if they hit escape a moment ago
-  useEffect(() => {
-    setDismissed(false);
-  }, [query]);
-
+  //track the previous matches array reference to see if a new debounce tick occurs
   //it only fires when matches itself changes (a new debounce tick produced a different array)
   //pressing arrow keys changes highlightedIndex directly via the setter returned from the hook,
   //which doesnt touch matches so this effect wont fight by resetting back to 0 everytime an down arrow key is pressed
-  useEffect(() => {
+  const [prevMatches, setPrevMatches] = useState(matches);
+  if (matches !== prevMatches) {
+    setPrevMatches(matches);
     setHighlightedIndex(matches.length > 0 ? 0 : -1);
-  }, [matches]);
+  }
 
   const isOpen = matches.length > 0 && !dismissed;
   const highlightedName = matches[highlightedIndex] ?? null;

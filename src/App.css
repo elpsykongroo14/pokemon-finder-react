@@ -140,3 +140,64 @@
   color: #d8dce8;
   text-decoration: none;
 }
+
+.search-bar-wrapper {
+  position: relative;
+}
+
+.autocomplete-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: #1a1d24;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 6px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.autocomplete-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.autocomplete-preview img {
+  width: 40px;
+  height: 40px;
+}
+
+.autocomplete-preview-name {
+  color: #d8dce8;
+  text-transform: capitalize;
+}
+
+.autocomplete-preview-id {
+  color: #6b7080;
+  margin-left: auto;
+  font-size: 0.85em;
+}
+
+.autocomplete-item {
+  list-style: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #d8dce8;
+  text-transform: capitalize;
+}
+
+.autocomplete-item--active {
+  background: #22252e;
+  color: #5b8dee;
+}
+
+#autocomplete-list {
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
