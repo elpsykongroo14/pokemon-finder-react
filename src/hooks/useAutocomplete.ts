@@ -63,11 +63,20 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   const isOpen = matches.length > 0 && !dismissed;
   const highlightedName = matches[highlightedIndex] ?? null;
 
-  useEffect(() => {
+  //if the highlighted match goes away (dropdown closes or the list becomes empty),
+  //clear the preview immediately this is derived state, not a sync with an external system so it belongs here
+  //not inside the fetch effect below
+  const [prevHighlightedName, setPrevHighlightedName] =
+    useState(highlightedName);
+  if (highlightedName !== prevHighlightedName) {
+    setPrevHighlightedName(highlightedName);
     if (!highlightedName) {
       setPreview(null);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!highlightedName) return;
 
     const controller = new AbortController();
 
