@@ -97,3 +97,19 @@ modal is Modal.tsx (generic, createPortal into document.body) wrapping TCGCardMo
 deliberately dropped the IntersectionObserver batching from renderCardGrid. that existed to stop 250 sequential appendChild calls from janking the thread, react's reconciler doesn't have that cost profile, loading="lazy" on the imgs is doing the actual heavy lifting either way. noted as a tradeoff to revisit with virtualization if card counts ever grow past a few hundred, not assumed away.
 
 SearchBar got a placeholder prop instead of a new search component, first real payoff of building it generic back then.
+
+08-26-2026 debounce live search and autocomplete
+
+shipped live autocomplete on the search bar, typing filters against the cached pokemon name list, shows up to 8 ranked matches (prefix matches before substring matches) and previews the currently highlighted match (sprite, name, dex number) before commiting to a search, full keyboard support and mouse support, both wired to trigger the actual search immediately.
+
+this was the last vanilla js feature left to port and it was the hardest one, the original implementation depended on a module level AbortController variable that had to be manually reassigned on every keystroke to keep cancellation working. That pattern has no equivalent in a function component (there's no persistent module state to hang a mutable controller off). Porting it honestly, instead of papering over the gap, forced a real answer to "how does React want you to cancel stale async work?"
+
+the build:
+
+lib/autocomplete.ts: pure filterNames(), ported and unit testable in isolation, same pattern as sprites.ts/sanitize.ts.
+
+hooks/useDebounce.ts: a generic hook that debounces a value, not a callback. Chose this over a hook wrapping the vanilla debounce<Args> callback pattern specifically to avoid stale-closure bugs that come from re created callbacks on every render; a debounced value plugs cleanly into useEffect dependency arrays instead.
+
+hooks/useAutocomplete.ts: owns all six pieces of interaction state (query debounce, matches, highlight index, preview, open/dismissed) and both useEffects one resetting the highlight when matches change, one fetching the preview for the highlighted name (not the raw query those diverge during keyboard nav) with AbortController cleanup.
+
+components/SearchBar.tsx: first real use of useRef for imperative DOM access (refocusing the input after a mouse-click selection), plus a fix for a classic autocomplete bug: onMouseDown={e => e.preventDefault()} on each option, to stop the browser from blurring the input (and closing the dropdown) before the click handler fires.
