@@ -13,6 +13,12 @@ vi.mock("../hooks/useFavorites", () => ({
   }),
 }));
 
+vi.mock("./TypeBadgeList", () => ({ TypeBadgeList: () => null }));
+vi.mock("./StatBarChart", () => ({ StatBarChart: () => null }));
+vi.mock("./MetaInfo", () => ({ MetaInfo: () => null }));
+vi.mock("./evolutionSection", () => ({ EvolutionSection: () => null }));
+vi.mock("../context/TeamButton", () => ({ TeamButton: () => null }));
+
 const mockPokemon: PokemonDetails = {
   name: "pikachu",
   id: 25,
