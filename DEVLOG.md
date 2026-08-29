@@ -113,3 +113,14 @@ hooks/useDebounce.ts: a generic hook that debounces a value, not a callback. Cho
 hooks/useAutocomplete.ts: owns all six pieces of interaction state (query debounce, matches, highlight index, preview, open/dismissed) and both useEffects one resetting the highlight when matches change, one fetching the preview for the highlighted name (not the raw query those diverge during keyboard nav) with AbortController cleanup.
 
 components/SearchBar.tsx: first real use of useRef for imperative DOM access (refocusing the input after a mouse-click selection), plus a fix for a classic autocomplete bug: onMouseDown={e => e.preventDefault()} on each option, to stop the browser from blurring the input (and closing the dropdown) before the click handler fires.
+
+08-29-2026 infra + first three components:
+
+added @testing-library/react (jest-dom and user-event were already devDependencies but the render()/screen half of the stack was missing). new src/test-setup.ts registers jest-dom's matchers via the /vitest entrypoint and calls cleanup() in an afterEach necessary by hand since vitest.config.ts runs with globals: false, so RTL's own auto cleanup hook never fires. wired into vitest.config.ts via setupFiles.
+
+FavoriteButton.test.tsx: first RTL test in the project. getByRole over className/test-id on purpose aria-pressed was already correct on the button, so no accessibility gap to work around. three cases: unfavorited render, favorited render, onToggle fires on click via user-event.
+
+PokemonCard.test.tsx: first use of vi.mock, and the harder case the
+component composes six children plus useFavorites, and EvolutionSection fetches for real on mount. mocked useFavorites and every child not under test (TypeBadgeList, StatBarChart, MetaInfo, evolutionSection, TeamButton) so the test only proves PokemonCard's own two jobs: shiny toggle state and favorite button wiring, not re-proving what each child already gets tested for on its own. hit the vi.mock hoisting gotcha here vi.mock calls get hoisted above regular imports, so a plain `const toggleFavorite = vi.fn()` referenced inside the factory throws a TDZ error; fixed with vi.hoisted()
+
+FavoritesList.test.tsx: opposite call from PokemonCard this component's whole job is rendering real favorites state, so mocking useFavorites would test nothing real. wrapped render() in the real FavoritesProvider + MemoryRouter instead (Link needs a router in the tree; MemoryRouter over BrowserRouter since it doesn't touch the real URL bar). seeded state by writing straight to localStorage before render, same mechanism useLocalStorage's lazy initializer already reads from, no backdoor needed. jsdom's localStorage is a real singleton shared across tests in a file though, so added beforeEach(() => localStorage.clear()) to stop state leaking test to test. also first use of queryByRole (returns null instead of throwing) to assert a favorite is gone after removal, versus getByRole for asserting something exists.
