@@ -136,3 +136,15 @@ Then knocked out the rest of the pure lib/ layer: statComparison, stats, evoluti
 evolution.ts was my first recursive function to test had to actually think about base case vs. recursive case as distinct things to prove, not just "call it once and check the output."
 
 typeEffectiveness.ts has a full 18×18 type chart realized fast that hand-testing every matchup is a waste of time, and the better move for a big static data table is a couple of targeted behavior checks (a plain weakness, a plain resistance, an immunity, and the 4x dual-type compounding case) plus a separate "data integrity" test that walks the whole table checking every referenced type name is real, which is the actual bug this kind of file is prone to: typos, not logic errors.
+
+09-04-2026: testing pass: hooks (useDebounce, useLocalStorage, usePokemon, useAutocomplete)
+
+First real hook testing session. Had to settle the actual mechanics before writing anything: useState/useEffect need a fiber to hang state off of, so a hook can't be called from a plain test function the way a pure function can needs either a real consuming component rendering it, or renderHook standing in as a throwaway host. Went with renderHook for everything this session since none of these six hooks are meaningfully owned by one component; noted useFavorites/useTeam are the opposite case (already covered indirectly through the components that use them) and will only need renderHook for their outside-provider throw guard, not the whole hook.
+
+useDebounce first, since it's dependency free and it's the one every other async hook in this session builds on. Used vi.useFakeTimers() + vi.advanceTimersByTime() instead of real waits a debounce test suite that actually sleeps 300ms per assertion doesn't scale and gets flaky under load.
+
+useLocalStorage next, mostly to establish that jsdom's localStorage is real, not something to mock same reasoning FavoritesList.test.tsx already leaned on, just applied one layer down.
+
+usePokemon is where the real complexity started. Mocked lib/api.ts at the module boundary with vi.mock + vi.hoisted (same TDZ gotcha as PokemonCard.test.tsx, vi.mock factories get hoisted above the import that would otherwise define the mock fn) instead of mocking fetch directly, so the test only proves "does this hook manage loading/data/error given what fetchPokemon returns," not the network layer that api.test.ts already owns. New tool: waitFor, needed because promise resolution lands a tick after the synchronous loading = true, asserting on data immediately instead of waiting for it would've been flaky by construction, not just occasionally.
+
+useAutocomplete composed everything above. Explicitly did not re-test debounce timing here it already has its own file, so useAutocomplete's tests get to trust it as a building block instead of re-litigating 250ms delays. That decision also killed fake timers for this file: mixing vi.useFakeTimers with waitFor's own internal polling is a known way to hang a test, so went with real elapsed time instead, since the delay's short and the isolation already exists elsewhere. Slower test file, on purpose.
