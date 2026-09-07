@@ -12,6 +12,9 @@ export function Modal({ onClose, children }: ModalProps) {
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [onClose]);
 
   useEffect(() => {
