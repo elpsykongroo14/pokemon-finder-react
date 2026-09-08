@@ -76,3 +76,7 @@ describe("Modal", () => {
     expect(document.body.style.overflow).toBe("");
   });
 });
+
+//this test file protects: content actually reaches the screen despite the portal, all three ways of closing work,
+//clicking inside doesnt accidentaly close it, and the background is locked and restored correctly
+//along the way we caught and fixed real listener leak

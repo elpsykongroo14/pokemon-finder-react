@@ -147,3 +147,7 @@ describe("SearchBar", () => {
     expect(handleSubmit).toHaveBeenCalledWith("pikachu");
   });
 });
+
+//this file protects: the field is discoverable and submittable, empty input is rejected, the dropdown reflects hook state faithfully,
+//all four keyboard interactions work, and mouse selection works. If we later rewrites useAutocomplete's internals, or swaps SearchBar's useState for a reducer, none of this file needs to change
+//only the assertions about useAutocomplete's own behavior would need updating

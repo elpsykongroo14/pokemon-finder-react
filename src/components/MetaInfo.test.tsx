@@ -64,3 +64,7 @@ describe("MetaInfo", () => {
     expect(screen.getByRole("cell", { name: "overgrow" })).toBeInTheDocument();
   });
 });
+
+//this file protects the unit-conversion math with an input specifically chosen to catch the most likely arithmetic mistake,
+//and it protects the hidden ability partition in both directions
+//not just "does the Hidden row show up" but "did the ability actually leave the normal list"
