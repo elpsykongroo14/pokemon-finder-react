@@ -13,6 +13,8 @@ interface MetaInfoProps {
 //same math, same filtering logic,
 //the only real change is how the conditional "hidden ability" row gets attached
 export function MetaInfo({ height, weight, abilities }: MetaInfoProps) {
+  //the api reports height in decimetres and weight in hectograms
+  //so we convert them to meters/kilograms by dividing by 10
   const heightM = (height / 10).toFixed(1);
   const weightKg = (weight / 10).toFixed(1);
 
