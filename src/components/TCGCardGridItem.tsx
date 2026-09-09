@@ -12,8 +12,9 @@ export function TCGCardGridItem({ card, onSelect }: TCGCardGridItemProps) {
         <img src={card.images?.small || ""} alt={card.name} loading="lazy" />
       </div>
       <div className="tcg-card-info">
-        <div className="tcg-card-set">{card.set?.name || "Unknow set"}</div>
-        <div className="tcg-card-rarity">{card.rarity || "unknow"}</div>
+        <div className="tcg-card-name">{card.name}</div>
+        <div className="tcg-card-set">{card.set?.name || "Unknown set"}</div>
+        <div className="tcg-card-rarity">{card.rarity || "unknown"}</div>
       </div>
     </div>
   );

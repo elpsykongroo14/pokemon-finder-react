@@ -113,6 +113,7 @@ export interface TCGCard {
     large?: string;
   };
   set?: {
+    id: string;
     name?: string;
     releaseDate?: string;
   };
