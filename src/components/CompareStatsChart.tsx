@@ -36,6 +36,6 @@ export function CompareStatsChart({
 
 //this does not index anything.
 //leftStats.find((s) => s.stat.name === statName) matches by name, not position
-//the entire index coupling assumption that caused the original bug (pokemonStats's bras and mainStats' order having to line up positionally)
+//the entire index coupling assumption that caused the original bug (pokemonStats's bars and mainStats' order having to line up positionally)
 //isnt just fixed here, its not expressible at all.
 //theres no array position anywhere that two things have to agree on.
