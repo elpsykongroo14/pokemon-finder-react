@@ -201,3 +201,10 @@
   max-height: 240px;
   overflow-y: auto;
 }
+
+.tcg-card-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #d8dce8;
+  margin-bottom: 2px;
+}
