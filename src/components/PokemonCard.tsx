@@ -8,7 +8,7 @@ import { MetaInfo } from "./MetaInfo";
 import { FavoriteButton } from "./FavoriteButton";
 import { useFavorites } from "../hooks/useFavorites";
 import type { PokemonDetails } from "../lib/type";
-import { EvolutionSection } from "./evolutionSection";
+import { EvolutionSection } from "./EvolutionSection";
 import { TeamButton } from "../context/TeamButton";
 
 interface PokemonCardProps {
