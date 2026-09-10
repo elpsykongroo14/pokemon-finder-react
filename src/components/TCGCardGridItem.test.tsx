@@ -11,7 +11,7 @@ function makeCard(overrides: Partial<TCGCard> = {}): TCGCard {
 describe("TCGCardGridItem", () => {
   it("renders the card's name, image, set, and rarity", () => {
     const card = makeCard({
-      set: { id: "base1", name: "Base Set" },
+      set: { name: "Base Set" },
       rarity: "Rare Holo",
       images: { small: "charizard.png" },
     });
