@@ -163,6 +163,4 @@ useFavorites/useTeam closed the hook list out, and correctly ended up tiny one t
 
 Component test files completed this session (all colocated under src/components/, RTL + Vitest, no snapshot tests):
 
-SearchBar.test.tsx: mocked useAutocomplete; covers submit/trim/empty guard, listbox open/closed, arrow key nav, Enter select, Escape-dismiss, click select.
-
 Concepts covered this session: query priority hierarchy and why it enforces "behavior not implementation"; get/query/find semantics; user event vs fireEvent; the mock hook vs real provider decision framework (and its inverse: composing real children once they're independently trusted); portals and why screen (not container) is required; regression tests as encoded bug memory; test input selection that specifically distinguishes correct logic from a coincidentally passing wrong version; ARIA live regions (role="status"/role="alert"); ARIA table roles; ESLint's exhaustive deps blind spot around missing cleanup functions; ARIA region role via aria label.
