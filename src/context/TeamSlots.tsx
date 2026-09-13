@@ -32,9 +32,7 @@ export function TeamSLots() {
               onClick={(e) => {
                 e.stopPropagation();
                 removeFromTeam(member.name);
-              }} //without e.stopPropagation() on the remove button,
-              //a click on the x would also bubble up and could trigger the slot's own click handler (select this pokemon)
-              //firing both actions from one click
+              }}
               aria-label={`Remove ${member.name} from team`}
             >
               x
