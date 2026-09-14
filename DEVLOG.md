@@ -164,3 +164,10 @@ useFavorites/useTeam closed the hook list out, and correctly ended up tiny one t
 Component test files completed this session (all colocated under src/components/, RTL + Vitest, no snapshot tests):
 
 Concepts covered this session: query priority hierarchy and why it enforces "behavior not implementation"; get/query/find semantics; user event vs fireEvent; the mock hook vs real provider decision framework (and its inverse: composing real children once they're independently trusted); portals and why screen (not container) is required; regression tests as encoded bug memory; test input selection that specifically distinguishes correct logic from a coincidentally passing wrong version; ARIA live regions (role="status"/role="alert"); ARIA table roles; ESLint's exhaustive deps blind spot around missing cleanup functions; ARIA region role via aria label.
+
+09-12/14-2026 Context layer tests finished, pages tests started"
+
+close off the Context test files by finishing the remaining files, FavoritesContext.test.tsx, TeamContext.test.tsx, TeamButton.test.tsx and TeamSlots.test.tsx.
+
+then proceeded to get started on the pages folder, kicking things off by working on NotFoundPage.test.tsx, atrivial component, tested anyway since it's the router's only fallback and nothing else exercises it.
+then Layout.test.tsx the SearchBar is trusted but not cheap (real fetch via useAutocomplete), so mocked the whole component (new technique) instead of a hook. Used real nested routes instead of mocking useNavigate, to assert on actual URL-driven content changes rather than call arguments. Includes a test proving the NavLink's end prop comment's claim (Home doesn't false positive as active on nested routes).
