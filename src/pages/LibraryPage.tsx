@@ -1,5 +1,5 @@
 //the file reads :name from the URL, hands it to the hook
-//and owns exactky one piece of local UI state that the hook correctly does not own: which card is currently selected in the modal
+//and owns exactly one piece of local UI state that the hook correctly does not own: which card is currently selected in the modal
 
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
