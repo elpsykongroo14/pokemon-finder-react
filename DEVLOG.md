@@ -171,3 +171,7 @@ close off the Context test files by finishing the remaining files, FavoritesCont
 
 then proceeded to get started on the pages folder, kicking things off by working on NotFoundPage.test.tsx, atrivial component, tested anyway since it's the router's only fallback and nothing else exercises it.
 then Layout.test.tsx the SearchBar is trusted but not cheap (real fetch via useAutocomplete), so mocked the whole component (new technique) instead of a hook. Used real nested routes instead of mocking useNavigate, to assert on actual URL-driven content changes rather than call arguments. Includes a test proving the NavLink's end prop comment's claim (Home doesn't false positive as active on nested routes).
+
+09-17-2026: follow up reminder
+
+after finishing the testing pass and moving onto builiding the CI/CD parity for the react app discovered tcg-proxy (the live Worker) is missing the TCG_CACHE/TCG_RATE_LIMITER bindings that exist on the orphaned pokemon-finder Worker instead — wrangler.jsonc deploys apparently targeted the wrong Worker name at some point. Needs a follow-up: fix tcg-proxy/'s config so one file, one name, and redeploy with bindings attached to the right Worker
