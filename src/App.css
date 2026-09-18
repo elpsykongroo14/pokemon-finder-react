@@ -1,13 +1,37 @@
 .app {
   max-width: 640px;
   margin: 0 auto;
-  padding: 32px 20px;
-  font-family: Menlo, Consolas, "Liberation Mono", monospace;
-  color: #d8dce8;
-  background: #111318;
+  padding: var(--space-6) var(--space-5);
   min-height: 100vh;
 }
 
+.main-nav {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-3) 0 var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.main-nav a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  padding-bottom: var(--space-1);
+  border-bottom: 2px solid transparent;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.main-nav a:hover {
+  color: var(--color-text-primary);
+}
+
+.main-nav a.active {
+  color: var(--color-text-heading);
+  border-bottom-color: var(--color-accent);
+}
 .status-message {
   color: #6b7080;
   margin-top: 16px;
@@ -118,31 +142,52 @@
   color: #6b7080;
 }
 
-.main-nav {
-  display: flex;
-  gap: 16px;
-  margin: 12px 0 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.main-nav a {
-  color: #6b7080;
-  text-decoration: none;
-  font-size: 0.9em;
-}
-
-.main-nav a.active {
-  color: #5b8dee;
-}
-
 .favorite-link {
   color: #d8dce8;
   text-decoration: none;
 }
 
-.search-bar-wrapper {
-  position: relative;
+.search-bar-wrapper form {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.search-bar-wrapper input {
+  flex: 1;
+  background: var(--color-bg-surface-sunken);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--text-sm);
+}
+
+.search-bar-wrapper input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.search-bar-wrapper input:focus {
+  outline: none;
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px rgba(91, 141, 238, 0.25);
+}
+
+.search-bar-wrapper button {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-5);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter var(--duration-fast) var(--ease-standard);
+}
+
+.search-bar-wrapper button:hover {
+  filter: brightness(1.08);
 }
 
 .autocomplete-panel {
@@ -151,19 +196,19 @@
   left: 0;
   right: 0;
   z-index: 10;
-  background: #1a1d24;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 6px;
-  margin-top: 4px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-1);
   overflow: hidden;
 }
 
 .autocomplete-preview {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .autocomplete-preview img {
@@ -172,34 +217,50 @@
 }
 
 .autocomplete-preview-name {
-  color: #d8dce8;
+  color: var(--color-text-primary);
   text-transform: capitalize;
 }
 
 .autocomplete-preview-id {
-  color: #6b7080;
+  color: var(--color-text-secondary);
   margin-left: auto;
-  font-size: 0.85em;
+  font-size: var(--text-sm);
 }
 
 .autocomplete-item {
   list-style: none;
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   cursor: pointer;
-  color: #d8dce8;
+  color: var(--color-text-primary);
   text-transform: capitalize;
 }
 
 .autocomplete-item--active {
-  background: #22252e;
-  color: #5b8dee;
+  background: var(--color-bg-surface-sunken);
+  color: var(--color-focus);
 }
 
-#autocomplete-list {
-  margin: 0;
-  padding: 0;
-  max-height: 240px;
-  overflow-y: auto;
+/* Type badges */
+
+.type-badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-surface-sunken);
+  border: 1px solid var(--badge-color);
+  color: var(--badge-color);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
 }
 
 .tcg-card-name {
