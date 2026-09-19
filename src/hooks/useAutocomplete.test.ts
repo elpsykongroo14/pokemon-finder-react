@@ -119,6 +119,13 @@ describe("useAutocomplete", () => {
     });
     expect(result.current.isOpen).toBe(false);
 
+    //the hook no longer infers "the user typed" from a query prop diff
+    //that diffing was the actual bug we fixed. the real <input onChange> calls notifyQueryEdited() alongside setQuery
+    //so the test has to do the same to simulate a genuine keystroke instead of a programmatic query change
+    //(which is what selectMatch does, and should not reopen the dropdown)
+    act(() => {
+      result.current.notifyQueryEdited();
+    });
     rerender({ query: "chara" });
 
     await waitFor(() => expect(result.current.isOpen).toBe(true));
