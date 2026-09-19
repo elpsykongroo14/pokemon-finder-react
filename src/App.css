@@ -7,7 +7,7 @@
 
 .main-nav {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-2);
   margin: var(--space-3) 0 var(--space-5);
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--color-border-subtle);
@@ -17,63 +17,98 @@
   color: var(--color-text-secondary);
   text-decoration: none;
   font-size: var(--text-sm);
-  padding-bottom: var(--space-1);
-  border-bottom: 2px solid transparent;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
   transition:
-    color var(--duration-fast) var(--ease-standard),
-    border-color var(--duration-fast) var(--ease-standard);
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
 }
 
 .main-nav a:hover {
   color: var(--color-text-primary);
+  background: var(--color-bg-surface-sunken);
 }
 
 .main-nav a.active {
-  color: var(--color-text-heading);
-  border-bottom-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+  background: var(--color-accent);
 }
 .status-message {
-  color: #6b7080;
+  color: var(--color-text-secondary);
   margin-top: 16px;
 }
 
 .status-message--error {
-  color: #e8754a;
+  color: var(--color-danger);
 }
 
 .team-slots {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  gap: var(--space-2);
   list-style: none;
   padding: 0;
-  margin: 16px 0;
+  margin: var(--space-4) 0;
 }
 
 .team-slot {
   aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1a1d24;
+  transition: border-color var(--duration-fast) var(--ease-standard);
 }
 
 .team-slot--empty {
-  color: #6b7080;
+  background: var(--color-bg-surface-sunken);
+  color: var(--color-text-secondary);
 }
 
 .team-slot--filled {
   position: relative;
   flex-direction: column;
+  background: var(--color-bg-surface);
+  border-color: var(--color-border-default);
+  padding: var(--space-1);
+}
+
+.team-slot--filled:hover {
+  border-color: var(--color-focus);
+}
+
+.team-slot--filled a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-size: var(--text-xs);
+  text-align: center;
+  line-height: 1.2;
+  text-transform: capitalize;
 }
 
 .remove-team {
   position: absolute;
   top: 2px;
   right: 2px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-surface-sunken);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
   font-size: 10px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.remove-team:hover {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
 .card-header-actions {
@@ -83,21 +118,25 @@
 }
 
 .compare-button[aria-pressed="true"] {
-  border-color: #5b8dee;
-  color: #5b8dee;
+  border-color: var(--color-focus);
+  color: var(--color-focus);
 }
 
 .compare-panel {
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .compare-heads {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
-  margin-top: 16px;
+  gap: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .compare-column {
@@ -105,16 +144,28 @@
   text-align: center;
 }
 
+.compare-column h3 {
+  text-transform: capitalize;
+}
+
 .compare-stats-chart {
-  margin-top: 16px;
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .compare-stat-row {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 8px;
-  padding: 4px 0;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.compare-stat-row:last-child {
+  border-bottom: none;
 }
 
 .compare-stat-row > .compare-stat-value:first-child {
@@ -125,25 +176,29 @@
 }
 
 .compare-stat-label {
-  color: #6b7080;
-  font-size: 0.85em;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .compare-stat-value {
   font-weight: 600;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-win {
-  color: #5b8dee;
+  color: var(--color-focus);
 }
 
 .stat-lose {
-  color: #6b7080;
+  color: var(--color-text-secondary);
 }
 
 .favorite-link {
-  color: #d8dce8;
+  color: var(--color-text-primary);
   text-decoration: none;
 }
 
@@ -270,9 +325,11 @@
 .tcg-card-name {
   font-weight: 600;
   font-size: 0.95rem;
-  color: #d8dce8;
+  color: var(--color-text-primary);
   margin-bottom: 2px;
 }
+
+/* PokemonCard */
 
 .pokemon-card {
   background: var(--color-bg-surface);
@@ -304,52 +361,6 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
-}
-
-.favorites-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  list-style: none;
-  padding: 0;
-  margin: var(--space-4) 0;
-}
-
-.favorites-list li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  background: var(--color-bg-surface-sunken);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-pill);
-  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
-}
-
-.favorite-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: var(--text-sm);
-  text-transform: capitalize;
-}
-
-.favorite-link img {
-  border-radius: var(--radius-pill);
-  background: var(--color-bg-canvas);
-}
-
-.favorites-list button {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: var(--text-xs);
-  line-height: 1;
-  padding: var(--space-1);
-}
-
-.favorites-list button:hover {
-  color: var(--color-danger);
 }
 
 .favorite-button,
@@ -574,7 +585,55 @@
   font-size: var(--text-sm);
 }
 
-/*TCG card grid: card-grid is the container, tcg-card is each clickable card*/
+/* Favorites strip */
+
+.favorites-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0;
+}
+
+.favorites-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-bg-surface-sunken);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
+}
+
+.favorites-list .favorite-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  text-transform: capitalize;
+}
+
+.favorites-list .favorite-link img {
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-canvas);
+}
+
+.favorites-list button {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: var(--text-xs);
+  line-height: 1;
+  padding: var(--space-1);
+}
+
+.favorites-list button:hover {
+  color: var(--color-danger);
+}
+
+/* TCG card grid */
 
 .card-grid {
   display: grid;
@@ -632,7 +691,7 @@
   padding: var(--space-7) 0;
 }
 
-/*Card modal: the generic card Modal shell plus the TCG specific content inside it*/
+/* Card modal */
 
 .card-modal {
   position: fixed;
@@ -747,7 +806,7 @@
   line-height: 1.5;
 }
 
-/*LibraryPage shell*/
+/* Library page */
 
 .library-header {
   display: flex;

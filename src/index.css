@@ -20,7 +20,8 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: var(--font-mono);
   font-weight: 600;
   color: var(--color-text-heading);
@@ -34,6 +35,10 @@ h1 {
 
 h2 {
   font-size: var(--text-xl);
+}
+
+h3 {
+  font-size: var(--text-lg);
 }
 
 p {
