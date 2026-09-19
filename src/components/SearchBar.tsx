@@ -21,6 +21,7 @@ export function SearchBar({
     preview,
     isOpen,
     dismiss,
+    notifyQueryEdited,
   } = useAutocomplete(query);
 
   function submit(value: string) {
@@ -78,7 +79,10 @@ export function SearchBar({
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            notifyQueryEdited();
+          }}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           aria-label="Search Pokémon"

@@ -11,6 +11,7 @@ interface UseAutocompleteResults {
   preview: PokemonDetails | null;
   isOpen: boolean;
   dismiss: () => void;
+  notifyQueryEdited: () => void;
 }
 
 export function useAutocomplete(query: string): UseAutocompleteResults {
@@ -19,17 +20,8 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [preview, setPreview] = useState<PokemonDetails | null>(null);
 
-  //track the previous query to detect when the user types a new character
-  //any new keystroke un dismisses, the user typing again means they want to see suggestions
-  //even if they hit escape a moment ago
-  const [prevQuery, setPrevQuery] = useState(query);
-  if (query !== prevQuery) {
-    setPrevQuery(query);
-    setDismissed(false); //resets synchronously in the same render pass
-  }
-
-  //empty dependency array: this runs on mount, same as the vanilla main.ts did on page load
-  //fetchAllpokemonNames already catches internally (allNamesCache in lib/api.ts) so even if useAutocomplete were ever used in two places at once,
+  //empty dependency array: this runs on mount, same as the vanilla main.ts did on pages load
+  //fetchAllPokemonNames already catches internally (allNamesCache in lib/api.ts) so even if useAutpcomplete were ever used in two place at once,
   //were not refetching all of the name list twice, react re running this effect on a remount just hits that in module cache
   useEffect(() => {
     fetchAllpokemonNames()
@@ -39,7 +31,7 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
       );
   }, []);
 
-  //useMemo here instead of plain const because filterNames runs two .filter() passes over up to 1025 strings,
+  //useMemo here instead of plain const because filterNames runs two .filter() passesover up to 1025 strings
   //its cheap but not free and this hook's component re renders on every keystroke (raw query changing) not just every debounce tick.
   //without useMemo wed redo that filtering work on renders where debouncedQuery and allNames havent actually changed at all
   //useMemo says to only recompute this when its actual input change
@@ -97,6 +89,15 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
     setDismissed(true);
   }
 
+  //call this ONLY from the input's onChange handler, never from a
+  //programmatic setQuery like selectMatch's. that restriction is what makes
+  //this work: onChange fires exclusively on real user keystrokes, so this
+  //function only ever runs when the user genuinely wants suggestions back,
+  //with no need to infer that from diffing query values during render.
+  function notifyQueryEdited() {
+    setDismissed(false);
+  }
+
   return {
     matches,
     highlightedIndex,
@@ -104,5 +105,6 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
     preview,
     isOpen,
     dismiss,
+    notifyQueryEdited,
   };
 }
