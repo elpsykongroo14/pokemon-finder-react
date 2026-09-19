@@ -4,9 +4,10 @@ import userEvent from "@testing-library/user-event";
 import { SearchBar } from "./SearchBar";
 import { useAutocomplete } from "../hooks/useAutocomplete";
 
-const { setHighlightedIndex, dismiss } = vi.hoisted(() => ({
+const { setHighlightedIndex, dismiss, notifyQueryEdited } = vi.hoisted(() => ({
   setHighlightedIndex: vi.fn(),
   dismiss: vi.fn(),
+  notifyQueryEdited: vi.fn(),
 }));
 
 vi.mock("../hooks/useAutocomplete", () => ({
@@ -26,6 +27,7 @@ function setAutocomplete(
     preview: null,
     isOpen: false,
     dismiss,
+    notifyQueryEdited,
     ...overrides,
   });
 }
