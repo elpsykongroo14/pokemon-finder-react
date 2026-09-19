@@ -23,35 +23,51 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
     <article className="pokemon-card">
       <header className="pokemon-card-header">
         <h2>{pokemon.name}</h2>
-        <FavoriteButton
-          isFavorite={isFavorite(pokemon.name)}
-          onToggle={() => toggleFavorite(pokemon)}
-        />
-        <TeamButton pokemon={pokemon} />
-        <label className="shiny-toggle">
-          <input
-            type="checkbox"
-            checked={shiny}
-            onChange={(e) => setShiny(e.target.checked)}
+        <div className="pokemon-card-actions">
+          <FavoriteButton
+            isFavorite={isFavorite(pokemon.name)}
+            onToggle={() => toggleFavorite(pokemon)}
           />
-          Shiny
-        </label>
+          <TeamButton pokemon={pokemon} />
+          <label className="shiny-toggle">
+            <input
+              type="checkbox"
+              checked={shiny}
+              onChange={(e) => setShiny(e.target.checked)}
+            />
+            Shiny
+          </label>
+        </div>
       </header>
 
-      <SpriteDisplay
-        sprites={pokemon.sprites}
-        name={pokemon.name}
-        shiny={shiny}
-      />
-      <TypeBadgeList types={pokemon.types} />
-      <StatBarChart stats={pokemon.stats} />
-      <MetaInfo
-        height={pokemon.height}
-        weight={pokemon.weight}
-        abilities={pokemon.abilities}
-      />
+      <div className="pokemon-card-sprite-section">
+        <SpriteDisplay
+          sprites={pokemon.sprites}
+          name={pokemon.name}
+          shiny={shiny}
+        />
+        <TypeBadgeList types={pokemon.types} />
+      </div>
+
+      <section className="pokemon-card-sprite-section">
+        <h3 className="pokemon-card-section-title">Base Stats</h3>
+        <StatBarChart stats={pokemon.stats} />
+      </section>
+
+      <section className="pokemon-card-sprite-section">
+        <h3 className="pokemon-card-section-title">Details</h3>
+        <MetaInfo
+          height={pokemon.height}
+          weight={pokemon.weight}
+          abilities={pokemon.abilities}
+        />
+      </section>
       {/*PokemonCard.tsx doesn't need to know anything changed underneath, it just hands its own pokemon prop to one more child, exactly the way it already hands slices of that same prop to SpriteDisplay, TypeBadgeList, and MetaInfo.*/}
-      <EvolutionSection pokemon={pokemon} />
+
+      <section className="pokemon-card-sprite-section">
+        <h3 className="pokemon-card-section-title">Evolution</h3>
+        <EvolutionSection pokemon={pokemon} />
+      </section>
     </article>
   );
 }
