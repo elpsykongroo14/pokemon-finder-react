@@ -32,9 +32,8 @@ jobs:
       - name: Build
         run: npm run build
 
-        # Preview deploy: only when code is pushed (i.e. merged) into ui/rehaul,
+  # Preview deploy: only when code is pushed (i.e. merged) into ui/rehaul,
   # and only after the test job above passed.
-
   preview:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/ui/rehaul'
@@ -55,12 +54,12 @@ jobs:
 
       - name: Build
         env:
-          VITE_TCG_PROXY: ${{secrets.VITE_TCG_PROXY}}
+          VITE_TCG_PROXY: ${{ secrets.VITE_TCG_PROXY }}
         run: npm run build
 
       - name: Deploy preview to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
-          accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=pokemon-finder-react --branch=ui-rehaul
