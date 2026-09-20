@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, ui/rehaul]
   pull_request:
-    branches: [main]
+    branches: [main, ui/rehaul]
 
 jobs:
   test:
@@ -20,7 +20,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Lint
+      - name: Install dependencies
         run: npm ci
 
       - name: Lint
@@ -28,3 +28,39 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Build
+        run: npm run build
+
+        # Preview deploy: only when code is pushed (i.e. merged) into ui/rehaul,
+  # and only after the test job above passed.
+
+  preview:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/ui/rehaul'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          VITE_TCG_PROXY: ${{secrets.VITE_TCG_PROXY}}
+        run: npm run build
+
+      - name: Deploy preview to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
+          accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
+          command: pages deploy dist --project-name=pokemon-finder-react --branch=ui-rehaul
