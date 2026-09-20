@@ -2,7 +2,7 @@ import { StatBar } from "./StatBar";
 import type { PokemonStat } from "../lib/type";
 import { STAT_LABELS, getOrderedStats } from "../lib/stats";
 
-const MAX_STAT = 225;
+const MAX_STAT = 255;
 
 interface StatBarChartProps {
   stats: PokemonStat[];
