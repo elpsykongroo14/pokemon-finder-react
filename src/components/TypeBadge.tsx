@@ -14,7 +14,7 @@ export function TypeBadge({ typeName }: TypeBadgeProps) {
   //we set ONE custome property here, the stylesheet decides what to do with it
   //(border color, text color,...) via the .type-badge rule
   const badgeStyle = {
-    "--badge-color": `var(--type-${typeName}, var(--color-text-secoondary))`,
+    "--badge-color": `var(--type-${typeName}, var(--color-text-secondary))`,
   } as CSSProperties;
   return (
     <span className="type-badge" style={badgeStyle}>
