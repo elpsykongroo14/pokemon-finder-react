@@ -19,7 +19,6 @@ function App() {
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/library/:name" element={<LibraryPage />} />
         <Route path="*" element={<NotFoundPage />} />
-        <Route />
       </Route>
     </Routes>
   );

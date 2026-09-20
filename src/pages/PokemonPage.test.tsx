@@ -77,7 +77,7 @@ describe("PokemonPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "View Cards" })).toHaveAttribute(
       "href",
-      "/Library/pikachu",
+      "/library/pikachu",
     );
   });
 

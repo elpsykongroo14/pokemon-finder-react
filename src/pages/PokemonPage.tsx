@@ -40,7 +40,7 @@ export function PokemonPage() {
             </button>
 
             <Link
-              to={`/Library/${encodeURIComponent(data.name)}`}
+              to={`/library/${encodeURIComponent(data.name)}`}
               className="tcg-btn"
             >
               View Cards
