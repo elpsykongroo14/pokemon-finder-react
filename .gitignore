@@ -27,3 +27,7 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+
+# private moodboard (game screenshots): never commit
+docs/ui-references/

@@ -183,4 +183,3 @@ Hygiene fixes shipped to main: TypeBadge fallback typo, /Library → /library
 
 CI now runs on ui/rehaul, includes a build step, and deploys a preview.
 Audited which tests depend on class names (the "class contract", see roadmap 8.3).
-Sprite spike result: [paste the fallback boundaries here].
