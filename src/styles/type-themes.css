@@ -1,0 +1,195 @@
+/* Tier 1.5: derives --type-x-deep / -soft / -ink from each
+   --type-x primitive, then exposes them under generic
+   --theme-* role names via a [data-type] attribute selector.
+   R4 sets data-type on a container to reskin that subtree;
+   nothing here is wired to a component yet (R1 scope). */
+
+:root {
+  --type-normal-deep: #54543c;
+  --type-normal-soft: #d8d8c2;
+  --type-normal-ink: var(--slate-900);
+  --type-fire-deep: #80361a;
+  --type-fire-soft: #ffbca4;
+  --type-fire-ink: var(--slate-900);
+  --type-water-deep: #25486c;
+  --type-water-soft: #aecdee;
+  --type-water-ink: var(--slate-900);
+  --type-electric-deep: #7c6212;
+  --type-electric-soft: #fce59c;
+  --type-electric-ink: var(--slate-900);
+  --type-grass-deep: #2e5c2e;
+  --type-grass-soft: #b6dfb6;
+  --type-grass-ink: var(--slate-900);
+  --type-ice-deep: #4b6c6b;
+  --type-ice-soft: #d0eeed;
+  --type-ice-ink: var(--slate-900);
+  --type-fighting-deep: #601814;
+  --type-fighting-soft: #e3a29e;
+  --type-fighting-ink: var(--slate-050);
+  --type-poison-deep: #502050;
+  --type-poison-soft: #d4a9d4;
+  --type-poison-ink: var(--slate-050);
+  --type-ground-deep: #706034;
+  --type-ground-soft: #f1e3bb;
+  --type-ground-ink: var(--slate-900);
+  --type-flying-deep: #544878;
+  --type-flying-soft: #d8cdf8;
+  --type-flying-ink: var(--slate-900);
+  --type-psychic-deep: #7c2c44;
+  --type-psychic-soft: #fcb4c9;
+  --type-psychic-ink: var(--slate-900);
+  --type-bug-deep: #545c10;
+  --type-bug-soft: #d8df9b;
+  --type-bug-ink: var(--slate-900);
+  --type-rock-deep: #5c501c;
+  --type-rock-soft: #dfd4a5;
+  --type-rock-ink: var(--slate-900);
+  --type-ghost-deep: #382c4c;
+  --type-ghost-soft: #bfb4d1;
+  --type-ghost-ink: var(--slate-050);
+  --type-dragon-deep: #381c7c;
+  --type-dragon-soft: #bfa5fc;
+  --type-dragon-ink: var(--slate-050);
+  --type-dark-deep: #382c24;
+  --type-dark-soft: #bfb4ad;
+  --type-dark-ink: var(--slate-050);
+  --type-steel-deep: #5c5c68;
+  --type-steel-soft: #dfdfea;
+  --type-steel-ink: var(--slate-900);
+  --type-fairy-deep: #774c56;
+  --type-fairy-soft: #f7d1da;
+  --type-fairy-ink: var(--slate-900);
+
+  /* Default theme accent: used on pages with no single Pokémon
+     in focus (Home, Compare, Library). */
+  --theme-accent: var(--teal-500);
+  --theme-accent-deep: var(--teal-700);
+  --theme-accent-soft: var(--slate-100);
+  --theme-accent-ink: var(--slate-900);
+}
+
+[data-type="normal"] {
+  --theme-accent: var(--type-normal);
+  --theme-accent-deep: var(--type-normal-deep);
+  --theme-accent-soft: var(--type-normal-soft);
+  --theme-accent-ink: var(--type-normal-ink);
+}
+
+[data-type="fire"] {
+  --theme-accent: var(--type-fire);
+  --theme-accent-deep: var(--type-fire-deep);
+  --theme-accent-soft: var(--type-fire-soft);
+  --theme-accent-ink: var(--type-fire-ink);
+}
+
+[data-type="water"] {
+  --theme-accent: var(--type-water);
+  --theme-accent-deep: var(--type-water-deep);
+  --theme-accent-soft: var(--type-water-soft);
+  --theme-accent-ink: var(--type-water-ink);
+}
+
+[data-type="electric"] {
+  --theme-accent: var(--type-electric);
+  --theme-accent-deep: var(--type-electric-deep);
+  --theme-accent-soft: var(--type-electric-soft);
+  --theme-accent-ink: var(--type-electric-ink);
+}
+
+[data-type="grass"] {
+  --theme-accent: var(--type-grass);
+  --theme-accent-deep: var(--type-grass-deep);
+  --theme-accent-soft: var(--type-grass-soft);
+  --theme-accent-ink: var(--type-grass-ink);
+}
+
+[data-type="ice"] {
+  --theme-accent: var(--type-ice);
+  --theme-accent-deep: var(--type-ice-deep);
+  --theme-accent-soft: var(--type-ice-soft);
+  --theme-accent-ink: var(--type-ice-ink);
+}
+
+[data-type="fighting"] {
+  --theme-accent: var(--type-fighting);
+  --theme-accent-deep: var(--type-fighting-deep);
+  --theme-accent-soft: var(--type-fighting-soft);
+  --theme-accent-ink: var(--type-fighting-ink);
+}
+
+[data-type="poison"] {
+  --theme-accent: var(--type-poison);
+  --theme-accent-deep: var(--type-poison-deep);
+  --theme-accent-soft: var(--type-poison-soft);
+  --theme-accent-ink: var(--type-poison-ink);
+}
+
+[data-type="ground"] {
+  --theme-accent: var(--type-ground);
+  --theme-accent-deep: var(--type-ground-deep);
+  --theme-accent-soft: var(--type-ground-soft);
+  --theme-accent-ink: var(--type-ground-ink);
+}
+
+[data-type="flying"] {
+  --theme-accent: var(--type-flying);
+  --theme-accent-deep: var(--type-flying-deep);
+  --theme-accent-soft: var(--type-flying-soft);
+  --theme-accent-ink: var(--type-flying-ink);
+}
+
+[data-type="psychic"] {
+  --theme-accent: var(--type-psychic);
+  --theme-accent-deep: var(--type-psychic-deep);
+  --theme-accent-soft: var(--type-psychic-soft);
+  --theme-accent-ink: var(--type-psychic-ink);
+}
+
+[data-type="bug"] {
+  --theme-accent: var(--type-bug);
+  --theme-accent-deep: var(--type-bug-deep);
+  --theme-accent-soft: var(--type-bug-soft);
+  --theme-accent-ink: var(--type-bug-ink);
+}
+
+[data-type="rock"] {
+  --theme-accent: var(--type-rock);
+  --theme-accent-deep: var(--type-rock-deep);
+  --theme-accent-soft: var(--type-rock-soft);
+  --theme-accent-ink: var(--type-rock-ink);
+}
+
+[data-type="ghost"] {
+  --theme-accent: var(--type-ghost);
+  --theme-accent-deep: var(--type-ghost-deep);
+  --theme-accent-soft: var(--type-ghost-soft);
+  --theme-accent-ink: var(--type-ghost-ink);
+}
+
+[data-type="dragon"] {
+  --theme-accent: var(--type-dragon);
+  --theme-accent-deep: var(--type-dragon-deep);
+  --theme-accent-soft: var(--type-dragon-soft);
+  --theme-accent-ink: var(--type-dragon-ink);
+}
+
+[data-type="dark"] {
+  --theme-accent: var(--type-dark);
+  --theme-accent-deep: var(--type-dark-deep);
+  --theme-accent-soft: var(--type-dark-soft);
+  --theme-accent-ink: var(--type-dark-ink);
+}
+
+[data-type="steel"] {
+  --theme-accent: var(--type-steel);
+  --theme-accent-deep: var(--type-steel-deep);
+  --theme-accent-soft: var(--type-steel-soft);
+  --theme-accent-ink: var(--type-steel-ink);
+}
+
+[data-type="fairy"] {
+  --theme-accent: var(--type-fairy);
+  --theme-accent-deep: var(--type-fairy-deep);
+  --theme-accent-soft: var(--type-fairy-soft);
+  --theme-accent-ink: var(--type-fairy-ink);
+}
