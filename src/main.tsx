@@ -1,3 +1,5 @@
+import "@fontsource/jersey-10/latin-400.css";
+import "@fontsource-variable/nunito";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
