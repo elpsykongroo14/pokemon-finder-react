@@ -55,6 +55,8 @@ how much of it there is and where it goes. fall back to reference pictures that 
   B = B/W-style slate + teal, thin crisp lines, subtle gloss. Leaning B.
   Decide in R1 Part 2 with swatches.
 
+  | D14 | Elevation direction | Roadmap's thick outline+bevel / thin-line-consistent hard shadow | Hard offset shadow kept; thick bevel replaced by a 1px inset highlight, consistent with D13/T2 | R1 | Hard shadow + thin bevel-line |
+
   answer for | D13 | Chrome direction | A (navy/cobalt) / B (slate/teal) | B, with gold retained as the selection accent | R1 | B — slate/teal chrome, gold selection |
 
 ## 6. Anti-goals (unchanged from roadmap §3)

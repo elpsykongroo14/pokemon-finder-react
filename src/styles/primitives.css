@@ -26,11 +26,14 @@
 
   /*Functional (not brand, not chrome)*/
   --green-500: #3fd68a; /* success, "high" stat tier */
+  --green-800: #22754b; /* on-light text ink, added after the contrast check */
+
   --red-500: #e2483c; /* danger, "low" stat tier */
+  --red-800: #b43930; /* on-light text ink, added after the contrast check */
 
   /*Pokémon type palette 
      Unchanged from the current tokens.css. Kept verbatim as
-     primitives; type-themes.css (Part 4) derives everything
+     primitives; type-themes.css derives everything
      else (deep/soft/ink) from these single source values. */
   --type-normal: #a8a878;
   --type-fire: #ff6b35;
@@ -86,7 +89,7 @@
 
   /*Raw z-index steps
      Roles (dropdown, modal, toast...) get assigned to these
-     steps in semantic.css, Part 3. */
+     steps in semantic.css */
   --z-00: 0;
   --z-10: 10;
   --z-20: 20;
