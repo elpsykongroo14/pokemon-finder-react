@@ -1,0 +1,28 @@
+/* src/styles/motion.css
+   Tier 2 (motion side of semantic). Locks roadmap §5.6's proposal
+   as final. R2 adds the `prefers reduced motion` override that
+   zeroes these out globally that override only has to exist in
+   one place because every animation in the app is required to
+   read its timing from here rather than a hardcoded number. */
+
+:root {
+  /* Durations */
+  --dur-instant: 80ms; /* press feedback */
+  --dur-fast: 140ms; /* hover, focus */
+  --dur-base: 240ms; /* most transitions */
+  --dur-slow: 420ms; /* modal, tab, route */
+  --dur-epic: 700ms; /* celebrations */
+
+  /* Easings */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* default */
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); /* pop-in, slight overshoot */
+  --ease-bounce: linear(
+    0,
+    0.4,
+    0.84,
+    1.04,
+    0.96,
+    1
+  ); /* celebrations, spring like */
+  --ease-tick: steps(6, end); /* HP bar chunky fill */
+}

@@ -864,8 +864,9 @@ D9 No: no fake console frame around the UI (backlog skin only)
 
 ## 14. Change log
 
-| Date       | Change                                                                                                                                  |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-19 | Initial roadmap created (R0–R12).                                                                                                       |
-| 2026-09-19 | R0 walkthrough: corrected §8.3 (some tests depend on class names), added CI/preview and class-contract tasks, added measured baselines. |
-| 2026-09-21 | R0 complete. D1, D2, D9 answered. R1 started.                                                                                           |
+| Date       | Change                                                                                                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-19 | Initial roadmap created (R0–R12).                                                                                                                                                         |
+| 2026-09-19 | R0 walkthrough: corrected §8.3 (some tests depend on class names), added CI/preview and class-contract tasks, added measured baselines.                                                   |
+| 2026-09-21 | R0 complete. D1, D2, D9 answered. R1 started.                                                                                                                                             |
+| 2026-09-23 | Fonts locked: Jersey 10 + Nunito. D13 → B (slate/teal + gold selection). D14 added (elevation). primitives.css, semantic.css, motion.css written; contrast-checked; wired into index.css. |
