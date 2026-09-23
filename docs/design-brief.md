@@ -49,8 +49,10 @@ how much of it there is and where it goes. fall back to reference pictures that 
 - D1: Integration branch `ui/rehaul` + preview deploys.
 - D2: One theme axis (the Pokémon's type). Light/dark deferred to R12.
 - D9: No console shell / fake frame around the UI (backlog skin only).
-- D12 (proposed): Retire "no glow, no color bloom". New rule: glow or
-  gradient only when it carries type or state information. Confirm in R1.
+- D12: Retired "no glow, no color bloom". New rule: glow or gradient
+  only when it carries type or state information. CONFIRMED — every
+  glow/gradient built in R1 (type-theme deep backdrops) ties to a
+  specific type or state, none are decorative.
 - D13 (open): Chrome direction. A = roadmap navy/cobalt, thick outlines.
   B = B/W-style slate + teal, thin crisp lines, subtle gloss. Leaning B.
   Decide in R1 Part 2 with swatches.
