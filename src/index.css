@@ -1,4 +1,8 @@
 @import "./styles/tokens.css";
+@import "./styles/primitives.css";
+@import "./styles/semantic.css";
+@import "./styles/type-themes.css";
+@import "./styles/motion.css";
 
 /* Global reset 
    Deliberately small: only browser-default overrides every page

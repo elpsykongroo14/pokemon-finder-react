@@ -1,0 +1,56 @@
+/* src/styles/semantic.css
+   Tier 2: roles. Every component reads a variable from THIS file
+   (or motion.css), never a primitive directly. This is the layer's type-theme engine rebinds to reskin the whole page.
+
+   Default values below assume a component sits on the dark
+   "frame" surface. Anything placed inside a light "window" panel
+   (.surface-window) gets a scoped override in the second block
+   several colors flip to darker ink variants there, because a
+   value that reads fine on near black fails contrast on
+   near white. That failure was measured, not guessed: see the R1
+   contrast notes in the design brief. */
+
+:root {
+  /* Surfaces */
+  --surface-frame: var(--slate-900);
+  --surface-chrome: var(--slate-800);
+  --surface-window: var(--slate-100);
+  --surface-window-raised: var(--slate-050);
+
+  /* Text (on the dark frame/chrome) */
+  --text-primary: var(--slate-100);
+  --text-secondary: var(--slate-300);
+  --text-danger: var(--red-500);
+  --text-success: var(--green-500);
+
+  /* Borders & accents (on the dark frame/chrome) */
+  --border-line: var(--teal-500);
+  --border-hairline: var(--slate-600);
+  --accent-select: var(--gold-400);
+  --focus-ring: var(--teal-500);
+
+  /* Elevation (D14 — see design-brief.md) */
+  --shadow-raised: 0 3px 0 0 var(--slate-900);
+  --shadow-pressed: 0 0 0 0 transparent;
+  --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+
+  /* z-index roles, mapped to the raw steps in primitives.css */
+  --z-dropdown: var(--z-10);
+  --z-sticky: var(--z-20);
+  --z-overlay: var(--z-30);
+  --z-modal: var(--z-40);
+  --z-toast: var(--z-50);
+}
+
+/* Any subtree marked .surface-window sits on the light panel
+   color, so several roles need their on-light variant instead. */
+.surface-window {
+  --text-primary: var(--slate-800);
+  --text-secondary: var(--slate-400);
+  --text-danger: var(--red-800);
+  --text-success: var(--green-800);
+  --border-line: var(--teal-700);
+  --focus-ring: var(--teal-700);
+  --shadow-raised: 0 3px 0 0 var(--slate-400);
+  --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+}

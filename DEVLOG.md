@@ -175,3 +175,11 @@ then Layout.test.tsx the SearchBar is trusted but not cheap (real fetch via useA
 09-17-2026: follow up reminder
 
 after finishing the testing pass and moving onto builiding the CI/CD parity for the react app discovered tcg-proxy (the live Worker) is missing the TCG_CACHE/TCG_RATE_LIMITER bindings that exist on the orphaned pokemon-finder Worker instead — wrangler.jsonc deploys apparently targeted the wrong Worker name at some point. Needs a follow-up: fix tcg-proxy/'s config so one file, one name, and redeploy with bindings attached to the right Worker
+
+09-21-2026: UI rehaul, R0 baseline & ground rules
+
+Hygiene fixes shipped to main: TypeBadge fallback typo, /Library → /library
+(with its test), stray <Route />, MAX_STAT 225 → 255.
+
+CI now runs on ui/rehaul, includes a build step, and deploys a preview.
+Audited which tests depend on class names (the "class contract", see roadmap 8.3).

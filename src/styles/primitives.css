@@ -1,0 +1,99 @@
+/* src/styles/primitives.css
+   Tier 1: raw values with no opinion about where they're used.
+   Nothing in src/components or src/pages ever reads a variable
+   from this file directly, see semantic.css for that layer. */
+
+:root {
+  /*Neutrals: the slate ramp (D13 chrome)*/
+  --slate-900: #10151a;
+  --slate-800: #171e24;
+  --slate-700: #202a31;
+  --slate-600: #2b3740;
+  --slate-500: #3c4a53;
+  --slate-400: #5b6b74;
+  --slate-300: #8b989e;
+  --slate-100: #eef3f2;
+  --slate-050: #f7faf9;
+
+  /*Accent ramps*/
+  --teal-700: #1f8f80;
+  --teal-600: #2bb9a5;
+  --teal-500: #3fd6c0;
+
+  --gold-600: #c98014;
+  --gold-500: #e79f2c;
+  --gold-400: #f2b545;
+
+  /*Functional (not brand, not chrome)*/
+  --green-500: #3fd68a; /* success, "high" stat tier */
+  --green-800: #22754b; /* on-light text ink, added after the contrast check */
+
+  --red-500: #e2483c; /* danger, "low" stat tier */
+  --red-800: #b43930; /* on-light text ink, added after the contrast check */
+
+  /*Pokémon type palette 
+     Unchanged from the current tokens.css. Kept verbatim as
+     primitives; type-themes.css derives everything
+     else (deep/soft/ink) from these single source values. */
+  --type-normal: #a8a878;
+  --type-fire: #ff6b35;
+  --type-water: #4a90d9;
+  --type-electric: #f9c523;
+  --type-grass: #5db85d;
+  --type-ice: #96d9d6;
+  --type-fighting: #c03028;
+  --type-poison: #a040a0;
+  --type-ground: #e0c068;
+  --type-flying: #a890f0;
+  --type-psychic: #f85888;
+  --type-bug: #a8b820;
+  --type-rock: #b8a038;
+  --type-ghost: #705898;
+  --type-dragon: #7038f8;
+  --type-dark: #705848;
+  --type-steel: #b8b8d0;
+  --type-fairy: #ee99ac;
+
+  /*Typography*/
+  --font-display: "Jersey 10", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Nunito Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.85rem;
+  --text-base: 1rem;
+  --text-lg: 1.15rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-display: 3rem;
+
+  /*Spacing (unchanged 4px grid)*/
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /*Radius*/
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /*Border widths (T2: thin, crisp lines)*/
+  --border-width-hairline: 1px;
+  --border-width-line: 2px;
+  --border-width-thick: 3px; /* reserved for the R3 Window frame */
+
+  /*Raw z-index steps
+     Roles (dropdown, modal, toast...) get assigned to these
+     steps in semantic.css */
+  --z-00: 0;
+  --z-10: 10;
+  --z-20: 20;
+  --z-30: 30;
+  --z-40: 40;
+  --z-50: 50;
+}
