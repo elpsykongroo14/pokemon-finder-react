@@ -1,0 +1,9 @@
+/* Declares the cascade layer order for the entire app, once.
+   Layer order beats specificity a rule in a later layer here
+   always wins over a rule in an earlier layer, regardless of how
+   many classes/IDs either selector has. Order = priority.
+
+   Nothing else belongs in this file. Add new layers here, never
+   inline inside a component's CSS or index.css. */
+
+@layer reset, tokens, base, primitives, features, themes, utilities;
