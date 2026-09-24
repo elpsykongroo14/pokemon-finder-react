@@ -1,0 +1,16 @@
+/* src/styles/shared.css
+   Cross-cutting classes with no single owning component yet.
+   Everything here is a candidate for a real R3 primitive
+   (status-message -> MessageBox). Don't add new things to this
+   file going forward without asking "should this actually be a
+   primitive instead?" */
+@layer features {
+  .status-message {
+    color: var(--color-text-secondary);
+    margin-top: 16px;
+  }
+
+  .status-message--error {
+    color: var(--color-danger);
+  }
+}

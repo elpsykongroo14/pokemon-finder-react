@@ -1,0 +1,39 @@
+/* Tier "tokens" layer. Rebinds every OLD flat color name to its
+   NEW semantic counterpart but changes nothing visible today.
+
+   Why nothing changes yet: layers.css declares `tokens` before
+   `base`, and tokens.css (still holding the ORIGINAL literal
+   values) lives in `base`. Layer order always wins over
+   specificity and source order, so base's declarations keep
+   overriding these for every property below, unconditionally.
+
+   Migration mechanic (R3 onward): to cut one color over, delete
+   its single line from tokens.css. With base's competing
+   declaration gone, this file becomes the only remaining source
+   for that name, and every component reading it switches to the
+   new value automatically  a one-line diff per cutover,
+   verified against a fresh screenshot each time.
+
+   Deliberately NOT aliased here (see design brief / DEVLOG note):
+   font-mono (splits into font-display/--font-body, a real
+   per-element decision), shadow-sm/md/lg (different elevation
+   model entirely), color-bg-surface-sunken and
+   color-bg-overlay (no semantic equivalent defined yet 
+   open question for the R3 Input/Dialog primitives). */
+
+@layer tokens {
+  :root {
+    --color-bg-canvas: var(--surface-frame);
+    --color-bg-surface: var(--surface-chrome);
+    --color-border-subtle: var(--border-hairline);
+    --color-border-default: var(--border-line);
+    --color-text-heading: var(--text-primary);
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-accent: var(--accent-select);
+    --color-accent-contrast: var(--surface-frame);
+    --color-focus: var(--focus-ring);
+    --color-success: var(--text-success);
+    --color-danger: var(--text-danger);
+  }
+}
