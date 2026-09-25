@@ -7,15 +7,18 @@ import "./index.css";
 import App from "./App.tsx";
 import { FavoritesProvider } from "./context/FavoritesContext.tsx";
 import { TeamProvider } from "./context/TeamContext.tsx";
+import { PreferencesProvider } from "./context/PreferencesContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <FavoritesProvider>
-        <TeamProvider>
-          <App />
-        </TeamProvider>
-      </FavoritesProvider>
+      <PreferencesProvider>
+        <FavoritesProvider>
+          <TeamProvider>
+            <App />
+          </TeamProvider>
+        </FavoritesProvider>
+      </PreferencesProvider>
     </BrowserRouter>
   </StrictMode>,
 );
