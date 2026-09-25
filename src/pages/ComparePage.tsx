@@ -1,3 +1,5 @@
+import "./ComparePage.css";
+import "../styles/shared.css";
 import { useSearchParams } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { CompareView } from "../components/CompareView";

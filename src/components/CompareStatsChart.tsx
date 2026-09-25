@@ -1,3 +1,4 @@
+import "./CompareStatsChart.css";
 import { CompareStatRow } from "./CompareStatRow";
 import { STAT_ORDER, STAT_LABELS } from "../lib/stats";
 import type { PokemonStat } from "../lib/type";

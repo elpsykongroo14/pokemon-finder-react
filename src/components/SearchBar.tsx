@@ -1,3 +1,4 @@
+import "./SearchBar.css";
 import { useState, useRef, type FormEvent, type KeyboardEvent } from "react";
 import { useAutocomplete } from "../hooks/useAutocomplete";
 import { getSpriteUrl } from "../lib/sprites";

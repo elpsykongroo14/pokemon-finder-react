@@ -1,3 +1,4 @@
+import "./Layout.css";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { FavoritesList } from "../components/FavoritesList";

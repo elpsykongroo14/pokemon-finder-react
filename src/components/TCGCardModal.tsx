@@ -1,3 +1,4 @@
+import "./TCGCardModal.css";
 import { Modal } from "./Modal";
 import { getCardMetaRows } from "../lib/tcg";
 import type { TCGCard } from "../lib/type";

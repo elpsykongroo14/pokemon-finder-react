@@ -1,0 +1,37 @@
+@layer features {
+  .app {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-5);
+    min-height: 100vh;
+  }
+
+  .main-nav {
+    display: flex;
+    gap: var(--space-2);
+    margin: var(--space-3) 0 var(--space-5);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .main-nav a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
+  }
+
+  .main-nav a:hover {
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface-sunken);
+  }
+
+  .main-nav a.active {
+    color: var(--color-accent-contrast);
+    background: var(--color-accent);
+  }
+}

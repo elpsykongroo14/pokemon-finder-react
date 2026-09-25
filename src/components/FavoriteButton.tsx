@@ -2,6 +2,8 @@
 //it doesnt know how favorites work
 //it just renders a boolean and fires a callback
 
+import "./FavoriteButton.css";
+
 interface FavoriteButtonProps {
   isFavorite: boolean;
   onToggle: () => void;

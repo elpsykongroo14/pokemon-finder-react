@@ -1,3 +1,4 @@
+import "./PokemonPage.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { usePokemon } from "../hooks/usePokemon";
 import { PokemonCard } from "../components/PokemonCard";

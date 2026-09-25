@@ -1,0 +1,12 @@
+@layer features {
+  .card-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+  }
+
+  .compare-button[aria-pressed="true"] {
+    border-color: var(--color-focus);
+    color: var(--color-focus);
+  }
+}

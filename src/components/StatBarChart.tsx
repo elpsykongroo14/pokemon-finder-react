@@ -1,3 +1,4 @@
+import "./StatBarChart.css";
 import { StatBar } from "./StatBar";
 import type { PokemonStat } from "../lib/type";
 import { STAT_LABELS, getOrderedStats } from "../lib/stats";

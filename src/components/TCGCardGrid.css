@@ -1,0 +1,14 @@
+@layer features {
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .library-loading,
+  .library-empty {
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: var(--space-7) 0;
+  }
+}

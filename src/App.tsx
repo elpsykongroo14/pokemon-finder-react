@@ -7,7 +7,6 @@ import { ComparePage } from "./pages/ComparePage";
 import { TeamPage } from "./pages/TeamPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { LibraryPage } from "./pages/LibraryPage";
-import "./App.css";
 
 //Lazy + import.meta.env.DEV gated: intended so this never ships to production
 const StyleGuideLazy = lazy(() =>
