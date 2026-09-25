@@ -1,0 +1,43 @@
+@layer features {
+  .compare-stat-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .compare-stat-label {
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .compare-stat-value {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .compare-stat-row:last-child {
+    border-bottom: none;
+  }
+
+  .compare-stat-row > .compare-stat-value:first-child {
+    text-align: right;
+  }
+  .compare-stat-row > .compare-stat-value:last-child {
+    text-align: left;
+  }
+
+  .stat-win {
+    color: var(--color-focus);
+  }
+
+  .stat-lose {
+    color: var(--color-text-secondary);
+  }
+}

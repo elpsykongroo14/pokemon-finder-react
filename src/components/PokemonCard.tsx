@@ -1,5 +1,6 @@
 //the container
 
+import "./PokemonCard.css";
 import { useState } from "react";
 import { SpriteDisplay } from "./SpriteDisplay";
 import { TypeBadgeList } from "./TypeBadgeList";
@@ -40,7 +41,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
         </div>
       </header>
 
-      <div className="pokemon-card-sprite-section">
+      <div className="pokemon-card-section">
         <SpriteDisplay
           sprites={pokemon.sprites}
           name={pokemon.name}
@@ -49,12 +50,12 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
         <TypeBadgeList types={pokemon.types} />
       </div>
 
-      <section className="pokemon-card-sprite-section">
+      <section className="pokemon-card-section">
         <h3 className="pokemon-card-section-title">Base Stats</h3>
         <StatBarChart stats={pokemon.stats} />
       </section>
 
-      <section className="pokemon-card-sprite-section">
+      <section className="pokemon-card-section">
         <h3 className="pokemon-card-section-title">Details</h3>
         <MetaInfo
           height={pokemon.height}
@@ -64,7 +65,7 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
       </section>
       {/*PokemonCard.tsx doesn't need to know anything changed underneath, it just hands its own pokemon prop to one more child, exactly the way it already hands slices of that same prop to SpriteDisplay, TypeBadgeList, and MetaInfo.*/}
 
-      <section className="pokemon-card-sprite-section">
+      <section className="pokemon-card-section">
         <h3 className="pokemon-card-section-title">Evolution</h3>
         <EvolutionSection pokemon={pokemon} />
       </section>

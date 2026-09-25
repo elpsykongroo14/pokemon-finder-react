@@ -1,3 +1,4 @@
+import "./TCGCardGrid.css";
 import type { TCGCard } from "../lib/type";
 import type { libraryStatus } from "../lib/tcgLibraryReducer";
 import { TCGCardGridItem } from "./TCGCardGridItem";

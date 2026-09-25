@@ -1,0 +1,98 @@
+@layer features {
+  .search-bar-wrapper {
+    position: relative;
+  }
+
+  .search-bar-wrapper form {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .search-bar-wrapper input {
+    flex: 1;
+    background: var(--color-bg-surface-sunken);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--text-sm);
+  }
+
+  .search-bar-wrapper input::placeholder {
+    color: var(--color-text-secondary);
+  }
+
+  .search-bar-wrapper input:focus {
+    outline: none;
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 3px rgba(91, 141, 238, 0.25);
+  }
+
+  .search-bar-wrapper button {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter var(--duration-fast) var(--ease-standard);
+  }
+
+  .search-bar-wrapper button:hover {
+    filter: brightness(1.08);
+  }
+
+  .autocomplete-preview img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .autocomplete-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-1);
+    overflow: hidden;
+  }
+
+  .autocomplete-item {
+    list-style: none;
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+    color: var(--color-text-primary);
+    text-transform: capitalize;
+  }
+
+  .autocomplete-item--active {
+    background: var(--color-bg-surface-sunken);
+    color: var(--color-focus);
+  }
+
+  .autocomplete-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .autocomplete-preview-name {
+    color: var(--color-text-primary);
+    text-transform: capitalize;
+  }
+
+  .autocomplete-preview-id {
+    color: var(--color-text-secondary);
+    margin-left: auto;
+    font-size: var(--text-sm);
+  }
+}

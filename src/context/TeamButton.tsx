@@ -1,5 +1,7 @@
 //TeamButton.tsx is the dumb-ish component that sits on PokemonCard,
 //mirroring FavoriteButton.tsx
+import "./TeamButton.css";
+import "../styles/shared.css";
 import { useEffect } from "react";
 import { useTeam } from "../hooks/useTeam";
 import type { PokemonDetails } from "../lib/type";

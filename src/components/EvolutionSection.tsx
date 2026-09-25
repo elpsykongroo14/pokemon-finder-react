@@ -1,3 +1,5 @@
+import "./EvolutionSection.css";
+import "../styles/shared.css";
 import { useEvolutionChain } from "../hooks/useEvolutionChain";
 import type { PokemonDetails } from "../lib/type";
 import { EvolutionNode } from "./EvolutionNode";

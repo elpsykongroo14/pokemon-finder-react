@@ -1,6 +1,7 @@
 //the file reads :name from the URL, hands it to the hook
 //and owns exactly one piece of local UI state that the hook correctly does not own: which card is currently selected in the modal
 
+import "./LibraryPage.css";
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTCGLibrary } from "../hooks/useTCGLibrary";

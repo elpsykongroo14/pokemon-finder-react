@@ -1,5 +1,7 @@
 //FavoritesList now reaches into the context directly instead of taking favorites/onRemove as props
 
+import "./FavoritesList.css";
+import "../styles/shared.css";
 import { Link } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
 

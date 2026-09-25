@@ -1,0 +1,52 @@
+@layer favorites {
+  .favorites-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+  }
+
+  .favorite-link {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .favorites-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: var(--color-bg-surface-sunken);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-pill);
+    padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
+  }
+
+  .favorites-list .favorite-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    text-transform: capitalize;
+  }
+
+  .favorites-list .favorite-link img {
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-canvas);
+  }
+
+  .favorites-list button {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-size: var(--text-xs);
+    line-height: 1;
+    padding: var(--space-1);
+  }
+
+  .favorites-list button:hover {
+    color: var(--color-danger);
+  }
+}

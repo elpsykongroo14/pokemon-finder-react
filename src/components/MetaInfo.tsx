@@ -1,3 +1,4 @@
+import "./MetaInfo.css";
 import type { PokemonAbility } from "../lib/type";
 
 interface MetaInfoProps {

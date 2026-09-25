@@ -1,0 +1,67 @@
+@layer features {
+  .pokemon-card {
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    box-shadow: var(--shadow-md);
+  }
+
+  .pokemon-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .pokemon-card-header h2 {
+    text-transform: capitalize;
+  }
+
+  .pokemon-card-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .shiny-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .shiny-toggle input {
+    accent-color: var(--color-accent);
+  }
+
+  /* Was two conflicting rules: `.pokemon-card-sprite-section`
+     (actually used, on four unrelated sections) and a dead,
+     never-applied `.pokemon-card-section`. Consolidated into
+     one correctly named rule, keeping the values that were
+     actually rendering. */
+  .pokemon-card-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .pokemon-card-section-title {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-weight: 600;
+  }
+}

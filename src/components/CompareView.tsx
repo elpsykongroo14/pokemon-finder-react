@@ -1,5 +1,6 @@
 //this is the container that puts two pokemon side by side
 
+import "./CompareView.css";
 import type { PokemonDetails } from "../lib/type";
 import { SpriteDisplay } from "./SpriteDisplay";
 import { TypeBadgeList } from "./TypeBadgeList";

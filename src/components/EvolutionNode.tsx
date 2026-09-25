@@ -1,3 +1,4 @@
+import "./EvolutionNode.css";
 import type { EvolutionNode as EvolutionNodeData } from "../lib/type";
 
 interface EvolutionNodeProps {

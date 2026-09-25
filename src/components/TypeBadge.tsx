@@ -1,6 +1,6 @@
 //this one only needs to know which type its rendering,
 //everything else (the color) it can look up itself
-
+import "./TypeBadge.css";
 import type { CSSProperties } from "react";
 
 interface TypeBadgeProps {

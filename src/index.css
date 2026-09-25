@@ -1,50 +1,59 @@
-@import "./styles/tokens.css";
-@import "./styles/primitives.css";
-@import "./styles/semantic.css";
-@import "./styles/type-themes.css";
-@import "./styles/motion.css";
+/* src/styles/layers.css must load first: it declares the order
+   every other layer in this file (and every future component
+   file) will be judged against. */
+@import "./styles/layers.css";
+@import "./styles/token-aliases.css";
+@import "./styles/tokens.css" layer(base);
+@import "./styles/primitives.css" layer(tokens);
+@import "./styles/semantic.css" layer(tokens);
+@import "./styles/type-themes.css" layer(themes);
+@import "./styles/motion.css" layer(tokens);
 
 /* Global reset 
    Deliberately small: only browser-default overrides every page
    needs. Anything component-specific belongs in App.css. */
 
-* {
-  box-sizing: border-box;
+@layer reset {
+  * {
+    box-sizing: border-box;
+  }
 }
 
-body {
-  margin: 0;
-  background: var(--color-bg-canvas);
-  color: var(--color-text-primary);
-  font-family: var(--font-mono);
-}
+@layer base {
+  body {
+    margin: 0;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+  }
 
-#root {
-  min-height: 100svh;
-}
+  #root {
+    min-height: 100svh;
+  }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--color-text-heading);
-  margin: 0 0 var(--space-2);
-}
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--color-text-heading);
+    margin: 0 0 var(--space-2);
+  }
 
-h1 {
-  font-size: var(--text-2xl);
-  letter-spacing: -0.01em;
-}
+  h1 {
+    font-size: var(--text-2xl);
+    letter-spacing: -0.01em;
+  }
 
-h2 {
-  font-size: var(--text-xl);
-}
+  h2 {
+    font-size: var(--text-xl);
+  }
 
-h3 {
-  font-size: var(--text-lg);
-}
+  h3 {
+    font-size: var(--text-lg);
+  }
 
-p {
-  margin: 0;
+  p {
+    margin: 0;
+  }
 }

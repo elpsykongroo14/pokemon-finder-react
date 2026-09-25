@@ -1,6 +1,7 @@
 //TeamSLots.tsx is the roster display
 //mirroring FavoritesList.tsx
 //this always renders exactly MAX_TEAM (6) <li>s, filled or empty, instead of team.map(...)
+import "./TeamSlots.css";
 import { Link } from "react-router-dom";
 import { useTeam } from "../hooks/useTeam";
 import { MAX_TEAM } from "../lib/teamReducer";

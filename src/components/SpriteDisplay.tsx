@@ -1,3 +1,4 @@
+import "./SpriteDisplay.css";
 import { getSpriteUrl } from "../lib/sprites";
 import type { PokemonSprites } from "../lib/sprites";
 

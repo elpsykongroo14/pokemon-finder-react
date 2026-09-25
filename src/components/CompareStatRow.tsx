@@ -1,3 +1,4 @@
+import "./CompareStatRow.css";
 import { compareStat } from "../lib/statComparison";
 
 interface compareStatRowProps {

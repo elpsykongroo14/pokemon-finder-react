@@ -1,3 +1,4 @@
+import "./TCGCardGridItem.css";
 import type { TCGCard } from "../lib/type";
 
 interface TCGCardGridItemProps {

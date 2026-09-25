@@ -1,0 +1,24 @@
+@layer features {
+  .sprite-stage {
+    width: 180px;
+    height: 180px;
+    border-radius: var(--radius-pill);
+    background: var(--color-bg-surface-sunken);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sprite-display {
+    max-width: 140px;
+    max-height: 140px;
+    filter: drop-shadow(var(--shadow-sm));
+  }
+
+  .sprite-placeholder {
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    text-align: center;
+    padding: 0 var(--space-4);
+  }
+}

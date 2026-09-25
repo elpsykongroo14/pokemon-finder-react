@@ -1,0 +1,27 @@
+@layer features {
+  .favorite-button,
+  .team-button {
+    background: var(--color-bg-surface-sunken);
+    border: 1px solid var(--color-border-default);
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-pill);
+    padding: var(--space-1) var(--space-3);
+    font-family: inherit;
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
+  }
+
+  .favorite-button:hover,
+  .team-button:hover {
+    color: var(--color-text-primary);
+  }
+
+  .favorite-button[aria-pressed="true"],
+  .team-button[aria-pressed="true"] {
+    border-color: var(--color-focus);
+    color: var(--color-focus);
+  }
+}
