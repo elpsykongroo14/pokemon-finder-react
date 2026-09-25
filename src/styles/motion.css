@@ -1,10 +1,3 @@
-/* src/styles/motion.css
-   Tier 2 (motion side of semantic). Locks roadmap §5.6's proposal
-   as final. R2 adds the `prefers reduced motion` override that
-   zeroes these out globally that override only has to exist in
-   one place because every animation in the app is required to
-   read its timing from here rather than a hardcoded number. */
-
 :root {
   /* Durations */
   --dur-instant: 80ms; /* press feedback */
@@ -25,4 +18,38 @@
     1
   ); /* celebrations, spring like */
   --ease-tick: steps(6, end); /* HP bar chunky fill */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0ms;
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+    --dur-epic: 0ms;
+  }
+}
+
+/* Preferences.tsx sets this explicitly. It has to be able to win
+   in both directions: force durations to zero even if the OS
+   preference is normal, or restore them even if the OS preference
+   is "reduce." Both rules below share the same :root specificity
+   as the media-query block above, so same layer, same
+   specificity source order decides, and both of these,
+   appearing later in the file, correctly win over the OS default
+   whichever way the person has explicitly chosen. */
+:root[data-motion="reduced"] {
+  --dur-instant: 0ms;
+  --dur-fast: 0ms;
+  --dur-base: 0ms;
+  --dur-slow: 0ms;
+  --dur-epic: 0ms;
+}
+
+:root[data-motion="on"] {
+  --dur-instant: 80ms;
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+  --dur-epic: 700ms;
 }
