@@ -1,0 +1,77 @@
+@layer features {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width-line) solid var(--border-line);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    box-shadow: var(--shadow-raised);
+    transition:
+      transform var(--dur-instant) var(--ease-standard),
+      box-shadow var(--dur-instant) var(--ease-standard);
+  }
+
+  .btn[data-variant="primary"] {
+    background: var(--accent-select);
+    color: var(--surface-frame);
+  }
+
+  .btn[data-variant="secondary"] {
+    background: var(--surface-chrome);
+    color: var(--text-primary);
+  }
+
+  .btn[data-variant="ghost"] {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--text-primary);
+  }
+
+  .btn[data-variant="danger"] {
+    background: var(--text-danger);
+    color: var(--surface-frame);
+  }
+
+  .btn[aria-pressed="true"] {
+    box-shadow: var(--shadow-pressed);
+    transform: translateY(2px);
+    border-color: var(--accent-select);
+  }
+
+  .btn:active:not(:disabled) {
+    box-shadow: var(--shadow-pressed);
+    transform: translateY(2px);
+  }
+
+  .btn:focus-visible {
+    outline: var(--border-width-line) solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn[aria-busy="true"] .btn__spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: btn-spin var(--dur-slow) linear infinite;
+  }
+
+  @keyframes btn-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
