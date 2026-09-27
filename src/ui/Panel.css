@@ -1,0 +1,33 @@
+@layer features {
+  .panel {
+    --notch: 10px;
+    clip-path: polygon(
+      var(--notch) 0%,
+      calc(100% - var(--notch)) 0%,
+      100% var(--notch),
+      100% calc(100% - var(--notch)),
+      calc(100% - var(--notch)) 100%,
+      var(--notch) 100%,
+      0% calc(100% - var(--notch)),
+      0% var(--notch)
+    );
+    border: var(--border-width-thick) solid var(--border-line);
+    padding: var(--space-4);
+    background: var(--surface-window);
+    color: var(--text-primary);
+    box-shadow: var(--bevel-highlight);
+    filter: drop-shadow(var(--drop-raised));
+  }
+
+  .panel[data-variant="sunken"] {
+    background: var(--surface-window-sunken);
+    box-shadow: var(--shadow-sunken);
+    filter: none;
+  }
+
+  .panel[data-variant="tinted"] {
+    background: var(--theme-accent-soft);
+    color: var(--theme-accent-ink);
+    border-color: var(--theme-accent-deep);
+  }
+}
