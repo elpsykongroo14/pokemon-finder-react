@@ -16,6 +16,9 @@
   --surface-chrome: var(--slate-800);
   --surface-window: var(--slate-100);
   --surface-window-raised: var(--slate-050);
+  --surface-window-sunken: var(--slate-800);
+  --drop-raised: 0 3px 0 var(--slate-900);
+  --shadow-sunken: inset 0 2px 0 0 var(--slate-900);
 
   /* Text (on the dark frame/chrome) */
   --text-primary: var(--slate-100);
@@ -53,4 +56,7 @@
   --focus-ring: var(--teal-700);
   --shadow-raised: 0 3px 0 0 var(--slate-400);
   --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+  --surface-window-sunken: var(--slate-300);
+  --drop-raised: 0 3px 0 var(--slate-400);
+  --shadow-sunken: inset 0 2px 0 0 var(--slate-400);
 }
