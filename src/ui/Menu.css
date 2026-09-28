@@ -1,0 +1,9 @@
+@layer features {
+  .menu {
+    --menu-item-height: 40px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    outline: none;
+  }
+}
