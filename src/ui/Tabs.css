@@ -1,0 +1,46 @@
+@layer features {
+  .tab-list {
+    position: relative;
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: var(--border-width-line) solid var(--border-line);
+  }
+
+  .tab {
+    background: transparent;
+    border: none;
+    font: inherit;
+    font-family: var(--font-display);
+    color: var(--text-secondary);
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+  }
+
+  .tab[aria-selected="true"] {
+    color: var(--text-primary);
+  }
+
+  .tab:focus-visible {
+    outline: var(--border-width-line) solid var(--focus-ring);
+    outline-offset: -2px;
+  }
+
+  .tab-indicator {
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 1px;
+    height: 4px;
+    background: var(--accent-select);
+    transform-origin: left;
+    transform: translateX(var(--indicator-x, 0px)) scaleX(var(--indicator-w, 0));
+  }
+
+  .tab-list[data-ready] .tab-indicator {
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+
+  .tab-panel {
+    padding: var(--space-4) 0;
+  }
+}
