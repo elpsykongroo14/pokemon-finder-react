@@ -25,6 +25,7 @@
   --text-secondary: var(--slate-300);
   --text-danger: var(--red-500);
   --text-success: var(--green-500);
+  --text-warning: var(--gold-600);
 
   /* Borders & accents (on the dark frame/chrome) */
   --border-line: var(--teal-500);
@@ -52,6 +53,7 @@
   --text-secondary: var(--slate-400);
   --text-danger: var(--red-800);
   --text-success: var(--green-800);
+  --text-warning: var(--gold-600);
   --border-line: var(--teal-700);
   --focus-ring: var(--teal-700);
   --shadow-raised: 0 3px 0 0 var(--slate-400);

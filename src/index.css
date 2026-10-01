@@ -8,6 +8,7 @@
 @import "./styles/semantic.css" layer(tokens);
 @import "./styles/type-themes.css" layer(themes);
 @import "./styles/motion.css" layer(tokens);
+@import "./styles/utilities.css";
 
 /* Global reset 
    Deliberately small: only browser-default overrides every page
