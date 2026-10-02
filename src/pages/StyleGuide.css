@@ -175,3 +175,27 @@
   text-align: left;
   text-transform: capitalize;
 }
+
+.primitives-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.primitives-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cursor-demo {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+.cursor-demo__row {
+  height: 40px;
+  display: flex;
+  align-items: center;
+}

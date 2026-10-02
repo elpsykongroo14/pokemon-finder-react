@@ -1,6 +1,5 @@
 import { type ReactNode } from "react";
 import { Button, type ButtonVariant } from "./Button";
-import "./IconButton.css";
 
 interface IconButtonProps {
   icon: ReactNode;
