@@ -1,5 +1,20 @@
 import { useState } from "react";
 import "./StyleGuide.css";
+import { Button } from "../ui/Button";
+import { IconButton } from "../ui/IconButton";
+import { Panel } from "../ui/Panel";
+import { Cursor } from "../ui/Cursor";
+import { Menu } from "../ui/Menu";
+import { MenuItem } from "../ui/MenuItem";
+import { Tabs } from "../ui/Tabs";
+import { TabList } from "../ui/TabList";
+import { Tab } from "../ui/Tab";
+import { TabPanel } from "../ui/TabPanel";
+import { MessageBox } from "../ui/MessageBox";
+import { StatMeter } from "../ui/StatMeter";
+import { Toggle } from "../ui/Toggle";
+import { Select } from "../ui/Select";
+import { Input } from "../ui/Input";
 
 const TYPES = [
   "normal",
@@ -61,11 +76,14 @@ const CONTRAST_ROWS: Array<[string, string, number]> = [
 
 export function StyleGuide() {
   const [activeType, setActiveType] = useState<(typeof TYPES)[number]>("fire");
+  const [lastSelected, setLastSelected] = useState<string | null>(null);
+  const [shinyDemo, setShinyDemo] = useState(false);
+  const [sortDemo, setSortDemo] = useState("newest");
 
   return (
     <div className="styleguide">
       <header className="styleguide__intro">
-        <h1>R1 Style Guide (dev only)</h1>
+        <h1>Style Guide (dev only)</h1>
         <p>
           Every token from Parts 1–4, rendered so they can be checked by eye
           instead of by reading CSS.
@@ -125,6 +143,17 @@ export function StyleGuide() {
           <div className="theme-demo__body">
             <p>--theme-accent drives the border and this button.</p>
             <button className="theme-demo__button">Themed action</button>
+          </div>
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Panel</h2>
+        <div className="primitives-row">
+          <Panel variant="raised">Raised</Panel>
+          <Panel variant="sunken">Sunken</Panel>
+          <div data-type={activeType}>
+            <Panel variant="tinted">Tinted ({activeType})</Panel>
           </div>
         </div>
       </section>
@@ -191,6 +220,102 @@ export function StyleGuide() {
             ))}
           </tbody>
         </table>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Button / IconButton</h2>
+        <div className="primitives-row">
+          <Button variant="primary">Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="danger">Danger</Button>
+          <Button pressed>Pressed toggle</Button>
+          <Button loading>Saving</Button>
+          <IconButton icon="♥" aria-label="Favorite" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Cursor</h2>
+        <div className="cursor-demo">
+          <Cursor offset={0} />
+          <div className="cursor-demo__row">Fight</div>
+          <div className="cursor-demo__row">Bag</div>
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Menu / MenuItem</h2>
+        <p className="styleguide__note">
+          Click in, then use arrow keys, Home and End.
+        </p>
+        <Menu aria-label="Battle menu demo">
+          <MenuItem index={0} onSelect={() => setLastSelected("Fight")}>
+            Fight
+          </MenuItem>
+          <MenuItem index={1} onSelect={() => setLastSelected("Bag")}>
+            Bag
+          </MenuItem>
+          <MenuItem index={2} onSelect={() => setLastSelected("Pokémon")}>
+            Pokémon
+          </MenuItem>
+          <MenuItem index={3} onSelect={() => setLastSelected("Run")}>
+            Run
+          </MenuItem>
+        </Menu>
+        <p className="styleguide__note">
+          Last selected: {lastSelected ?? "none yet"}
+        </p>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Tabs</h2>
+        <Tabs defaultValue="info">
+          <TabList aria-label="Pokémon details demo">
+            <Tab value="info">Info</Tab>
+            <Tab value="stats">Stats</Tab>
+            <Tab value="evolution">Evolution</Tab>
+          </TabList>
+          <TabPanel value="info">Info content goes here.</TabPanel>
+          <TabPanel value="stats">Stats content goes here.</TabPanel>
+          <TabPanel value="evolution">Evolution content goes here.</TabPanel>
+        </Tabs>
+      </section>
+      <section className="styleguide__section">
+        <h2>MessageBox</h2>
+        <div className="primitives-column">
+          <MessageBox text="A wild PIKACHU appeared!" />
+          <MessageBox text="Added to your team!" variant="success" />
+          <MessageBox text="Pokémon not found." variant="error" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>StatMeter</h2>
+        <div className="primitives-column">
+          <StatMeter label="Attack" value={80} max={255} />
+          <StatMeter label="Speed" value={130} max={255} variant="highest" />
+          <StatMeter label="HP (low)" value={15} max={100} variant="tiered" />
+          <StatMeter label="HP (mid)" value={35} max={100} variant="tiered" />
+          <StatMeter label="HP (high)" value={80} max={100} variant="tiered" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Toggle / Select / Input</h2>
+        <div className="primitives-row">
+          <Toggle checked={shinyDemo} onChange={setShinyDemo} label="Shiny" />
+          <Select
+            aria-label="Sort demo"
+            value={sortDemo}
+            onChange={(e) => setSortDemo(e.target.value)}
+          >
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="rarity">Rarity</option>
+          </Select>
+          <Input aria-label="Text input demo" placeholder="Type here" />
+        </div>
       </section>
     </div>
   );
