@@ -16,15 +16,14 @@
 
    Deliberately NOT aliased here (see design brief / DEVLOG note):
    font-mono (splits into font-display/--font-body, a real
-   per-element decision), shadow-sm/md/lg (different elevation
-   model entirely), color-bg-surface-sunken and
-   color-bg-overlay (no semantic equivalent defined yet 
-   open question for the R3 Input/Dialog primitives). */
+    per-element decision), shadow-sm/md/lg, duration-fast/base/slow and ease-standard (all superseded by motion.css's --dur-/--ease- family, but real consumers still read the old names directly — not a one-line rebind, a genuine per-file migration, deferred to R5+ same as the color roles above).*/
 
 @layer tokens {
   :root {
     --color-bg-canvas: var(--surface-frame);
     --color-bg-surface: var(--surface-chrome);
+    --color-bg-surface-sunken: var(--surface-window-sunken);
+    --color-bg-overlay: var(--surface-overlay);
     --color-border-subtle: var(--border-hairline);
     --color-border-default: var(--border-line);
     --color-text-heading: var(--text-primary);

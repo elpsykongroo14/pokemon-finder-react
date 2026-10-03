@@ -15,6 +15,11 @@ import { StatMeter } from "../ui/StatMeter";
 import { Toggle } from "../ui/Toggle";
 import { Select } from "../ui/Select";
 import { Input } from "../ui/Input";
+import { Dialog } from "../ui/Dialog";
+import { Spinner } from "../ui/Spinner";
+import { Skeleton } from "../ui/Skeleton";
+import { TypeBadge } from "../components/TypeBadge";
+import { Icon } from "../components/Icon";
 
 const TYPES = [
   "normal",
@@ -79,6 +84,7 @@ export function StyleGuide() {
   const [lastSelected, setLastSelected] = useState<string | null>(null);
   const [shinyDemo, setShinyDemo] = useState(false);
   const [sortDemo, setSortDemo] = useState("newest");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
     <div className="styleguide">
@@ -315,6 +321,50 @@ export function StyleGuide() {
             <option value="rarity">Rarity</option>
           </Select>
           <Input aria-label="Text input demo" placeholder="Type here" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Dialog</h2>
+        <Button onClick={() => setDialogOpen(true)}>Open demo dialog</Button>
+        {dialogOpen && (
+          <Dialog aria-label="Demo dialog" onClose={() => setDialogOpen(false)}>
+            <h2>Demo dialog</h2>
+            <p>Tab around, then try Escape.</p>
+          </Dialog>
+        )}
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Spinner / Skeleton</h2>
+        <div className="primitives-row">
+          <Spinner size="sm" label="Loading, small" />
+          <Spinner label="Loading, medium" />
+          <Spinner size="lg" label="Loading, large" />
+          <Skeleton width={64} height={64} label="Sprite loading" />
+          <Skeleton width={140} height={16} label="Text loading" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>Icon</h2>
+        <div className="primitives-row">
+          <Icon name="github" label="GitHub" />
+          <Icon name="discord" label="Discord" />
+          <Icon name="bluesky" label="Bluesky" />
+          <Icon name="x" label="X" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>TypeBadge</h2>
+        <div className="primitives-row">
+          <TypeBadge typeName="water" />
+          <TypeBadge typeName="electric" />
+          <div className="primitives-row">
+            <TypeBadge typeName="fire" />
+            <TypeBadge typeName="flying" />
+          </div>
         </div>
       </section>
     </div>
