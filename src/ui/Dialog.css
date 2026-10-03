@@ -1,0 +1,35 @@
+@layer features {
+  .dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+  }
+
+  .dialog__backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--surface-overlay);
+  }
+
+  .dialog__content {
+    position: relative;
+    max-width: 640px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .dialog__content:focus-visible {
+    outline: none;
+  }
+
+  .dialog__close {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+  }
+}

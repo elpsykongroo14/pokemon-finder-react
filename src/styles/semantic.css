@@ -17,6 +17,7 @@
   --surface-window: var(--slate-100);
   --surface-window-raised: var(--slate-050);
   --surface-window-sunken: var(--slate-800);
+  --surface-overlay: rgba(0, 0, 0, 0.55);
   --drop-raised: 0 3px 0 var(--slate-900);
   --shadow-sunken: inset 0 2px 0 0 var(--slate-900);
 
