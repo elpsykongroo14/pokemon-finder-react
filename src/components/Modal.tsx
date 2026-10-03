@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 
 interface ModalProps {
   onClose: () => void;
+  "aria-label"?: string;
   children: React.ReactNode;
 }
 
