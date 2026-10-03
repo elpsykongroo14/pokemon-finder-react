@@ -1,5 +1,6 @@
 import { type ButtonHTMLAttributes, type ReactNode } from "react";
 import "./Button.css";
+import { Spinner } from "./Spinner";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
@@ -36,7 +37,7 @@ export function Button({
       aria-pressed={isToggle ? pressed : undefined}
       aria-busy={loading || undefined}
     >
-      {loading && <span className="btn__spinner" aria-hidden="true" />}
+      {loading && <Spinner decorative size="sm" />}
       {children}
     </button>
   );
