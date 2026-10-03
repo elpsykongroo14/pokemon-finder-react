@@ -1,0 +1,6 @@
+@layer features {
+  .icon {
+    display: inline-block;
+    flex-shrink: 0;
+  }
+}

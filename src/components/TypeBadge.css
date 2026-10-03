@@ -4,9 +4,9 @@
     align-items: center;
     padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-pill);
-    background: var(--color-bg-surface-sunken);
-    border: 1px solid var(--badge-color);
-    color: var(--badge-color);
+    background: var(--theme-accent);
+    color: var(--theme-accent-ink);
+    box-shadow: var(--bevel-highlight);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     text-transform: capitalize;
