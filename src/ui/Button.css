@@ -60,18 +60,12 @@
     box-shadow: none;
   }
 
-  .btn[aria-busy="true"] .btn__spinner {
+  .btn[aria-busy="true"] {
     width: 1em;
     height: 1em;
     border: 2px solid currentColor;
     border-right-color: transparent;
     border-radius: 50%;
     animation: btn-spin var(--dur-slow) linear infinite;
-  }
-
-  @keyframes btn-spin {
-    to {
-      transform: rotate(360deg);
-    }
   }
 }
