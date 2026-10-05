@@ -14,6 +14,10 @@ vi.mock("../components/PokemonCard", () => ({
   ),
 }));
 
+function makePokemon(overrides: Partial<PokemonDetails> = {}): PokemonDetails {
+  return { name: "pikachu", types: [], ...overrides } as PokemonDetails;
+}
+
 function renderPokemonPage(initialPath: string) {
   return render(
     <MemoryRouter initialEntries={[initialPath]}>
@@ -64,7 +68,7 @@ describe("PokemonPage", () => {
 
   it("renders the pokemon card and activation links when data loads", () => {
     vi.mocked(usePokemon).mockReturnValue({
-      data: { name: "pikachu" } as PokemonDetails,
+      data: makePokemon(),
       loading: false,
       error: null,
     });
@@ -93,9 +97,47 @@ describe("PokemonPage", () => {
     expect(screen.getByText('No results for "missingno".')).toBeInTheDocument();
   });
 
+  it("themes the whole page to the pokemon's types and clears it on leaving", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: makePokemon({
+        name: "charizard",
+        types: [
+          { slot: 1, type: { name: "fire", url: "" } },
+          { slot: 2, type: { name: "flying", url: "" } },
+        ],
+      }),
+      loading: false,
+      error: null,
+    });
+
+    const { unmount } = renderPokemonPage("/pokemon/charizard");
+
+    expect(document.documentElement.dataset.type).toBe("fire");
+    expect(document.documentElement.dataset.type2).toBe("flying");
+
+    unmount();
+
+    expect(document.documentElement.dataset.type).toBeUndefined();
+    expect(document.documentElement.dataset.typ2).toBeUndefined();
+  });
+
+  it("does not theme the page when the fetch failed", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: makePokemon({
+        types: [{ slot: 1, type: { name: "electric", url: "" } }],
+      }),
+      loading: false,
+      error: "Pokémon not found",
+    });
+
+    renderPokemonPage("/pokemon/missingno");
+
+    expect(document.documentElement.dataset.type).toBeUndefined();
+  });
+
   it("navigates to the compare page when Compare is clicked", async () => {
     vi.mocked(usePokemon).mockReturnValue({
-      data: { name: "pikachu" } as PokemonDetails,
+      data: makePokemon(),
       loading: false,
       error: null,
     });
