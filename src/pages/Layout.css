@@ -1,37 +1,124 @@
+/* App shell: header / main / tray.
+
+   Breakpoints (mobile-first, min-width only):
+     768px  tablet   header becomes two rows
+     1024px desktop  header becomes one row
+   CSS cannot read var() inside @media, so these two numbers live
+   here as literals. Decision D15 in the roadmap records why. */
+
 @layer features {
-  .app {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: var(--space-6) var(--space-5);
-    min-height: 100vh;
+  .app-shell {
+    --shell-max-width: 80rem;
+    --shell-gutter: var(--space-4);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "header"
+      "main"
+      "tray";
+    min-height: 100svh;
+    max-width: var(--shell-max-width);
+    margin-inline: auto;
   }
 
+  /* Header */
+  .app-header {
+    grid-area: header;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-3) var(--shell-gutter);
+    background: var(--surface-chrome);
+    border-bottom: var(--border-width-line) solid var(--border-hairline);
+  }
+
+  .app-title {
+    margin: 0;
+  }
+
+  /* Navigation (restyled properly in Part 3) */
   .main-nav {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-2);
-    margin: var(--space-3) 0 var(--space-5);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--color-border-subtle);
   }
 
   .main-nav a {
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
     text-decoration: none;
     font-size: var(--text-sm);
     padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-pill);
     transition:
-      background-color var(--duration-fast) var(--ease-standard),
-      color var(--duration-fast) var(--ease-standard);
+      background-color var(--dur-fast) var(--ease-standard),
+      color var(--dur-fast) var(--ease-standard);
   }
 
   .main-nav a:hover {
-    color: var(--color-text-primary);
-    background: var(--color-bg-surface-sunken);
+    color: var(--text-primary);
+    background: var(--surface-window-sunken);
   }
 
   .main-nav a.active {
-    color: var(--color-accent-contrast);
-    background: var(--color-accent);
+    color: var(--surface-frame);
+    background: var(--accent-select);
+  }
+
+  /* Main and tray */
+  .app-main {
+    grid-area: main;
+    min-width: 0;
+    padding: var(--space-5) var(--shell-gutter);
+  }
+
+  .app-tray {
+    grid-area: tray;
+    padding: var(--space-3) var(--shell-gutter);
+    background: var(--surface-chrome);
+    border-top: var(--border-width-line) solid var(--border-hairline);
+  }
+
+  @media (min-width: 768px) {
+    .app-shell {
+      --shell-gutter: var(--space-5);
+    }
+
+    .app-header {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        "title nav"
+        "search search";
+      align-items: center;
+    }
+
+    .app-title {
+      grid-area: title;
+    }
+
+    .main-nav {
+      grid-area: nav;
+      justify-content: flex-end;
+    }
+
+    .app-search {
+      grid-area: search;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .app-shell {
+      --shell-gutter: var(--space-6);
+    }
+
+    .app-header {
+      grid-template-columns: auto minmax(0, 1fr) minmax(16rem, 24rem);
+      grid-template-areas: "title nav search";
+    }
+
+    .main-nav {
+      justify-content: center;
+    }
   }
 }

@@ -781,6 +781,10 @@ _(Add rows as new decisions appear. Never edit history; append a superseding row
 
 ---
 
+ID: D15, Decision: Breakpoints, Recommendation: Literals (768, 1024) in Layout.css; add breakpoints.ts only when JS needs them, Needed by: R4, Answer: Literals
+
+---
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
