@@ -74,6 +74,48 @@ describe("Layout", () => {
     expect(screen.getByText("Pokemon Page Content")).toBeInTheDocument();
     expect(screen.queryByText("Home Content")).not.toBeInTheDocument();
   });
+
+  it("exposes the shell as landmarks: banner, navigation, main, favorites", () => {
+    renderLayout("/");
+
+    expect(screen.getByRole("banner")).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Main" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("main")).toBeInTheDocument();
+    expect(
+      screen.getByRole("complementary", { name: "Favorites" }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the routed page inside <main>, not in the header or tray", () => {
+    renderLayout("/");
+
+    expect(screen.getByRole("main")).toContainElement(
+      screen.getByText("Home Content"),
+    );
+    expect(screen.getByRole("banner")).not.toContainElement(
+      screen.getByText("Home Content"),
+    );
+  });
+
+  it("keeps the keyboard order: nav links, then search, then page content", async () => {
+    const user = userEvent.setup();
+    renderLayout("/");
+
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Home" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Compare" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Team" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Library" })).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole("button", { name: "fake-search-submit" }),
+    ).toHaveFocus();
+  });
 });
 
 //this file is where were fored to mock a whole component rather than a hook (SearchBar)
