@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { FavoritesList } from "../components/FavoritesList";
 import { MainNav } from "../components/MainNav";
-import { BrandMark } from "../components/Brandmark";
+import { BrandMark } from "../components/BrandMark";
 
 export function Layout() {
   const navigate = useNavigate();
