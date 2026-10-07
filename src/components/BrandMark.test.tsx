@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
-import { BrandMark } from "./Brandmark";
+import { BrandMark } from "./BrandMark";
 
 describe("BrandMark", () => {
   it("is decorative: hidden from assistive tech and not focusable", () => {
