@@ -17,4 +17,25 @@ describe("Cursor", () => {
       "--cursor-offset": "48px",
     });
   });
+
+  it("accepts a CSS length string, so callers can use percentages", () => {
+    const { container } = render(<Cursor offset="200%" axis="y" />);
+    expect(container.querySelector(".cursor")).toHaveStyle({
+      "--cursor-offset": "200%",
+    });
+  });
+
+  it("moves along the vertical axis by default and the horizontal one on request", () => {
+    const { container, rerender } = render(<Cursor offset={0} />);
+    expect(container.querySelector(".cursor")).toHaveAttribute(
+      "data-axis",
+      "y",
+    );
+
+    rerender(<Cursor offset={0} axis="x" />);
+    expect(container.querySelector(".cursor")).toHaveAttribute(
+      "data-axis",
+      "x",
+    );
+  });
 });

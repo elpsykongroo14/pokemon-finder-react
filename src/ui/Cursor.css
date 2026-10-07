@@ -8,6 +8,13 @@
     animation: cursor-blink 900ms steps(1) infinite;
   }
 
+  /* Horizontal mode: slides left/right and centers itself vertically
+     inside whatever positioned parent it lives in. */
+  .cursor[data-axis="x"] {
+    top: 50%;
+    transform: translate(var(--cursor-offset, 0px), -50%);
+  }
+
   @keyframes cursor-blink {
     0%,
     49% {
