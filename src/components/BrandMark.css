@@ -1,0 +1,29 @@
+@layer features {
+  .brand-mark {
+    flex: none;
+  }
+
+  .brand-mark__top {
+    fill: var(--theme-accent);
+  }
+
+  .brand-mark__bottom {
+    fill: var(--surface-window);
+  }
+
+  .brand-mark__band {
+    fill: var(--surface-frame);
+  }
+
+  .brand-mark__outline {
+    fill: none;
+    stroke: var(--surface-frame);
+    stroke-width: 2;
+  }
+
+  .brand-mark__button {
+    fill: var(--surface-window);
+    stroke: var(--surface-frame);
+    stroke-width: 2;
+  }
+}

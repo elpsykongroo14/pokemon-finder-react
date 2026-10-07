@@ -35,35 +35,13 @@
   }
 
   .app-title {
-    margin: 0;
-  }
-
-  /* Navigation (restyled properly in Part 3) */
-  .main-nav {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     gap: var(--space-2);
-  }
-
-  .main-nav a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: var(--text-sm);
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-pill);
-    transition:
-      background-color var(--dur-fast) var(--ease-standard),
-      color var(--dur-fast) var(--ease-standard);
-  }
-
-  .main-nav a:hover {
-    color: var(--text-primary);
-    background: var(--surface-window-sunken);
-  }
-
-  .main-nav a.active {
-    color: var(--surface-frame);
-    background: var(--accent-select);
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1;
   }
 
   /* Main and tray */
@@ -99,7 +77,7 @@
 
     .main-nav {
       grid-area: nav;
-      justify-content: flex-end;
+      justify-self: end;
     }
 
     .app-search {
@@ -118,7 +96,7 @@
     }
 
     .main-nav {
-      justify-content: center;
+      justify-self: center;
     }
   }
 }

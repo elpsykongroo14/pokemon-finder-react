@@ -785,6 +785,10 @@ ID: D15, Decision: Breakpoints, Recommendation: Literals (768, 1024) in Layout.c
 
 ---
 
+ID: D16, Decision: Header navigation, Options: Menu primitive; real links with a custom indicator, Recommendation: Real NavLinks inside equal-width cells, with the shared Cursor primitive as the indicator, Needed by: R4, Answer: Real links + cursor
+
+---
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
