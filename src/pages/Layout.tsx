@@ -1,7 +1,9 @@
 import "./Layout.css";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { FavoritesList } from "../components/FavoritesList";
+import { MainNav } from "../components/MainNav";
+import { BrandMark } from "../components/Brandmark";
 
 export function Layout() {
   const navigate = useNavigate();
@@ -18,36 +20,11 @@ export function Layout() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <h1 className="app-title">Pokémon Finder</h1>
-        <nav className="main-nav" aria-label="Main">
-          <NavLink
-            to="/"
-            end //without end, Navlink to= "/" would report isActive: true on every route
-            //because /pokemon/pikachu technically starts with /
-            //end tells it to only match if the URL is exactly this not just prefixed by it
-            className={({ isActive }) => (isActive ? "active" : undefined)}
-          >
-            Home
-          </NavLink>
-          <NavLink
-            to="/compare"
-            className={({ isActive }) => (isActive ? "active" : undefined)}
-          >
-            Compare
-          </NavLink>
-          <NavLink
-            to="/team"
-            className={({ isActive }) => (isActive ? "active" : undefined)}
-          >
-            Team
-          </NavLink>
-          <NavLink
-            to="/library"
-            className={({ isActive }) => (isActive ? "active" : undefined)}
-          >
-            Library
-          </NavLink>
-        </nav>
+        <h1 className="app-title">
+          <BrandMark />
+          Pokémon Finder
+        </h1>
+        <MainNav />
 
         <div className="app-search">
           <SearchBar onSubmit={handleSearch} />

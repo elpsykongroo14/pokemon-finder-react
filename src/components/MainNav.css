@@ -1,0 +1,44 @@
+@layer features {
+  /* Equal-width cells: the cursor is exactly one cell wide, so sliding
+     it by N x 100% of its own width lands on cell N. No measuring. */
+  .main-nav {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--nav-count), minmax(0, 1fr));
+    width: min(100%, 26rem);
+  }
+
+  .main-nav a {
+    padding: var(--space-2) var(--space-1) var(--space-2) var(--space-4);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+
+  .main-nav a:hover {
+    color: var(--text-primary);
+  }
+
+  .main-nav a[aria-current="page"] {
+    color: var(--accent-select);
+  }
+
+  .main-nav .cursor {
+    width: calc(100% / var(--nav-count));
+    padding-inline-start: var(--space-1);
+    font-size: var(--text-xs);
+    pointer-events: none;
+    transition: transform var(--dur-base) var(--ease-snap);
+  }
+
+  @media (min-width: 768px) {
+    .main-nav a {
+      padding-inline-start: var(--space-5);
+    }
+
+    .main-nav .cursor {
+      padding-inline-start: var(--space-2);
+    }
+  }
+}
