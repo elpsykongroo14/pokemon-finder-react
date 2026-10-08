@@ -20,6 +20,7 @@ import { Spinner } from "../ui/Spinner";
 import { Skeleton } from "../ui/Skeleton";
 import { TypeBadge } from "../components/TypeBadge";
 import { Icon } from "../components/Icon";
+import { StageConsole } from "../ui/StageConsole";
 
 const TYPES = [
   "normal",
@@ -162,6 +163,22 @@ export function StyleGuide() {
             <Panel variant="tinted">Tinted ({activeType})</Panel>
           </div>
         </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>StageConsole</h2>
+        <p className="styleguide__note">
+          Resize the window: stacked below 1024px, side by side from 1024px.
+        </p>
+        <StageConsole
+          stage={
+            <div data-type={activeType}>
+              <Panel variant="tinted">Stage: the hero of the page</Panel>
+            </div>
+          }
+        >
+          <Panel>Console: menus, tabs and details</Panel>
+        </StageConsole>
       </section>
 
       <section className="styleguide__section">
