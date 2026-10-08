@@ -6,27 +6,14 @@
 
 :root {
   /*Color: surfaces (elevation via lightness*/
-  --color-bg-canvas: #0f1115; /* page background, deepest layer */
-  --color-bg-surface: #1a1d24; /* cards, panels, sidebar */
   --color-bg-surface-sunken: #22252e; /* inputs, wells, "pressed in" */
-  --color-bg-overlay: rgba(15, 17, 21, 0.85); /* modal backdrop over canvas */
 
   /*Color: borders*/
   --color-border-subtle: rgba(255, 255, 255, 0.08);
   --color-border-default: rgba(255, 255, 255, 0.13);
 
-  /*Color: text*/
-  --color-text-heading: #f2f4f8;
-  --color-text-primary: #d8dce8;
-  --color-text-secondary: #6b7080;
-
-  /*Color: brand accent (sparingly  CTAs, active states)*/
-  --color-accent: #f5c518;
-  --color-accent-contrast: #14151a; /* text/icon color placed ON the accent */
-
   /*Color: functional (semantic, not brand)*/
   --color-focus: #5b8dee; /* focus rings, links, "info" emphasis */
-  --color-danger: #e8754a;
 
   /*Typography*/
   --font-mono: Menlo, Consolas, "Liberation Mono", monospace;
