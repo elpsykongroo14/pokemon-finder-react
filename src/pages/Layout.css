@@ -53,9 +53,24 @@
 
   .app-tray {
     grid-area: tray;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
     padding: var(--space-3) var(--shell-gutter);
     background: var(--surface-chrome);
     border-top: var(--border-width-line) solid var(--border-hairline);
+  }
+
+  /* The favorites strip takes whatever room the party counter leaves.
+     min-width: 0 lets it shrink so its own list can scroll sideways. */
+  .app-tray__favorites {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .app-tray__favorites .status-message {
+    margin: 0;
+    font-size: var(--text-sm);
   }
 
   @media (min-width: 768px) {
