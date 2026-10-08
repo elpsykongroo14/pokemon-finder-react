@@ -1,9 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./Layout";
 import { FavoritesProvider } from "../context/FavoritesContext";
+import { TeamProvider } from "../context/TeamContext";
 
 vi.mock("../components/SearchBar", () => ({
   SearchBar: ({ onSubmit }: { onSubmit: (query: string) => void }) => (
@@ -15,16 +16,18 @@ function renderLayout(initialPath = "/") {
   return render(
     <MemoryRouter initialEntries={[initialPath]}>
       <FavoritesProvider>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<div>Home Content</div>} />
-            <Route
-              path="/pokemon/:name"
-              element={<div>Pokemon Page Content</div>}
-            />
-            <Route path="/compare" element={<div>Compare Content</div>} />
-          </Route>
-        </Routes>
+        <TeamProvider>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<div>Home Content</div>} />
+              <Route
+                path="/pokemon/:name"
+                element={<div>Pokemon Page Content</div>}
+              />
+              <Route path="/compare" element={<div>Compare Content</div>} />
+            </Route>
+          </Routes>
+        </TeamProvider>
       </FavoritesProvider>
     </MemoryRouter>,
   );
@@ -84,7 +87,19 @@ describe("Layout", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(
-      screen.getByRole("complementary", { name: "Favorites" }),
+      screen.getByRole("complementary", { name: "Favorites and party" }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps favorites and the party counter together in the tray", () => {
+    renderLayout("/");
+
+    const tray = screen.getByRole("complementary", {
+      name: "Favorites and party",
+    });
+    expect(within(tray).getByText("No favorites yet.")).toBeInTheDocument();
+    expect(
+      within(tray).getByRole("link", { name: "Party 0/6" }),
     ).toBeInTheDocument();
   });
 

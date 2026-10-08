@@ -4,6 +4,7 @@ import { SearchBar } from "../components/SearchBar";
 import { FavoritesList } from "../components/FavoritesList";
 import { MainNav } from "../components/MainNav";
 import { BrandMark } from "../components/BrandMark";
+import { PartyCounter } from "../components/PartyCounter";
 
 export function Layout() {
   const navigate = useNavigate();
@@ -36,8 +37,11 @@ export function Layout() {
         {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and tray around it persist across every navigation; only this slot swaps.*/}
       </main>
 
-      <aside className="app-tray" aria-label="Favorites">
-        <FavoritesList />
+      <aside className="app-tray" aria-label="Favorites and party">
+        <div className="app-tray__favorites">
+          <FavoritesList />
+        </div>
+        <PartyCounter />
       </aside>
     </div>
   );
