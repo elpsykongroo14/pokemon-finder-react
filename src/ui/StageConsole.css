@@ -1,0 +1,23 @@
+/* Two screens. Below 1024px they stack (stage on top, like the DS top
+   screen); from 1024px they sit side by side. The breakpoint is a
+   literal on purpose: CSS cannot read var() inside @media (decision D15). */
+
+@layer features {
+  .stage-console {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .stage-console__stage,
+  .stage-console__console {
+    min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .stage-console {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-6);
+    }
+  }
+}
