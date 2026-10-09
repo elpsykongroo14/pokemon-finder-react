@@ -1,0 +1,46 @@
+@layer features {
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--theme-accent-deep) 15%, var(--surface-frame)),
+      color-mix(in srgb, var(--theme-accent-2-deep) 15%, var(--surface-frame))
+    );
+  }
+
+  .backdrop::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(
+      circle at 30% 30%,
+      color-mix(in srgb, var(--theme-accent-deep) 8%, transparent),
+      transparent 60%
+    );
+    animation: backdrop-drift 24s ease-in-out infinite alternate;
+  }
+
+  @keyframes backdrop-drift {
+    from {
+      transform: translate3d(-4%, -3%, 0);
+    }
+
+    to {
+      transform: translate3d(4%, 3%, 0);
+    }
+  }
+
+  :root[data-motion="reduced"] .backdrop::before {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root:not([data-motion="on"]) .backdrop::before {
+      animation: none;
+    }
+  }
+}
