@@ -5,6 +5,7 @@ import { FavoritesList } from "../components/FavoritesList";
 import { MainNav } from "../components/MainNav";
 import { BrandMark } from "../components/BrandMark";
 import { PartyCounter } from "../components/PartyCounter";
+import { Backdrop } from "../components/Backdrop";
 
 export function Layout() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export function Layout() {
 
   return (
     <div className="app-shell">
+      <Backdrop />
       <header className="app-header">
         <h1 className="app-title">
           <BrandMark />
