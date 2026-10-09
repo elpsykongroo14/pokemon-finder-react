@@ -25,7 +25,7 @@
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-raised);
   }
 
   .card-modal-close {

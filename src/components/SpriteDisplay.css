@@ -12,7 +12,6 @@
   .sprite-display {
     max-width: 140px;
     max-height: 140px;
-    filter: drop-shadow(var(--shadow-sm));
   }
 
   .sprite-placeholder {

@@ -40,7 +40,7 @@
     font-size: var(--text-sm);
     font-weight: 600;
     cursor: pointer;
-    transition: filter var(--duration-fast) var(--ease-standard);
+    transition: filter var(--dur-fast) var(--ease-standard);
   }
 
   .search-bar-wrapper button:hover {

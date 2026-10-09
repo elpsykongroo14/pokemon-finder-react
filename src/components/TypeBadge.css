@@ -7,7 +7,7 @@
     background: var(--theme-accent);
     color: var(--theme-accent-ink);
     box-shadow: var(--bevel-highlight);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-xs);
     text-transform: capitalize;
     letter-spacing: 0.02em;
