@@ -22,10 +22,12 @@
   :root {
     --color-bg-canvas: var(--surface-frame);
     --color-bg-surface: var(--surface-chrome);
-    --color-bg-surface-sunken: var(--surface-window-sunken);
+    --color-bg-surface-sunken: var(--surface-well);
     --color-bg-overlay: var(--surface-overlay);
     --color-border-subtle: var(--border-hairline);
-    --color-border-default: var(--border-line);
+    /* Legacy components expect a quiet outline. The bright teal
+   --border-line belongs to rebuilt components. Revisit in R5-R8. */
+    --color-border-default: var(--border-hairline);
     --color-text-heading: var(--text-primary);
     --color-text-primary: var(--text-primary);
     --color-text-secondary: var(--text-secondary);

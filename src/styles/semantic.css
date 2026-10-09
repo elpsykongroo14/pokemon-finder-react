@@ -15,6 +15,7 @@
   --surface-frame: var(--slate-900);
   --surface-chrome: var(--slate-800);
   --surface-window: var(--slate-100);
+  --surface-well: var(--slate-700);
   --surface-window-raised: var(--slate-050);
   --surface-window-sunken: var(--slate-800);
   --surface-overlay: rgba(0, 0, 0, 0.55);
