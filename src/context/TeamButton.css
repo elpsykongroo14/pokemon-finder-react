@@ -12,7 +12,7 @@
     font-size: var(--text-xs);
     cursor: pointer;
     transition:
-      border-color var(--duration-fast) var(--ease-standard),
-      color var(--duration-fast) var(--ease-standard);
+      border-color var(--dur-fast) var(--ease-standard),
+      color var(--dur-fast) var(--ease-standard);
   }
 }

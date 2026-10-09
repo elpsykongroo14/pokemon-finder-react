@@ -3,7 +3,6 @@
    file) will be judged against. */
 @import "./styles/layers.css";
 @import "./styles/token-aliases.css";
-@import "./styles/tokens.css" layer(base);
 @import "./styles/primitives.css" layer(tokens);
 @import "./styles/semantic.css" layer(tokens);
 @import "./styles/type-themes.css" layer(themes);
@@ -25,7 +24,7 @@
     margin: 0;
     background: var(--color-bg-canvas);
     color: var(--color-text-primary);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
   }
 
   #root {
@@ -35,8 +34,8 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-mono);
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-weight: 400;
     color: var(--color-text-heading);
     margin: 0 0 var(--space-2);
   }
