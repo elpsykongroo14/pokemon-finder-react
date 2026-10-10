@@ -49,6 +49,7 @@
     grid-area: main;
     min-width: 0;
     padding: var(--space-5) var(--shell-gutter);
+    view-transition-name: page;
   }
 
   .app-tray {

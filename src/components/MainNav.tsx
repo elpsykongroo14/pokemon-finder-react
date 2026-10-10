@@ -1,7 +1,8 @@
 import "./MainNav.css";
 import { NavLink, matchPath, useLocation } from "react-router-dom";
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import { Cursor } from "../ui/Cursor";
+import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 
 interface NavItem {
   to: string;
@@ -17,11 +18,24 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/", label: "Home", end: true },
   { to: "/compare", label: "Compare" },
   { to: "/team", label: "Team" },
-  { to: "library", label: "Library" },
+  { to: "/library", label: "Library" },
 ];
+
+//a click the browser should handle itself: ctrl/cmd-click opens a new tab
+//shift click a new window, middle click does its own thing
+function isPlainLeftClick(event: MouseEvent<HTMLAnchorElement>) {
+  return (
+    event.button === 0 &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  );
+}
 
 export function MainNav() {
   const { pathname } = useLocation();
+  const goTo = useViewTransitionNavigate();
 
   //derived every render from the URL, nothing to keep in sync:
   //same idea as ComparePage's isSelfCompare.
@@ -43,6 +57,14 @@ export function MainNav() {
           to={item.to}
           end={item.end}
           className={({ isActive }) => (isActive ? "active" : undefined)}
+          onClick={(event) => {
+            if (!isPlainLeftClick(event)) return;
+            //we take over plain clicks so the page change can be animated.
+            //the href stays on the link, so ctrl-click, new tabs and screen
+            //readers all still work
+            event.preventDefault();
+            goTo(item.to);
+          }}
         >
           {item.label}
         </NavLink>
