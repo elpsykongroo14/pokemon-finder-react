@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import {
   PreferencesContext,
@@ -12,10 +12,21 @@ const DEFAULT_PREFERENCES: Preferences = {
   spriteMode: "pixel",
 };
 
+//a new visitor's first answer to "animations on?" should come from their OS not be a hardcoded true.
+//a saved choice (see useLocalStorage) still wins
+function getDefaultPreferences(): Preferences {
+  const osWantsReductionMotion =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  return { ...DEFAULT_PREFERENCES, animationsEnabled: !osWantsReductionMotion };
+}
+
 export function PreferencesProvider({ children }: { children: ReactNode }) {
+  const [defaults] = useState(getDefaultPreferences);
   const [preferences, setPreferences] = useLocalStorage<Preferences>(
     "pokemon_preferences",
-    DEFAULT_PREFERENCES,
+    defaults,
   );
 
   //<html> exists outside anything React renders or owns, its the
