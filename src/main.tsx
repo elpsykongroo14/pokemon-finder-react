@@ -11,7 +11,7 @@ import { PreferencesProvider } from "./context/PreferencesContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter useTransitions={false}>
       <PreferencesProvider>
         <FavoritesProvider>
           <TeamProvider>
