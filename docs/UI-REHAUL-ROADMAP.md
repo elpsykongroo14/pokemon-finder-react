@@ -32,11 +32,11 @@ Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessio
 
 | ✓   | Phase   | Name                                   | Size | Depends on             | Visible payoff                                 |
 | --- | ------- | -------------------------------------- | ---- | ---------------------- | ---------------------------------------------- |
-| ☐   | **R0**  | Baseline & ground rules                | S    | Phase 9 checkpoint     | None (safety net)                              |
-| ☐   | **R1**  | Design language                        | M    | R0                     | Style guide page                               |
-| ☐   | **R2**  | Foundation refactor (no visual change) | M    | R1                     | None (enables everything)                      |
-| ☐   | **R3**  | Primitives kit                         | L    | R2                     | Buttons, panels, bars look like the game       |
-| ☐   | **R4**  | App shell, navigation & theme engine   | L    | R3                     | **First "wow": whole app re-skinned**          |
+| ✓   | **R0**  | Baseline & ground rules                | S    | Phase 9 checkpoint     | None (safety net)                              |
+| ✓   | **R1**  | Design language                        | M    | R0                     | Style guide page                               |
+| ✓   | **R2**  | Foundation refactor (no visual change) | M    | R1                     | None (enables everything)                      |
+| ✓   | **R3**  | Primitives kit                         | L    | R2                     | Buttons, panels, bars look like the game       |
+| ✓   | **R4**  | App shell, navigation & theme engine   | L    | R3                     | **First "wow": whole app re-skinned**          |
 | ☐   | **R5**  | The Pokémon page                       | L    | R4                     | **Animated sprite stage, type-reactive world** |
 | ☐   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
 | ☐   | **R7**  | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
@@ -789,6 +789,8 @@ ID: D16, Decision: Header navigation, Options: Menu primitive; real links with a
 
 ---
 
+| D17 | Route transition mechanism | viewTransition prop; migrate to RouterProvider; CSS-only enter animation; own wrapper hook | Recommendation: Own hook with feature detection; revisit RouterProvider at R5 if more links need it | needed by R4 | Answer: Own hook (useViewTransitionNavigate) on the main nav and search only; Back/Forward and other links stay instant |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
@@ -878,3 +880,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-09-19 | R0 walkthrough: corrected §8.3 (some tests depend on class names), added CI/preview and class-contract tasks, added measured baselines.                                                   |
 | 2026-09-21 | R0 complete. D1, D2, D9 answered. R1 started.                                                                                                                                             |
 | 2026-09-23 | Fonts locked: Jersey 10 + Nunito. D13 → B (slate/teal + gold selection). D14 added (elevation). primitives.css, semantic.css, motion.css written; contrast-checked; wired into index.css. | type-themes.css added: 18 types x deep/soft/ink derived and contrast-checked (zero AA failures), [data-type] mechanism wired. | R1 CLOSED. /styleguide route built (dev-only, lazy); full production exclusion deferred to R9/R10 per roadmap. D12 confirmed. All tokens (primitives, semantic, type-themes, motion) verified via tsc, vite build, and the existing test suite (all green). |
+
+| 2026-10-10 | add rows for today: “R4 complete: secondary theme variables, Backdrop, theme fades, route transitions (D17), OS-aware animation default.” |
