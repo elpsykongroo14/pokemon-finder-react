@@ -183,3 +183,11 @@ Hygiene fixes shipped to main: TypeBadge fallback typo, /Library → /library
 
 CI now runs on ui/rehaul, includes a build step, and deploys a preview.
 Audited which tests depend on class names (the "class contract", see roadmap 8.3).
+
+10-09-2026: UI rehaul, app shell, navigation & theme engine
+
+Token cutover finished: colors, shadows, durations and fonts moved to the new system; tokens.css retired; aliases remain until R5-R8. Decisions: border-default points at border-hairline for legacy components; sunken uses a new surface-well role; font-mono split into display and body.
+Added the type-reactive Backdrop (diagonal for dual types, tint capped at 22% so text stays above 4.5:1), secondary theme variables, and @property-based fades.
+Route transitions: React Router’s viewTransition option does nothing under BrowserRouter, so navigation goes through useViewTransitionNavigate (main nav and search only).
+Fixed: a new visitor’s animation default now follows the OS reduced-motion setting.
+Known, owned by R5: stat bars not visible, unstyled Compare button and View Cards link, danger red at 4.19:1 on cards.
