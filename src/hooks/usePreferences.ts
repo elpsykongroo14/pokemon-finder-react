@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
+import type { SpriteMode } from "../lib/sprites";
 
-export type SpriteMode = "pixel" | "artwork";
+export type { SpriteMode };
 
 export interface Preferences {
   animationsEnabled: boolean;
