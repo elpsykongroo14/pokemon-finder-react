@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { SpriteDisplay } from "./SpriteDisplay";
 import type { PokemonSprites } from "../lib/sprites";
 
@@ -44,6 +44,74 @@ describe("SpriteDisplay", () => {
 
     const img = screen.getByRole("img", { name: "pikachu(shiny)" });
     expect(img).toHaveAttribute("src", "artwork-shiny.png");
+  });
+});
+
+describe("SpriteDisplay modes", () => {
+  const sprites: PokemonSprites = {
+    front_default: "p.png",
+    other: { "official-artwork": { front_default: "art.png" } },
+    versions: {
+      "generation-v": {
+        "black-white": { animated: { front_default: "a.gif" } },
+      },
+    },
+  };
+
+  it("shows the animated sprite in pixel mode when animation is allowed", () => {
+    render(
+      <SpriteDisplay
+        sprites={sprites}
+        name="mew"
+        shiny={false}
+        mode="pixel"
+        animate
+      />,
+    );
+    const img = screen.getByRole("img", { name: "mew" });
+    expect(img).toHaveAttribute("src", "a.gif");
+    expect(img).toHaveAttribute("data-kind", "animated");
+  });
+
+  it("swaps to the static pixel sprite when animation is off", () => {
+    render(
+      <SpriteDisplay sprites={sprites} name="mew" shiny={false} mode="pixel" />,
+    );
+
+    expect(screen.getByRole("img", { name: "mew" })).toHaveAttribute(
+      "src",
+      "p.png",
+    );
+  });
+
+  it("scales a pixel sprite by a whole number once it has loaded", () => {
+    render(
+      <SpriteDisplay
+        sprites={sprites}
+        name="mew"
+        shiny={false}
+        mode="pixel"
+        size={300}
+      />,
+    );
+    const img = screen.getByRole("img", { name: "mew" });
+    Object.defineProperty(img, "naturalWidth", { value: 96 });
+    Object.defineProperty(img, "naturalHeight", { value: 96 });
+
+    fireEvent.load(img);
+
+    expect(img).toHaveStyle({ width: "288px" });
+  });
+
+  it("never forces a width onto artwork", () => {
+    render(<SpriteDisplay sprites={sprites} name="mew" shiny={false} />);
+    const img = screen.getByRole("img", { name: "mew" });
+    Object.defineProperty(img, "naturalWidth", { value: 475 });
+    Object.defineProperty(img, "naturalHeight", { value: 475 });
+
+    fireEvent.load(img);
+
+    expect(img.getAttribute("style")).toBeNull();
   });
 });
 
