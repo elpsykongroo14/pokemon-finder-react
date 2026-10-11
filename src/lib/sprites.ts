@@ -65,7 +65,8 @@ export function resolveSprite(
   {
     shiny = false,
     mode = "pixel",
-  }: { shiny?: boolean; mode?: SpriteMode } = {},
+    animate = true,
+  }: { shiny?: boolean; mode?: SpriteMode; animate?: boolean } = {},
 ): ResolvedSprite | null {
   const animated = pickFrame(
     sprites.versions?.["generation-v"]?.["black-white"]?.animated,
@@ -77,7 +78,7 @@ export function resolveSprite(
   const chain: Array<[SpriteKind, string | null]> =
     mode === "pixel"
       ? [
-          ["animated", animated],
+          ["animated", animate ? animated : null],
           ["pixel", pixel],
           ["artwork", artwork],
         ]
@@ -91,4 +92,15 @@ export function resolveSprite(
   }
 
   return null;
+}
+
+//pixel art only stays crisp when scaled by a whole number (2x, 3x, never 2.5x)
+//returns the biggest whole number multiplier that still fits the longest side inside the box
+export function integerScale(
+  natural: { width: number; height: number },
+  box: number,
+): number {
+  const longest = Math.max(natural.width, natural.height);
+  if (!(longest > 0)) return 1;
+  return Math.max(1, Math.floor(box / longest));
 }
