@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getSpriteUrl, resolveSprite } from "./sprites";
+import { getSpriteUrl, integerScale, resolveSprite } from "./sprites";
 import type { PokemonSprites } from "./sprites";
 
 describe("getSpriteUrl", () => {
@@ -116,5 +116,44 @@ describe("resolveSprite", () => {
 
   it("returns null when nothing is available", () => {
     expect(resolveSprite({})).toBeNull();
+  });
+});
+
+describe("resolveSprite with animation switched off", () => {
+  it("skips the animated sprite uses the static pixel one", () => {
+    expect(resolveSprite(full, { animate: false })).toEqual({
+      url: "p.png",
+      kind: "pixel",
+    });
+  });
+
+  it("still reaches artwork when nothing static exists either", () => {
+    const sprites: PokemonSprites = {
+      other: full.other,
+      versions: full.versions,
+    };
+    expect(resolveSprite(sprites, { animate: false })).toEqual({
+      url: "art.png",
+      kind: "artwork",
+    });
+  });
+});
+
+describe("integerScale", () => {
+  it("returns the largest whole multiplier that fits", () => {
+    expect(integerScale({ width: 96, height: 96 }, 300)).toBe(3);
+  });
+
+  it("is limited by the longest side", () => {
+    expect(integerScale({ width: 50, height: 100 }, 250)).toBe(2);
+  });
+
+  it("never goes below 1, even when the image is bigger than the box", () => {
+    expect(integerScale({ width: 475, height: 475 }, 180)).toBe(1);
+  });
+
+  it("returns 1 when the size is unknown (0 or NAN)", () => {
+    expect(integerScale({ width: 0, height: 0 }, 180)).toBe(1);
+    expect(integerScale({ width: NaN, height: NaN }, 180)).toBe(1);
   });
 });
