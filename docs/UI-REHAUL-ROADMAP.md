@@ -791,6 +791,24 @@ ID: D16, Decision: Header navigation, Options: Menu primitive; real links with a
 
 | D17 | Route transition mechanism | viewTransition prop; migrate to RouterProvider; CSS-only enter animation; own wrapper hook | Recommendation: Own hook with feature detection; revisit RouterProvider at R5 if more links need it | needed by R4 | Answer: Own hook (useViewTransitionNavigate) on the main nav and search only; Back/Forward and other links stay instant |
 
+---
+
+       | R5        |        |
+
+| spike | this is the sprite spike we were meant to record in R0 done in R5 | the results: 1 'bulbasaur' {animated: true, pixel: true, artwork: true}
+VM87:5 6 'charizard' {animated: true, pixel: true, artwork: true}
+VM87:5 25 'pikachu' {animated: true, pixel: true, artwork: true}
+VM87:5 150 'mewtwo' {animated: true, pixel: true, artwork: true}
+VM87:5 252 'treecko' {animated: true, pixel: true, artwork: true}
+VM87:5 384 'rayquaza' {animated: true, pixel: true, artwork: true}
+VM87:5 493 'arceus' {animated: true, pixel: true, artwork: true}
+VM87:5 649 'genesect' {animated: true, pixel: true, artwork: true}
+VM87:5 650 'chespin' {animated: false, pixel: true, artwork: true}
+VM87:5 700 'sylveon' {animated: true, pixel: true, artwork: true}
+VM87:5 800 'necrozma' {animated: true, pixel: true, artwork: true}
+VM87:5 898 'calyrex' {animated: true, pixel: true, artwork: true}
+| |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
