@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PokemonCard } from "./PokemonCard";
 import type { PokemonDetails } from "../lib/type";
+import { PreferencesProvider } from "../context/PreferencesContext";
 
 const { toggleFavorite } = vi.hoisted(() => ({ toggleFavorite: vi.fn() }));
 
@@ -39,9 +40,17 @@ const mockPokemon: PokemonDetails = {
   },
 };
 
+function renderCard() {
+  return render(
+    <PreferencesProvider>
+      <PokemonCard pokemon={mockPokemon} />
+    </PreferencesProvider>,
+  );
+}
+
 describe("PokemonCard", () => {
   it("shows the default sprite and an unchecked shiny toggle on first render", () => {
-    render(<PokemonCard pokemon={mockPokemon} />);
+    renderCard();
 
     expect(screen.getByRole("checkbox", { name: "Shiny" })).not.toBeChecked();
     expect(screen.getByRole("img", { name: "pikachu" })).toBeInTheDocument();
@@ -49,7 +58,7 @@ describe("PokemonCard", () => {
 
   it("swaps to the shiny sprite when the Shiny checkbox is checked", async () => {
     const user = userEvent.setup();
-    render(<PokemonCard pokemon={mockPokemon} />);
+    renderCard();
 
     await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
 
@@ -61,7 +70,7 @@ describe("PokemonCard", () => {
 
   it("calls toggleFavorite with the pokemon when the favorite button is clicked", async () => {
     const user = userEvent.setup();
-    render(<PokemonCard pokemon={mockPokemon} />);
+    renderCard();
 
     await user.click(screen.getByRole("button", { name: /favorite/i }));
 
