@@ -16,6 +16,11 @@
       box-shadow var(--dur-instant) var(--ease-standard);
   }
 
+  /* the same look on a link: a.btn is an anchor drawn like a button */
+  a.btn {
+    text-decoration: none;
+  }
+
   .btn[data-variant="primary"] {
     background: var(--accent-select);
     color: var(--surface-frame);
