@@ -4,6 +4,10 @@ import "./PokemonCard.css";
 import { useState } from "react";
 import { Stage } from "./Stage";
 import { StageConsole } from "../ui/StageConsole";
+import { Tabs } from "../ui/Tabs";
+import { TabList } from "../ui/TabList";
+import { Tab } from "../ui/Tab";
+import { TabPanel } from "../ui/TabPanel";
 import { StatBarChart } from "./StatBarChart";
 import { MetaInfo } from "./MetaInfo";
 import { PokemonActions } from "./PokemonActions";
@@ -28,25 +32,31 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
           onShinyChange={setShiny}
         />
 
-        <section className="pokemon-card-section">
-          <h3 className="pokemon-card-section-title">Base Stats</h3>
-          <StatBarChart stats={pokemon.stats} />
-        </section>
+        <Tabs defaultValue="info">
+          <TabList aria-label="Pokémon details">
+            <Tab value="info">Info</Tab>
+            <Tab value="stats">Stats</Tab>
+            <Tab value="evolution">Evolution</Tab>
+          </TabList>
 
-        <section className="pokemon-card-section">
-          <h3 className="pokemon-card-section-title">Details</h3>
-          <MetaInfo
-            height={pokemon.height}
-            weight={pokemon.weight}
-            abilities={pokemon.abilities}
-          />
-        </section>
-        {/*PokemonCard.tsx doesn't need to know anything changed underneath, it just hands its own pokemon prop to one more child, exactly the way it already hands slices of that same prop to SpriteDisplay, TypeBadgeList, and MetaInfo.*/}
+          <TabPanel value="info">
+            <MetaInfo
+              height={pokemon.height}
+              weight={pokemon.weight}
+              abilities={pokemon.abilities}
+            />
+          </TabPanel>
 
-        <section className="pokemon-card-section">
-          <h3 className="pokemon-card-section-title">Evolution</h3>
-          <EvolutionSection pokemon={pokemon} />
-        </section>
+          {/* keepMounted={false}: the bars mount each time this tab opens,
+              so their fill and count-up play when you can actually see them */}
+          <TabPanel value="stats" keepMounted={false}>
+            <StatBarChart stats={pokemon.stats} />
+          </TabPanel>
+
+          <TabPanel value="evolution">
+            <EvolutionSection pokemon={pokemon} />
+          </TabPanel>
+        </Tabs>
       </StageConsole>
     </article>
   );

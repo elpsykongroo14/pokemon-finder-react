@@ -79,4 +79,22 @@ describe("PokemonCard", () => {
 
     expect(toggleFavorite).toHaveBeenCalledWith(mockPokemon);
   });
+
+  it("organises the details into Info, Stats and Evolution tabs", async () => {
+    const user = userEvent.setup();
+    renderCard();
+
+    const tabs = screen.getAllByRole("tab").map((tab) => tab.textContent);
+    expect(tabs).toEqual(["Info", "Stats", "Evolution"]);
+    expect(screen.getByRole("tab", { name: "Info" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    await user.click(screen.getByRole("tab", { name: "Stats" }));
+    expect(screen.getByRole("tab", { name: "Stats" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
 });
