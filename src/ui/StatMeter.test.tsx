@@ -32,6 +32,15 @@ describe("StatMeter", () => {
     expect(screen.getByText("78")).toBeInTheDocument();
   });
 
+  it("Passes its list position to CSS so row can stagger", () => {
+    const { container } = renderMeter({ index: 3 });
+    expect(
+      (
+        container.querySelector(".stat-meter") as HTMLElement
+      ).style.getPropertyValue("--stat-index"),
+    ).toBe("3");
+  });
+
   it("colors by percentage when tiered", () => {
     const { container } = renderMeter({
       value: 10,

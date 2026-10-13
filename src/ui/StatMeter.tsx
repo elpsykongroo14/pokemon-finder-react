@@ -11,6 +11,9 @@ interface statMeterProps {
   value: number;
   max: number;
   variant?: MeterVariant;
+  //position in a list of meters: later rows start their fill a little
+  //later, which is what the fills ripple instead of land together
+  index?: number;
 }
 
 function tierFor(percent: number): "low" | "mid" | "high" {
@@ -24,6 +27,7 @@ export function StatMeter({
   value,
   max,
   variant = "default",
+  index = 0,
 }: statMeterProps) {
   const { animationsEnabled } = usePreferences();
   const prefersReduceMotion = usePrefersReduceMotion();
@@ -41,6 +45,7 @@ export function StatMeter({
       className="stat-meter"
       data-variant={variant}
       data-tier={variant === "tiered" ? tierFor(percent) : undefined}
+      style={{ "--stat-index": index } as CSSProperties}
     >
       <span className="stat-meter__label" id={labelId}>
         {label}

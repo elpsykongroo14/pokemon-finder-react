@@ -26,6 +26,17 @@
     background: var(--accent-select);
     width: var(--stat-meter-percent, 0%);
     transition: width var(--dur-slow) var(--ease-tick);
+    /* on mount: grow from empty, each row a beat after the one above.
+       Both times come from motion tokens, which are 0ms when animations
+       are off, so reduced motion needs no extra rule here. */
+    animation: stat-meter-fill var(--dur-slow) var(--ease-tick) both;
+    animation-delay: calc(var(--stat-index, 0) * var(--dur-instant));
+  }
+
+  @keyframes stat-meter-fill {
+    from {
+      width: 0;
+    }
   }
 
   .stat-meter[data-variant="highest"] .stat-meter__fill {
