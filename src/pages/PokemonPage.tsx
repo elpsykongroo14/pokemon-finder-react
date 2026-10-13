@@ -1,5 +1,4 @@
-import "./PokemonPage.css";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { usePokemon } from "../hooks/usePokemon";
 import { PokemonCard } from "../components/PokemonCard";
 import { useTypeTheme } from "../hooks/useTypeTheme";
@@ -8,7 +7,6 @@ export function PokemonPage() {
   const { name } = useParams<{ name: string }>(); //this line reads the dynamic segment straight off the current URL.
   //it just reflects whatever the router already matched to get this component rendered in the first place
   //useParams here just reads result
-  const navigate = useNavigate();
   const { data, loading, error } = usePokemon(name ?? "");
 
   useTypeTheme(error ? undefined : data?.types.map((t) => t.type.name));
@@ -36,29 +34,7 @@ export function PokemonPage() {
         </p>
       )}
 
-      {!loading && !error && data && (
-        <>
-          <div className="card-header-actions">
-            <button
-              type="button"
-              className="compare-button"
-              onClick={() =>
-                navigate(`/compare?a=${encodeURIComponent(data.name)}`)
-              }
-            >
-              ⚔️ Compare
-            </button>
-
-            <Link
-              to={`/library/${encodeURIComponent(data.name)}`}
-              className="tcg-btn"
-            >
-              View Cards
-            </Link>
-          </div>
-          <PokemonCard pokemon={data} />
-        </>
-      )}
+      {!loading && !error && data && <PokemonCard pokemon={data} />}
 
       {!loading && !error && !data && (
         <p className="status-message">No results for "{name}".</p>

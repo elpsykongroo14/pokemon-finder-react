@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { PokemonPage } from "./PokemonPage";
 import { usePokemon } from "../hooks/usePokemon";
@@ -66,7 +65,7 @@ describe("PokemonPage", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Pokémon not found");
   });
 
-  it("renders the pokemon card and activation links when data loads", () => {
+  it("renders the pokemon card when data loads", () => {
     vi.mocked(usePokemon).mockReturnValue({
       data: makePokemon(),
       loading: false,
@@ -76,13 +75,6 @@ describe("PokemonPage", () => {
     renderPokemonPage("/pokemon/pikachu");
 
     expect(screen.getByTestId("pokemon-card")).toHaveTextContent("pikachu");
-    expect(
-      screen.getByRole("button", { name: "⚔️ Compare" }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "View Cards" })).toHaveAttribute(
-      "href",
-      "/library/pikachu",
-    );
   });
 
   it("shows a not found message when the fetch succeeds with no data", () => {
@@ -133,27 +125,6 @@ describe("PokemonPage", () => {
     renderPokemonPage("/pokemon/missingno");
 
     expect(document.documentElement.dataset.type).toBeUndefined();
-  });
-
-  it("navigates to the compare page when Compare is clicked", async () => {
-    vi.mocked(usePokemon).mockReturnValue({
-      data: makePokemon(),
-      loading: false,
-      error: null,
-    });
-    const user = userEvent.setup();
-
-    render(
-      <MemoryRouter initialEntries={["/pokemon/pikachu"]}>
-        <Routes>
-          <Route path="/pokemon/:name" element={<PokemonPage />} />
-          <Route path="/compare" element={<p>Compare Page Content</p>} />
-        </Routes>
-      </MemoryRouter>,
-    );
-    await user.click(screen.getByRole("button", { name: "⚔️ Compare" }));
-
-    expect(screen.getByText("Compare Page Content")).toBeInTheDocument();
   });
 });
 

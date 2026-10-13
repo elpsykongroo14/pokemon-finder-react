@@ -6,11 +6,9 @@ import { Stage } from "./Stage";
 import { StageConsole } from "../ui/StageConsole";
 import { StatBarChart } from "./StatBarChart";
 import { MetaInfo } from "./MetaInfo";
-import { FavoriteButton } from "./FavoriteButton";
-import { useFavorites } from "../hooks/useFavorites";
+import { PokemonActions } from "./PokemonActions";
 import type { PokemonDetails } from "../lib/type";
 import { EvolutionSection } from "./EvolutionSection";
-import { TeamButton } from "../context/TeamButton";
 
 interface PokemonCardProps {
   pokemon: PokemonDetails;
@@ -20,26 +18,15 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
   //shiny lives here, not in Stage: the checkbox (Console) and the
   //sprite (Stage) both need it, so their closest shared parent owns it
   const [shiny, setShiny] = useState(false);
-  const { isFavorite, toggleFavorite } = useFavorites();
 
   return (
     <article className="pokemon-card">
       <StageConsole stage={<Stage pokemon={pokemon} shiny={shiny} />}>
-        <div className="pokemon-card-actions">
-          <FavoriteButton
-            isFavorite={isFavorite(pokemon.name)}
-            onToggle={() => toggleFavorite(pokemon)}
-          />
-          <TeamButton pokemon={pokemon} />
-          <label className="shiny-toggle">
-            <input
-              type="checkbox"
-              checked={shiny}
-              onChange={(e) => setShiny(e.target.checked)}
-            />
-            Shiny
-          </label>
-        </div>
+        <PokemonActions
+          pokemon={pokemon}
+          shiny={shiny}
+          onShinyChange={setShiny}
+        />
 
         <section className="pokemon-card-section">
           <h3 className="pokemon-card-section-title">Base Stats</h3>

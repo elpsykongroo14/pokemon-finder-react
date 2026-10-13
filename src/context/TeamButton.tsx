@@ -1,7 +1,7 @@
 //TeamButton.tsx is the dumb-ish component that sits on PokemonCard,
 //mirroring FavoriteButton.tsx
-import "./TeamButton.css";
 import "../styles/shared.css";
+import { Button } from "../ui/Button";
 import { useEffect } from "react";
 import { useTeam } from "../hooks/useTeam";
 import type { PokemonDetails } from "../lib/type";
@@ -33,14 +33,9 @@ export function TeamButton({ pokemon }: TeamButtonProps) {
 
   return (
     <div className="team-builder-wrap">
-      <button
-        type="button"
-        className="team-button"
-        onClick={handleClick}
-        aria-pressed={onTeam}
-      >
+      <Button variant="secondary" onClick={handleClick} pressed={onTeam}>
         {onTeam ? "✅ On Team" : "+ Add to Team"}
-      </button>
+      </Button>
       {error && (
         <p role="alert" className="status-message status-message--error">
           {error}

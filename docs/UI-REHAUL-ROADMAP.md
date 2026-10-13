@@ -809,6 +809,14 @@ VM87:5 800 'necrozma' {animated: true, pixel: true, artwork: true}
 VM87:5 898 'calyrex' {animated: true, pixel: true, artwork: true}
 | |
 
+| R5 | static rung of the sprite chain |
+| D18 | options: Gen IV/V rung; top-level front_default, | recommendation: Top-level front_default (nearly universal pixel sprite) | answer: Top-level front_default; spike showed animated Gen V everywhere tested except #650 |
+
+| R5 | animating links beyond the main nav |
+| D19 | options: Migrate to RouterProvider; reusable TransitionLink, | recommendation: TransitionLink; revisit RouterProvider only if Back/Forward animation matters | answer: TransitionLink on Compare and View Cards; Back/Forward stays instant |
+
+| D20 | response animations and the shiny sparkle move to R9 | The roadmap lists them under R5, but R9 is “Juice, sound & settings: celebrations, polish”. | Recommendation: Building the structure now and the sparkle later keeps this part about system design | Answer: moved from R5 to R9 |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
