@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { PokemonCard } from "./PokemonCard";
 import type { PokemonDetails } from "../lib/type";
 import { PreferencesProvider } from "../context/PreferencesContext";
+import { MemoryRouter } from "react-router-dom";
 
 const { toggleFavorite } = vi.hoisted(() => ({ toggleFavorite: vi.fn() }));
 
@@ -42,9 +43,11 @@ const mockPokemon: PokemonDetails = {
 
 function renderCard() {
   return render(
-    <PreferencesProvider>
-      <PokemonCard pokemon={mockPokemon} />
-    </PreferencesProvider>,
+    <MemoryRouter>
+      <PreferencesProvider>
+        <PokemonCard pokemon={mockPokemon} />
+      </PreferencesProvider>
+    </MemoryRouter>,
   );
 }
 
