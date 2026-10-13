@@ -33,14 +33,9 @@ export function TeamButton({ pokemon }: TeamButtonProps) {
 
   return (
     <div className="team-builder-wrap">
-      <button
-        type="button"
-        className="team-button"
-        onClick={handleClick}
-        aria-pressed={onTeam}
-      >
+      <Button variant="secondary" onClick={handleClick} pressed={onTeam}>
         {onTeam ? "✅ On Team" : "+ Add to Team"}
-      </button>
+      </Button>
       {error && (
         <p role="alert" className="status-message status-message--error">
           {error}
