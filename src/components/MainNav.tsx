@@ -1,8 +1,9 @@
 import "./MainNav.css";
 import { NavLink, matchPath, useLocation } from "react-router-dom";
-import type { CSSProperties, MouseEvent } from "react";
+import type { CSSProperties } from "react";
 import { Cursor } from "../ui/Cursor";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
+import { isPlainLeftClick } from "../lib/clicks";
 
 interface NavItem {
   to: string;
@@ -20,18 +21,6 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/team", label: "Team" },
   { to: "/library", label: "Library" },
 ];
-
-//a click the browser should handle itself: ctrl/cmd-click opens a new tab
-//shift click a new window, middle click does its own thing
-function isPlainLeftClick(event: MouseEvent<HTMLAnchorElement>) {
-  return (
-    event.button === 0 &&
-    !event.metaKey &&
-    !event.ctrlKey &&
-    !event.shiftKey &&
-    !event.altKey
-  );
-}
 
 export function MainNav() {
   const { pathname } = useLocation();
