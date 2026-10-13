@@ -74,4 +74,26 @@ describe("Tabs", () => {
     await userEvent.click(screen.getByRole("tab", { name: "Evolution" }));
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Evolution content");
   });
+
+  it("only mounts a keepMounted={false} panel while it is selected", async () => {
+    render(
+      <Tabs defaultValue="info">
+        <TabList aria-label="Pokémon details">
+          <Tab value="info">Info</Tab>
+          <Tab value="stats">Stats</Tab>
+        </TabList>
+        <TabPanel value="info">Info content</TabPanel>
+        <TabPanel value="stats" keepMounted={false}>
+          Stats content
+        </TabPanel>
+      </Tabs>,
+    );
+    expect(screen.queryByText("Stats content")).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("tab", { name: "Stats" }));
+    expect(screen.getByText("Stats content")).toBeVisible();
+
+    await userEvent.click(screen.getByRole("tab", { name: "Info" }));
+    expect(screen.queryByText("Stats content")).not.toBeInTheDocument();
+  });
 });
