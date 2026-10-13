@@ -21,6 +21,20 @@ describe("MetaInfo", () => {
     expect(screen.getByRole("cell", { name: "90.5 kg" })).toBeInTheDocument();
   });
 
+  it("labels every row with a row header, so each value is tied to its names", () => {
+    render(
+      <MetaInfo
+        height={10}
+        weight={10}
+        abilities={[makeAbility("overgrow"), makeAbility("chlorophyll", true)]}
+      />,
+    );
+
+    for (const name of ["Height", "Weight", "Abilities", "Hidden"]) {
+      expect(screen.getByRole("rowheader", { name })).toBeInTheDocument();
+    }
+  });
+
   it("joins multiple non hidden abilities with a comma", () => {
     render(
       <MetaInfo

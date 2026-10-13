@@ -30,20 +30,28 @@ export function MetaInfo({ height, weight, abilities }: MetaInfoProps) {
     <table className="meta-table">
       <tbody>
         <tr>
-          <td className="meta-key">Height</td>
+          <th scope="row" className="meta-key">
+            Height
+          </th>
           <td className="meta-val">{heightM} m</td>
         </tr>
         <tr>
-          <td className="meta-key">Weight</td>
+          <th scope="row" className="meta-key">
+            Weight
+          </th>
           <td className="meta-val">{weightKg} kg</td>
         </tr>
         <tr>
-          <td className="meta-key">Abilities</td>
+          <th scope="row" className="meta-key">
+            Abilities
+          </th>
           <td className="meta-val">{normalAbilities}</td>
         </tr>
         {hiddenAbility && (
           <tr>
-            <td className="meta-key">Hidden</td>
+            <th scope="row" className="meta-key">
+              Hidden
+            </th>
             <td className="meta-val meta-val--hidden">
               {hiddenAbility.ability.name}
             </td>
