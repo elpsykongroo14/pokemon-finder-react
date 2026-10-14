@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { fetchSpecies, fetchEvolutionChain, fetchPokemon } from "../lib/api";
+import type { PokemonSprites } from "../lib/sprites";
 import type { PokemonDetails, EvolutionNode } from "../lib/type";
 import { buildEvolutionTree, collectEvolutionNames } from "../lib/evolution";
-import { getSpriteUrl } from "../lib/sprites";
 
 interface useEvolutionChainResult {
   tree: EvolutionNode | null;
-  sprites: Record<string, string | null>;
+  //raw sprite data per stage, not finished URLs: choosing which image to show
+  //(pixel or artwork) is presentation, so the component decides not the hook
+  sprites: Record<string, PokemonSprites | null>;
   loading: boolean;
   error: string | null;
 }
@@ -15,7 +17,9 @@ export function useEvolutionChain(
   pokemon: PokemonDetails,
 ): useEvolutionChainResult {
   const [tree, setTree] = useState<EvolutionNode | null>(null);
-  const [sprites, setSprites] = useState<Record<string, string | null>>({});
+  const [sprites, setSprites] = useState<Record<string, PokemonSprites | null>>(
+    {},
+  );
   //starts true: this effect always fires on mount,
   //since "pokemon" is guaranteed non null
   //unlike usePokemon's empty query like idle state
@@ -48,13 +52,13 @@ export function useEvolutionChain(
             fetchPokemon(name, { signal: controller.signal })
               //one stage failing to load shoudlnt take down the whole section
               //same shrug and continue pattern as fetchTCGCardsBatch
-              .then((data) => getSpriteUrl(data.sprites))
+              .then((data) => data.sprites)
               .catch(() => null),
           ),
         );
 
         //zip names and results back together into a lookup map
-        const spriteMap: Record<string, string | null> = {};
+        const spriteMap: Record<string, PokemonSprites | null> = {};
         names.forEach((name, i) => {
           spriteMap[name] = results[i];
         });

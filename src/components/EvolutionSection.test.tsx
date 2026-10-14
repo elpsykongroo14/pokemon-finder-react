@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { EvolutionSection } from "./EvolutionSection";
 import { useEvolutionChain } from "../hooks/useEvolutionChain";
 import type { PokemonDetails } from "../lib/type";
+import { PreferencesProvider } from "../context/PreferencesContext";
 
 vi.mock("../hooks/useEvolutionChain", () => ({
   useEvolutionChain: vi.fn(),
@@ -20,6 +21,15 @@ function setEvolutionChain(
     error: null,
     ...overrides,
   });
+}
+
+//EvolutionSection reads the sprite preference, so it needs the provider
+function renderSection() {
+  return render(
+    <PreferencesProvider>
+      <EvolutionSection pokemon={makePokemon()} />
+    </PreferencesProvider>,
+  );
 }
 
 function makePokemon(): PokemonDetails {
@@ -47,7 +57,7 @@ beforeEach(() => {
 describe("EvolutionSection", () => {
   it("shows a status message while loading", () => {
     setEvolutionChain({ loading: true });
-    render(<EvolutionSection pokemon={makePokemon()} />);
+    renderSection();
 
     expect(screen.getByRole("status")).toHaveTextContent(
       "Loading evolution chain...",
@@ -56,7 +66,7 @@ describe("EvolutionSection", () => {
 
   it("shows an alert when the fetch fails", () => {
     setEvolutionChain({ error: "network error" });
-    render(<EvolutionSection pokemon={makePokemon()} />);
+    renderSection();
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Couldn't load evolution data.",
@@ -68,7 +78,7 @@ describe("EvolutionSection", () => {
       tree: { name: "bulbasaur", children: [] },
       sprites: {},
     });
-    render(<EvolutionSection pokemon={makePokemon()} />);
+    renderSection();
 
     expect(
       screen.getByText("This Pokémon does not evolve."),
@@ -83,9 +93,12 @@ describe("EvolutionSection", () => {
         name: "bulbasaur",
         children: [{ name: "ivysaur", children: [] }],
       },
-      sprites: { bulbasaur: "bulbasaur.png", ivysaur: "ivysaur.png" },
+      sprites: {
+        bulbasaur: { front_default: "bulbasaur.png" },
+        ivysaur: { front_default: "ivysaur.png" },
+      },
     });
-    render(<EvolutionSection pokemon={makePokemon()} />);
+    renderSection();
 
     expect(screen.getByText("bulbasaur")).toBeInTheDocument();
     expect(screen.getByText("ivysaur")).toBeInTheDocument();
