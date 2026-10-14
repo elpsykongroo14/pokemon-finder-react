@@ -103,6 +103,21 @@ describe("SpriteDisplay modes", () => {
     expect(img).toHaveStyle({ width: "288px" });
   });
 
+  it("lets the browser defer the download only when asked to", () => {
+    const { rerender } = render(
+      <SpriteDisplay sprites={sprites} name="mew" shiny={false} />,
+    );
+    expect(screen.getByRole("img", { name: "mew" })).not.toHaveAttribute(
+      "loading",
+    );
+
+    rerender(<SpriteDisplay sprites={sprites} name="mew" shiny={false} lazy />);
+    expect(screen.getByRole("img", { name: "mew" })).toHaveAttribute(
+      "loading",
+      "lazy",
+    );
+  });
+
   it("never forces a width onto artwork", () => {
     render(<SpriteDisplay sprites={sprites} name="mew" shiny={false} />);
     const img = screen.getByRole("img", { name: "mew" });
