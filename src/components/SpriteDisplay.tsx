@@ -16,6 +16,10 @@ interface SpriteDisplayProps {
   mode?: SpriteMode;
   animate?: boolean;
   size?: number;
+  //true: the browser waits to download the image until it is near the screen.
+  //right for the things below the fold or in hidden tabs, wrong for
+  //the hero sprite, which should start downloading immediately
+  lazy?: boolean;
 }
 
 export function SpriteDisplay({
@@ -25,6 +29,7 @@ export function SpriteDisplay({
   mode = "artwork",
   animate = false,
   size = 180,
+  lazy = false,
 }: SpriteDisplayProps) {
   const sprite = resolveSprite(sprites, { shiny, mode, animate });
   const alt = `${name}${shiny ? "(shiny)" : ""}`;
@@ -37,7 +42,13 @@ export function SpriteDisplay({
       {sprite ? (
         //key={url}: a new url mounts a fresh SpriteImage, so its
         //measured width resets by itself instead of via an effect
-        <SpriteImage key={sprite.url} sprite={sprite} alt={alt} box={size} />
+        <SpriteImage
+          key={sprite.url}
+          sprite={sprite}
+          alt={alt}
+          box={size}
+          lazy={lazy}
+        />
       ) : (
         <div className="sprite-placeholder">No image available</div>
       )}
@@ -49,10 +60,12 @@ function SpriteImage({
   sprite,
   alt,
   box,
+  lazy,
 }: {
   sprite: ResolvedSprite;
   alt: string;
   box: number;
+  lazy: boolean;
 }) {
   const [width, setWidth] = useState<number | undefined>(undefined);
 
@@ -73,6 +86,7 @@ function SpriteImage({
       src={sprite.url}
       alt={alt}
       decoding="async"
+      loading={lazy ? "lazy" : undefined}
       onLoad={handleLoad}
       style={width ? { width } : undefined}
     />
