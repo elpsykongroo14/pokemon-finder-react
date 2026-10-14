@@ -8,12 +8,6 @@
     overflow-x: auto;
   }
 
-  .evolution-stage img,
-  .evolution-stage .sprite-placeholder {
-    width: 56px;
-    height: 56px;
-  }
-
   .evolution-stage span {
     font-size: var(--text-xs);
     color: var(--color-text-primary);

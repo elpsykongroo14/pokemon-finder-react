@@ -25,5 +25,45 @@
     background: var(--color-border-default);
     position: relative;
     flex-shrink: 0;
+    /* the arrow is revealed left to right, deeper levels a beat later.
+       Duration and delay come from motion tokens, which are 0ms when
+       animations are off, so there is no separate reduced-motion rule. */
+    animation: evolution-draw var(--dur-base) var(--ease-standard) both;
+    animation-delay: calc(var(--evo-depth, 0) * var(--dur-base));
+  }
+
+  @keyframes evolution-draw {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+  }
+
+  /* narrow screens: stack the chain top to bottom instead of scrolling sideways */
+  @media (max-width: 480px) {
+    .evolution-branch-row {
+      flex-direction: column;
+    }
+
+    .evolution-arrow {
+      width: 1px;
+      height: 24px;
+      animation-name: evolution-draw-down;
+    }
+
+    .evolution-arrow::after {
+      right: auto;
+      left: 50%;
+      top: auto;
+      bottom: 0;
+      transform: translateX(-50%);
+      border-color: transparent;
+      border-top-color: var(--color-border-default);
+    }
+  }
+
+  @keyframes evolution-draw-down {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
   }
 }
