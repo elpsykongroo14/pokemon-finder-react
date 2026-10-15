@@ -191,3 +191,11 @@ Added the type-reactive Backdrop (diagonal for dual types, tint capped at 22% so
 Route transitions: React Router’s viewTransition option does nothing under BrowserRouter, so navigation goes through useViewTransitionNavigate (main nav and search only).
 Fixed: a new visitor’s animation default now follows the OS reduced-motion setting.
 Known, owned by R5: stat bars not visible, unstyled Compare button and View Cards link, danger red at 4.19:1 on cards.
+
+10-14-2026: UI rehaul Pokemon page
+
+Built the sprite pipeline: resolveSprite returns { url, kind } through a mode-aware fallback chain (animated Gen V → static pixel → artwork), with an animate switch that swaps GIFs for stills when animations are off, and integerScale for crisp pixel art. Spike result: animated sprites present for every Pokémon tested except #650 (the chain, not an ID range, handles the gaps).
+Stage + Console layout with Info/Stats/Evolution tabs; TabPanel keepMounted lets Stats replay its staggered fill each time it opens. StatBarChart now uses StatMeter; dead StatBar removed. MetaInfo labels are real row headers.
+Compare and View Cards are now real links via TransitionLink, built on the Part 8 view-transition hook; Back/Forward stays instant.
+Page logic is one discriminated union (getPokemonPageState); loading is a skeleton built from the real layout; error and not-found use MessageBox.
+Deferred: shiny sparkle and button response animations; remaining getSpriteUrl callers (SearchBar, team, favorites) because they persist URL.
