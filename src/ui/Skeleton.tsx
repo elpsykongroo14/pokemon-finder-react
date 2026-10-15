@@ -6,6 +6,8 @@ interface SkeletonProps {
   height: number | string;
   label?: string;
   decorative?: boolean;
+  //"circle" is for silhuettes of round things like a sprite
+  shape?: "rect" | "circle";
 }
 
 export function Skeleton({
@@ -13,10 +15,12 @@ export function Skeleton({
   height,
   label = "loading",
   decorative = false,
+  shape = "rect",
 }: SkeletonProps) {
   return (
     <span
       className="skeleton"
+      data-shape={shape}
       role={decorative ? undefined : "status"}
       aria-label={decorative ? undefined : label}
       aria-hidden={decorative ? "true" : undefined}

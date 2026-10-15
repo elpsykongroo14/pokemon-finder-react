@@ -6,6 +6,10 @@
     animation: skeleton-pulse 1200ms ease-in-out infinite;
   }
 
+  .skeleton[data-shape="circle"] {
+    border-radius: 50%;
+  }
+
   @keyframes skeleton-pulse {
     0%,
     100% {

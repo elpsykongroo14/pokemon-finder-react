@@ -14,4 +14,18 @@ describe("Skeleton", () => {
     render(<Skeleton width={96} height={96} decorative />);
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
+
+  it("is a rounded rectangle unless asked to be a circle", () => {
+    const { rerender } = render(<Skeleton width={96} height={96} decorative />);
+    expect(document.querySelector(".skeleton")).toHaveAttribute(
+      "data-shape",
+      "rect",
+    );
+
+    rerender(<Skeleton width={96} height={96} decorative shape="circle" />);
+    expect(document.querySelector(".skeleton")).toHaveAttribute(
+      "data-shape",
+      "circle",
+    );
+  });
 });
