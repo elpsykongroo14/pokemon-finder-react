@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { PokemonPage } from "./PokemonPage";
 import { usePokemon } from "../hooks/usePokemon";
 import type { PokemonDetails } from "../lib/type";
+import { PreferencesProvider } from "../context/PreferencesContext";
 
 vi.mock("../hooks/usePokemon");
 
@@ -19,12 +20,16 @@ function makePokemon(overrides: Partial<PokemonDetails> = {}): PokemonDetails {
 
 function renderPokemonPage(initialPath: string) {
   return render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <Routes>
-        <Route path="/pokemon" element={<PokemonPage />} />
-        <Route path="/pokemon/:name" element={<PokemonPage />} />
-      </Routes>
-    </MemoryRouter>,
+    //MessageBox reads the animation preference, so the page needs the provider
+    <PreferencesProvider>
+      <MemoryRouter initialEntries={[initialPath]}>
+        <Routes>
+          <Route path="/pokemon" element={<PokemonPage />} />
+          <Route path="/pokemon/:name" element={<PokemonPage />} />
+        </Routes>
+      </MemoryRouter>
+      ,
+    </PreferencesProvider>,
   );
 }
 
@@ -38,10 +43,12 @@ describe("PokemonPage", () => {
 
     renderPokemonPage("/pokemon");
 
-    expect(screen.getByText("No Pokémon specified")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "No Pokémon specified",
+    );
   });
 
-  it("shows a loading status while the fetch is in flight", () => {
+  it("shows a loading skeleton while the fetch is in flight", () => {
     vi.mocked(usePokemon).mockReturnValue({
       data: null,
       loading: true,
@@ -50,7 +57,9 @@ describe("PokemonPage", () => {
 
     renderPokemonPage("/pokemon/pikachu");
 
-    expect(screen.getByRole("status")).toHaveTextContent("Loading…");
+    expect(
+      screen.getByRole("status", { name: "Loading Pokémon" }),
+    ).toBeInTheDocument();
   });
 
   it("shows an alert with the error message when the fetch fails", () => {
@@ -86,7 +95,9 @@ describe("PokemonPage", () => {
 
     renderPokemonPage("/pokemon/missingno");
 
-    expect(screen.getByText('No results for "missingno".')).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      'No results for "missingno".',
+    );
   });
 
   it("themes the whole page to the pokemon's types and clears it on leaving", () => {
