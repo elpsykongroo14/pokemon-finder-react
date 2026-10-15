@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { classifyFetchError } from "./fetchError";
+import { classifyFetchError } from "./fetchErrors";
 import { HttpError } from "./httpError";
 
 describe("classifyFetchError", () => {
