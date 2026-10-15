@@ -35,6 +35,7 @@ export function Stage({ pokemon, shiny }: StageProps) {
             mode={spriteMode}
             animate={animationsEnabled}
             size={240}
+            plain
           />
         </div>
 

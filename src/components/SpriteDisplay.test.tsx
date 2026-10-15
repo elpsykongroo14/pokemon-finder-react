@@ -118,6 +118,23 @@ describe("SpriteDisplay modes", () => {
     );
   });
 
+  it("keeps the circle by default and drops it when plain", () => {
+    const { container, rerender } = render(
+      <SpriteDisplay sprites={sprites} name="mew" shiny={false} />,
+    );
+    expect(container.querySelector(".sprite-stage")).not.toHaveAttribute(
+      "data-plain",
+    );
+
+    rerender(
+      <SpriteDisplay sprites={sprites} name="mew" shiny={false} plain />,
+    );
+    expect(container.querySelector(".sprite-stage")).toHaveAttribute(
+      "data-plain",
+      "true",
+    );
+  });
+
   it("never forces a width onto artwork", () => {
     render(<SpriteDisplay sprites={sprites} name="mew" shiny={false} />);
     const img = screen.getByRole("img", { name: "mew" });

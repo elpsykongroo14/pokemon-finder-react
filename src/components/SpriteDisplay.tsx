@@ -20,6 +20,9 @@ interface SpriteDisplayProps {
   //right for the things below the fold or in hidden tabs, wrong for
   //the hero sprite, which should start downloading immediately
   lazy?: boolean;
+  //true: no dark circle behind the sprite, and it stands on the bottom
+  //edge of its box. For places that already have their own backdrop
+  plain?: boolean;
 }
 
 export function SpriteDisplay({
@@ -30,6 +33,7 @@ export function SpriteDisplay({
   animate = false,
   size = 180,
   lazy = false,
+  plain = false,
 }: SpriteDisplayProps) {
   const sprite = resolveSprite(sprites, { shiny, mode, animate });
   const alt = `${name}${shiny ? "(shiny)" : ""}`;
@@ -37,6 +41,7 @@ export function SpriteDisplay({
   return (
     <div
       className="sprite-stage"
+      data-plain={plain || undefined}
       style={{ "--sprite-size": `${size}px` } as CSSProperties}
     >
       {sprite ? (
