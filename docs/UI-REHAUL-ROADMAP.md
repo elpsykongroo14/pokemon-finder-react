@@ -37,7 +37,7 @@ Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessio
 | ✓   | **R2**  | Foundation refactor (no visual change) | M    | R1                     | None (enables everything)                      |
 | ✓   | **R3**  | Primitives kit                         | L    | R2                     | Buttons, panels, bars look like the game       |
 | ✓   | **R4**  | App shell, navigation & theme engine   | L    | R3                     | **First "wow": whole app re-skinned**          |
-| ☐   | **R5**  | The Pokémon page                       | L    | R4                     | **Animated sprite stage, type-reactive world** |
+| ✓   | **R5**  | The Pokémon page                       | L    | R4                     | **Animated sprite stage, type-reactive world** |
 | ☐   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
 | ☐   | **R7**  | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
 | ☐   | **R8**  | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
