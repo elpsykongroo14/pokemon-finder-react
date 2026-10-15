@@ -33,6 +33,7 @@ export function EvolutionNode({
         mode={mode}
         size={96}
         lazy
+        plain
       />
       <span>{data.name}</span>
     </div>

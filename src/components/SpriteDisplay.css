@@ -9,6 +9,12 @@
     justify-content: center;
   }
 
+  .sprite-stage[data-plain="true"] {
+    background: none;
+    border-radius: 0;
+    align-items: flex-end;
+  }
+
   .sprite-display[data-kind="artwork"] {
     max-width: calc(var(--sprite-size, 180px) * 0.78);
     max-height: calc(var(--sprite-size, 180px) * 0.78);
