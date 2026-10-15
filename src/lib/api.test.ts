@@ -8,6 +8,7 @@ import {
   fetchAllpokemonNames,
   clearPokeCache,
 } from "./api.ts";
+import { HttpError } from "./httpError.ts";
 
 function fakeResponse(ok: boolean, body: unknown) {
   return { ok, status: ok ? 200 : 404, json: async () => body };
@@ -48,6 +49,19 @@ describe("fetchPokemon", () => {
     await expect(fetchPokemon("not-a-real-pokemon")).rejects.toThrow(
       /HTTP 404/,
     );
+  });
+
+  it("throws an HttpError that carries the status code", async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 503,
+      json: async () => ({}),
+    });
+
+    const error = await fetchPokemon("pikachu").catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(HttpError);
+    expect((error as HttpError).status).toBe(503);
   });
 
   it("does not call fetch twice for the same name (cache hit)", async () => {
