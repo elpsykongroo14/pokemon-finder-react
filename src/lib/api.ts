@@ -9,6 +9,8 @@ import type {
   TCGCard,
 } from "./type";
 
+import { HttpError } from "./httpError";
+
 //base URLs
 //POKE_API is a public, shared API - same url for every developer
 //so its fine as a hardcoded constant.
@@ -50,7 +52,7 @@ export function clearPokeCache(): void {
 async function getJSON<T>(url: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(url, options);
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status} for: ${url}`);
+    throw new HttpError(response.status, url);
   }
   return response.json();
 }
