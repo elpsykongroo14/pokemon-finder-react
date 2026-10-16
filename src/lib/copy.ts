@@ -1,0 +1,18 @@
+import type { FetchFailureKind } from "./fetchErrors";
+
+//every sentence the user reads when something goes wrong lives here
+//components pick a massage by kind,
+//they never write their own, so rewording the voice is a one file change
+//
+//the switch has no default on purpose: if someone adds a third
+//FetchFailureKind, TypeScript refuses to compile this function until a
+//message exists for it. the compiler is a reminder
+
+export function failureMessage(kind: FetchFailureKind, query: string): string {
+  switch (kind) {
+    case "not-found":
+      return `No Pokémon named "${query}" was found. Check the spelling or try its Pokédex number.`;
+    case "unreachable":
+      return "Couldn't reach the Pokédex. Check your connection and try again.";
+  }
+}
