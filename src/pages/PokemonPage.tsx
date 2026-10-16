@@ -5,6 +5,7 @@ import { PokemonSkeleton } from "../components/PokemonSkeleton";
 import { MessageBox } from "../ui/MessageBox";
 import { useTypeTheme } from "../hooks/useTypeTheme";
 import { getPokemonPageState } from "../lib/pokemonPageState";
+import { failureMessage } from "../lib/copy";
 
 export function PokemonPage() {
   const { name } = useParams<{ name: string }>(); //this line reads the dynamic segment straight off the current URL.
@@ -29,10 +30,15 @@ export function PokemonPage() {
       return <MessageBox text="No Pokémon specified" />;
     case "loading":
       return <PokemonSkeleton />;
-    case "error":
-      return <MessageBox variant="error" text={state.message} />;
-    case "not-found":
-      return <MessageBox text={`No results for "${state.name}".`} />;
+    case "failed":
+      //a search that matched nothing is an ordinary outcome (polite "status"),
+      //a dead connection is a real problem (assertive "alert")
+      return (
+        <MessageBox
+          variant={state.kind === "unreachable" ? "error" : "info"}
+          text={failureMessage(state.kind, state.name)}
+        />
+      );
     case "ready":
       return <PokemonCard pokemon={state.pokemon} />;
   }

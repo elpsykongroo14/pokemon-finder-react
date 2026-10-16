@@ -1,20 +1,22 @@
 import type { PokemonDetails } from "./type";
+import type { FetchFailureKind } from "./fetchErrors";
 
 //the page can be in exactly ONE of these situations at a time
 //a "discriminated union": every case has 'status' tag, and TypeScript
-//uses the tag to know which other fields exist (only "ready" has a pokemon, only "error" has a message)
+//uses the tag to know which other fields exist (only "ready" has a pokemon, only "failed" has a a kin)
 //that makes impossible combinations, like "loading AND showing an error", unrepresentable
+//
+//"failed" carries a KIND, not a sentence: the words live in lib/copy.ts
 export type PokemonPageState =
   | { status: "no-name" }
   | { status: "loading" }
-  | { status: "error"; message: string }
-  | { status: "ready"; pokemon: PokemonDetails }
-  | { status: "not-found"; name: string };
+  | { status: "failed"; kind: FetchFailureKind; name: string }
+  | { status: "ready"; pokemon: PokemonDetails };
 
 interface PageInputs {
   name: string | undefined;
   loading: boolean;
-  error: string | null;
+  error: FetchFailureKind | null;
   data: PokemonDetails | null;
 }
 
@@ -30,7 +32,7 @@ export function getPokemonPageState({
 }: PageInputs): PokemonPageState {
   if (!name) return { status: "no-name" };
   if (loading) return { status: "loading" };
-  if (error) return { status: "error", message: error };
+  if (error) return { status: "failed", kind: error, name };
   if (data) return { status: "ready", pokemon: data };
-  return { status: "not-found", name };
+  return { status: "failed", kind: "not-found", name };
 }

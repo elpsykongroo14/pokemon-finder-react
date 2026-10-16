@@ -62,16 +62,33 @@ describe("PokemonPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows an alert with the error message when the fetch fails", () => {
+  it("shows a polite status, not an alert, when the Pokémon does not exist", () => {
     vi.mocked(usePokemon).mockReturnValue({
       data: null,
       loading: false,
-      error: "Pokémon not found",
+      error: "not-found",
+    });
+
+    renderPokemonPage("/pokemon/missingno");
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      'No Pokémon named "missingno" was found.',
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("shows an alert when the pokedex cannot be reached", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: null,
+      loading: false,
+      error: "unreachable",
     });
 
     renderPokemonPage("/pokemon/pikachu");
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Pokémon not found");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Couldn't reach the Pokédex. Check your connection and try again.",
+    );
   });
 
   it("renders the pokemon card when data loads", () => {
@@ -96,8 +113,9 @@ describe("PokemonPage", () => {
     renderPokemonPage("/pokemon/missingno");
 
     expect(screen.getByRole("status")).toHaveTextContent(
-      'No results for "missingno".',
+      'No Pokémon named "missingno" was found.',
     );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("themes the whole page to the pokemon's types and clears it on leaving", () => {
@@ -130,7 +148,7 @@ describe("PokemonPage", () => {
         types: [{ slot: 1, type: { name: "electric", url: "" } }],
       }),
       loading: false,
-      error: "Pokémon not found",
+      error: "not-found",
     });
 
     renderPokemonPage("/pokemon/missingno");

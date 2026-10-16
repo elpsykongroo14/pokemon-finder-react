@@ -73,13 +73,15 @@ describe("ComparePage", () => {
   it("shows an alert when Pokémon A fails to load", () => {
     vi.mocked(usePokemon).mockImplementation((name: string) =>
       name === "pikachu"
-        ? { data: null, loading: false, error: "Pokémon not found" }
+        ? { data: null, loading: false, error: "not-found" }
         : { data: null, loading: false, error: null },
     );
 
     renderComparePage("/compare?a=pikachu");
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Pokémon not found");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      'No Pokémon named "pikachu" was found.',
+    );
   });
 
   it("prompts for a second Pokémon once the first has loaded", () => {
