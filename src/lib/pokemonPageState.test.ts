@@ -21,10 +21,16 @@ describe("getPokemonPageState", () => {
     });
   });
 
-  it("carries the messsage when the fetch failed", () => {
-    expect(getPokemonPageState({ ...idle, error: "boom" })).toEqual({
-      status: "error",
-      message: "boom",
+  it("carries the failure kind and the name when the fetch failed", () => {
+    expect(getPokemonPageState({ ...idle, error: "unreachable" })).toEqual({
+      status: "failed",
+      kind: "unreachable",
+      name: "pikachu",
+    });
+    expect(getPokemonPageState({ ...idle, error: "not-found" })).toEqual({
+      status: "failed",
+      kind: "not-found",
+      name: "pikachu",
     });
   });
 
@@ -35,9 +41,10 @@ describe("getPokemonPageState", () => {
     });
   });
 
-  it("is not-found when the fetch is finished with nothing", () => {
+  it("treats a finished lookup with nothing to show as not-found", () => {
     expect(getPokemonPageState({ ...idle, name: "missingno" })).toEqual({
-      status: "not-found",
+      status: "failed",
+      kind: "not-found",
       name: "missingno",
     });
   });
@@ -50,7 +57,7 @@ describe("getPokemonPageState", () => {
 
   it("shows an error instead of a stale pokemon when a fetch fails", () => {
     expect(
-      getPokemonPageState({ ...idle, error: "boom", data: pikachu }),
-    ).toEqual({ status: "error", message: "boom" });
+      getPokemonPageState({ ...idle, error: "unreachable", data: pikachu }),
+    ).toEqual({ status: "failed", kind: "unreachable", name: "pikachu" });
   });
 });

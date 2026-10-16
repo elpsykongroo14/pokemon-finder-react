@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { CompareView } from "../components/CompareView";
 import { usePokemon } from "../hooks/usePokemon";
+import { failureMessage } from "../lib/copy";
 
 export function ComparePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,7 +38,7 @@ export function ComparePage() {
       )}
       {errorA && (
         <p role="alert" className="status-message status-message--error">
-          {errorA}
+          {failureMessage(errorA, a)}
         </p>
       )}
 
@@ -57,7 +58,7 @@ export function ComparePage() {
           )}
           {errorB && (
             <p role="alert" className="status-message status-message--error">
-              {errorB}
+              {failureMessage(errorB, b)}
             </p>
           )}
           {!loadingB && !errorB && dataB && isSelfCompare && (

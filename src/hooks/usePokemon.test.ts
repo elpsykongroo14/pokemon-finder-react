@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { usePokemon } from "./usePokemon";
 import type { PokemonDetails } from "../lib/type";
+import { useEffect } from "react";
+import { HttpError } from "../lib/httpError";
 
 const { fetchPokemon } = vi.hoisted(() => ({ fetchPokemon: vi.fn() }));
 vi.mock("../lib/api", () => ({ fetchPokemon }));
@@ -40,23 +42,8 @@ describe("usePokemon", () => {
     expect(result.current).toEqual({ data: null, loading: false, error: null });
   });
 
-  it("sets loading, then resolves with data", async () => {
-    fetchPokemon.mockResolvedValue(mockPokemon);
-
-    const { result } = renderHook(({ name }) => usePokemon(name), {
-      initialProps: { name: "pikachu" },
-    });
-
-    expect(result.current.loading).toBe(true);
-
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.data).toEqual(mockPokemon);
-    expect(result.current.error).toBeNull();
-  });
-
-  it("surfaces the error message when the fetch fails", async () => {
-    fetchPokemon.mockRejectedValue(new Error("Pokemon not found"));
+  it("reports 'not-found' when the server answers 404", async () => {
+    fetchPokemon.mockRejectedValue(new HttpError(404, "https://x.test/a"));
 
     const { result } = renderHook(({ name }) => usePokemon(name), {
       initialProps: { name: "missingno" },
@@ -64,14 +51,12 @@ describe("usePokemon", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe("Pokemon not found");
+    expect(result.current.error).toBe("not-found");
     expect(result.current.data).toBeNull();
   });
 
-  it("does not treat an aborted request as an error", async () => {
-    fetchPokemon.mockRejectedValue(new DOMException("Aborted", "AbortError"));
-    //new DOMException(message, name) builds the exact shape the browser's real AbortController produces when we abort a fetch
-    //so we're simulating the real failure mode, not an approximation of it
+  it("reports 'unreachable' when the network itself fails", async () => {
+    fetchPokemon.mockRejectedValue(new TypeError("Failed to fetch"));
 
     const { result } = renderHook(({ name }) => usePokemon(name), {
       initialProps: { name: "pikachu" },
@@ -79,8 +64,119 @@ describe("usePokemon", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
+    expect(result.current.error).toBe("unreachable");
+  });
+
+  it("does not treat an aborted request as an error", async () => {
+    fetchPokemon.mockRejectedValue(new DOMException("Aborte", "AbortError"));
+
+    const { result } = renderHook(({ name }) => usePokemon(name), {
+      initialProps: { name: "pikachu" },
+    });
+
+    //nothing will ever flip loading here, so there is nothing to waitFor on.
+    //we let the rejected promise settle instead, then look at the result
+    await act(async () => {});
+
     expect(result.current.error).toBeNull();
     expect(result.current.data).toBeNull();
+    //an abort means "a newer request replaced me", so the hook keeps
+    //waiting for that newer one instead of declaring itself finished
+    expect(result.current.loading).toBe(true);
+  });
+
+  it("is already loading on the very first painted render of a lookup", () => {
+    fetchPokemon.mockImplementation(() => new Promise(() => {}));
+    const painted: boolean[] = [];
+
+    renderHook(() => {
+      const result = usePokemon("missingno");
+      //an effect runs only for renders React COMMITS (puts on screen).
+      //a render that React throws away and redoes never reache it
+      useEffect(() => {
+        painted.push(result.loading);
+      });
+      return result;
+    });
+
+    //if loading were stored state this would be [false, true]: one painted
+    //frame of "nothing found" before the effect started the request
+    expect(painted).not.toContain(false);
+  });
+
+  it("is loading, never the old answer, in the first painted render after the name changes", async () => {
+    fetchPokemon.mockResolvedValueOnce(mockPokemon);
+    fetchPokemon.mockImplementation(() => new Promise(() => {}));
+    const painted: boolean[] = [];
+
+    const { result, rerender } = renderHook(
+      ({ name }) => {
+        const r = usePokemon(name);
+        useEffect(() => {
+          painted.push(r.loading);
+        });
+        return r;
+      },
+      { initialProps: { name: "pikachu" } },
+    );
+    await waitFor(() => expect(result.current.data).toEqual(mockPokemon));
+
+    painted.length = 0; //forget everything before the name change
+    rerender({ name: "charmander" });
+
+    expect(painted).not.toContain(false);
+  });
+
+  it("keeps the previous pokemon in data while the next one loads", async () => {
+    fetchPokemon.mockResolvedValueOnce(mockPokemon);
+    fetchPokemon.mockImplementation(() => new Promise(() => {}));
+
+    const { result, rerender } = renderHook(({ name }) => usePokemon(name), {
+      initialProps: { name: "pikachu" },
+    });
+    await waitFor(() => expect(result.current.data).toEqual(mockPokemon));
+
+    rerender({ name: "charmander" });
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.data).toEqual(mockPokemon);
+  });
+
+  it("shows loading, not the old error, when you come back to a name that failed", async () => {
+    fetchPokemon.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    fetchPokemon.mockImplementation(() => new Promise(() => {}));
+
+    const { result, rerender } = renderHook(({ name }) => usePokemon(name), {
+      initialProps: { name: "pikachu" },
+    });
+    await waitFor(() => expect(result.current.error).toBe("unreachable"));
+
+    rerender({ name: "" });
+    rerender({ name: "pikachu" });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.loading).toBe(true);
+  });
+
+  it("ignores a stale aborted request finishing after a newer one started", async () => {
+    //each fake request rejects with AbortError the moment ITS signal aborts,
+    //exactly like a real fetch
+    fetchPokemon.mockImplementation(
+      (_name: string, options?: { signal?: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          options?.signal?.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError")),
+          );
+        }),
+    );
+
+    const { result, rerender } = renderHook(({ name }) => usePokemon(name), {
+      initialProps: { name: "pikachu" },
+    });
+    rerender({ name: "charmander" });
+    await act(async () => {}); //let the stale pikachu rejection land
+
+    expect(result.current.loading).toBe(true); //charmander is still in flight
   });
 
   it("aborts the in-flight request when the name changes before it resolves", () => {
