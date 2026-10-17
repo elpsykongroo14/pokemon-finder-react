@@ -7,6 +7,7 @@ import { usePokemon } from "../hooks/usePokemon";
 import type { PokemonDetails } from "../lib/type";
 
 vi.mock("../hooks/usePokemon");
+const retry = vi.fn();
 
 vi.mock("../components/SearchBar", () => ({
   SearchBar: ({ onSubmit }: { onSubmit: (query: string) => void }) => (
@@ -47,6 +48,7 @@ describe("ComparePage", () => {
       data: null,
       loading: false,
       error: null,
+      retry,
     });
 
     renderComparePage("/compare");
@@ -61,8 +63,8 @@ describe("ComparePage", () => {
   it("shows a loading status while Pokémon A is loading", () => {
     vi.mocked(usePokemon).mockImplementation((name: string) =>
       name === "pikachu"
-        ? { data: null, loading: true, error: null }
-        : { data: null, loading: false, error: null },
+        ? { data: null, loading: true, error: null, retry }
+        : { data: null, loading: false, error: null, retry },
     );
 
     renderComparePage("/compare?a=pikachu");
@@ -73,8 +75,8 @@ describe("ComparePage", () => {
   it("shows an alert when Pokémon A fails to load", () => {
     vi.mocked(usePokemon).mockImplementation((name: string) =>
       name === "pikachu"
-        ? { data: null, loading: false, error: "not-found" }
-        : { data: null, loading: false, error: null },
+        ? { data: null, loading: false, error: "not-found", retry }
+        : { data: null, loading: false, error: null, retry },
     );
 
     renderComparePage("/compare?a=pikachu");
@@ -87,8 +89,8 @@ describe("ComparePage", () => {
   it("prompts for a second Pokémon once the first has loaded", () => {
     vi.mocked(usePokemon).mockImplementation((name: string) =>
       name === "pikachu"
-        ? { data: pikachuData, loading: false, error: null }
-        : { data: null, loading: false, error: null },
+        ? { data: pikachuData, loading: false, error: null, retry }
+        : { data: null, loading: false, error: null, retry },
     );
 
     renderComparePage("/compare?a=pikachu");
@@ -104,10 +106,10 @@ describe("ComparePage", () => {
   it("adds the second Pokémon to the comparison on submit", async () => {
     vi.mocked(usePokemon).mockImplementation((name: string) => {
       if (name === "pikachu")
-        return { data: pikachuData, loading: false, error: null };
+        return { data: pikachuData, loading: false, error: null, retry };
       if (name === "charmander")
-        return { data: charmanderData, loading: false, error: null };
-      return { data: null, loading: false, error: null };
+        return { data: charmanderData, loading: false, error: null, retry };
+      return { data: null, loading: false, error: null, retry };
     });
     const user = userEvent.setup();
 
@@ -125,6 +127,7 @@ describe("ComparePage", () => {
       data: pikachuData,
       loading: false,
       error: null,
+      retry,
     });
 
     renderComparePage("/compare?a=pikachu&b=pikachu");
@@ -137,10 +140,10 @@ describe("ComparePage", () => {
   it("renders the comparison when two different Pokémon have loaded", () => {
     vi.mocked(usePokemon).mockImplementation((name: string) => {
       if (name === "pikachu")
-        return { data: pikachuData, loading: false, error: null };
+        return { data: pikachuData, loading: false, error: null, retry };
       if (name === "charmander")
-        return { data: charmanderData, loading: false, error: null };
-      return { data: null, loading: false, error: null };
+        return { data: charmanderData, loading: false, error: null, retry };
+      return { data: null, loading: false, error: null, retry };
     });
 
     renderComparePage("/compare?a=pikachu&b=charmander");
