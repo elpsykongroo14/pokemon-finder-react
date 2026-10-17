@@ -1,11 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { PokemonPage } from "./PokemonPage";
 import { usePokemon } from "../hooks/usePokemon";
 import type { PokemonDetails } from "../lib/type";
 import { PreferencesProvider } from "../context/PreferencesContext";
-import { beforeEach } from "node:test";
 import userEvent from "@testing-library/user-event";
 
 vi.mock("../hooks/usePokemon");
