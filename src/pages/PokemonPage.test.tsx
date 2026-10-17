@@ -1,12 +1,14 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { PokemonPage } from "./PokemonPage";
 import { usePokemon } from "../hooks/usePokemon";
 import type { PokemonDetails } from "../lib/type";
 import { PreferencesProvider } from "../context/PreferencesContext";
+import userEvent from "@testing-library/user-event";
 
 vi.mock("../hooks/usePokemon");
+const retry = vi.fn();
 
 vi.mock("../components/PokemonCard", () => ({
   PokemonCard: ({ pokemon }: { pokemon: { name: string } }) => (
@@ -34,11 +36,13 @@ function renderPokemonPage(initialPath: string) {
 }
 
 describe("PokemonPage", () => {
+  beforeEach(() => retry.mockClear());
   it("shows a message when no name is in the URL", () => {
     vi.mocked(usePokemon).mockReturnValue({
       data: null,
       loading: false,
       error: null,
+      retry,
     });
 
     renderPokemonPage("/pokemon");
@@ -53,13 +57,55 @@ describe("PokemonPage", () => {
       data: null,
       loading: true,
       error: null,
+      retry,
     });
 
     renderPokemonPage("/pokemon/pikachu");
 
     expect(
-      screen.getByRole("status", { name: "Loading Pokémon" }),
+      screen.getByRole("status", { name: "Searching the tall grass…" }),
     ).toBeInTheDocument();
+  });
+
+  it("offers Retry when the pokeex is unreachable, and only then", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: null,
+      loading: false,
+      error: "unreachable",
+      retry,
+    });
+    const { unmount } = renderPokemonPage("/pokemon/pikachu");
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    //the alert announces the sentence only, not the button's label
+    expect(screen.getByRole("alert")).not.toHaveTextContent("Retry");
+    unmount();
+
+    vi.mocked(usePokemon).mockReturnValue({
+      data: null,
+      loading: false,
+      error: "not-found",
+      retry,
+    });
+    renderPokemonPage("/pokemon/missingno");
+    expect(
+      screen.queryByRole("button", { name: "Retry" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("Retry calls retry and keeps keyboard focus on the page", async () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: null,
+      loading: false,
+      error: "unreachable",
+      retry,
+    });
+    const user = userEvent.setup();
+    renderPokemonPage("/pokemon/pikachu");
+
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+
+    expect(retry).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toHaveClass("pokemon-page");
   });
 
   it("shows a polite status, not an alert, when the Pokémon does not exist", () => {
@@ -67,6 +113,7 @@ describe("PokemonPage", () => {
       data: null,
       loading: false,
       error: "not-found",
+      retry,
     });
 
     renderPokemonPage("/pokemon/missingno");
@@ -82,6 +129,7 @@ describe("PokemonPage", () => {
       data: null,
       loading: false,
       error: "unreachable",
+      retry,
     });
 
     renderPokemonPage("/pokemon/pikachu");
@@ -96,6 +144,7 @@ describe("PokemonPage", () => {
       data: makePokemon(),
       loading: false,
       error: null,
+      retry,
     });
 
     renderPokemonPage("/pokemon/pikachu");
@@ -108,6 +157,7 @@ describe("PokemonPage", () => {
       data: null,
       loading: false,
       error: null,
+      retry,
     });
 
     renderPokemonPage("/pokemon/missingno");
@@ -129,6 +179,7 @@ describe("PokemonPage", () => {
       }),
       loading: false,
       error: null,
+      retry,
     });
 
     const { unmount } = renderPokemonPage("/pokemon/charizard");
@@ -149,6 +200,7 @@ describe("PokemonPage", () => {
       }),
       loading: false,
       error: "not-found",
+      retry,
     });
 
     renderPokemonPage("/pokemon/missingno");

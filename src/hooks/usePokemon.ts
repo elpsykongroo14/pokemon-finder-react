@@ -7,6 +7,7 @@ interface UsePokemonResult {
   data: PokemonDetails | null;
   loading: boolean;
   error: FetchFailureKind | null;
+  retry: () => void;
 }
 
 //what a FINISHED request leaves behind. failure null means it succed
@@ -20,6 +21,8 @@ export function usePokemon(name: string): UsePokemonResult {
   //so the page theme can glide pikachu -> with no flicker
   const [data, setData] = useState<PokemonDetails | null>(null);
   const [outcome, setOutCome] = useState<Outcome | null>(null);
+  //how many times the user has asked to try again. it exists only so the effect below has something to re-run on when the name is unchanged
+  const [attempt, setAttempt] = useState(0);
 
   //"reset state when an input changes": compare during render, and if the
   //name differs, drop the old outcome right now. react throws this render
@@ -53,12 +56,17 @@ export function usePokemon(name: string): UsePokemonResult {
     return () => {
       controller.abort();
     };
-  }, [name]);
+  }, [name, attempt]);
+
+  function retry() {
+    setOutCome(null); //back to "waiting", so loading is true at once
+    setAttempt((count) => count + 1);
+  }
 
   //derived on every renedr, never stored: nothing to keep in sync
   //loading = there is something to look up and no answer has arrived
   const loading = name.trim() !== "" && outcome === null;
   const error = outcome?.failure ?? null;
 
-  return { data, loading, error };
+  return { data, loading, error, retry };
 }

@@ -17,4 +17,8 @@
   .message-box__rest {
     visibility: hidden;
   }
+
+  .message-box__actions {
+    margin-top: var(--space-3);
+  }
 }

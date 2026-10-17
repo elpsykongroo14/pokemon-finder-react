@@ -8,6 +8,9 @@ import type { FetchFailureKind } from "./fetchErrors";
 //FetchFailureKind, TypeScript refuses to compile this function until a
 //message exists for it. the compiler is a reminder
 
+export const LOADING_LABEL = "Searching the tall grass…";
+export const RETRY_LABEL = "Retry";
+
 export function failureMessage(kind: FetchFailureKind, query: string): string {
   switch (kind) {
     case "not-found":

@@ -3,15 +3,22 @@ import { usePrefersReduceMotion } from "../hooks/usePrefersReducedMotion";
 import { useTypewriter } from "../hooks/useTypewriter";
 import { Panel } from "./Panel";
 import "./MessageBox.css";
+import type { ReactNode } from "react";
 
 export type MessageBoxVariant = "info" | "success" | "error";
 
 interface MessageBoxProps {
   text: string;
   variant?: MessageBoxVariant;
+  //optional extra controls under the text, e.g a Retry button
+  children?: ReactNode;
 }
 
-export function MessageBox({ text, variant = "info" }: MessageBoxProps) {
+export function MessageBox({
+  text,
+  variant = "info",
+  children,
+}: MessageBoxProps) {
   const { animationsEnabled } = usePreferences();
   const prefersReduceMotion = usePrefersReduceMotion();
   const animate =
@@ -35,6 +42,7 @@ export function MessageBox({ text, variant = "info" }: MessageBoxProps) {
           <span className="message-box__typed">{typed}</span>
           <span className="message-box__rest">{rest}</span>
         </span>
+        {children && <div className="message-box__actions">{children}</div>}
       </div>
     </Panel>
   );

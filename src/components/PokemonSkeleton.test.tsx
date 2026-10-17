@@ -8,7 +8,7 @@ describe("PokemonSkeleton", () => {
 
     expect(screen.getAllByRole("status")).toHaveLength(1);
     expect(
-      screen.getByRole("status", { name: "Loading Pokémon" }),
+      screen.getByRole("status", { name: "Searching the tall grass…" }),
     ).toBeInTheDocument();
   });
 
