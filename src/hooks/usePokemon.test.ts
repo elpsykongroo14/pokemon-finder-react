@@ -39,7 +39,12 @@ describe("usePokemon", () => {
     });
 
     expect(fetchPokemon).not.toHaveBeenCalled();
-    expect(result.current).toEqual({ data: null, loading: false, error: null });
+    expect(result.current).toEqual({
+      data: null,
+      loading: false,
+      error: null,
+      retry: expect.any(Function),
+    });
   });
 
   it("reports 'not-found' when the server answers 404", async () => {
@@ -177,6 +182,25 @@ describe("usePokemon", () => {
     await act(async () => {}); //let the stale pikachu rejection land
 
     expect(result.current.loading).toBe(true); //charmander is still in flight
+  });
+
+  it("retry runs the same lookup again and shows loading at once", async () => {
+    fetchPokemon.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    fetchPokemon.mockResolvedValueOnce(mockPokemon);
+
+    const { result } = renderHook(({ name }) => usePokemon(name), {
+      initialProps: { name: "pikachu" },
+    });
+    await waitFor(() => expect(result.current.error).toBe("unreachable"));
+
+    act(() => result.current.retry());
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.error).toBeNull();
+
+    await waitFor(() => expect(result.current.data).toEqual(mockPokemon));
+    expect(fetchPokemon).toHaveBeenCalledTimes(2);
+    expect(result.current.error).toBeNull();
   });
 
   it("aborts the in-flight request when the name changes before it resolves", () => {
