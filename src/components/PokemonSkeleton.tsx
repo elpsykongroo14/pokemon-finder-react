@@ -4,6 +4,7 @@ import "./PokemonSkeleton.css";
 import { Panel } from "../ui/Panel";
 import { Skeleton } from "../ui/Skeleton";
 import { StageConsole } from "../ui/StageConsole";
+import { LOADING_LABEL } from "../lib/copy";
 
 //the loading state: a grey outline of the real page, built from the SAME
 //layout pieces (StageConsole, Panel, the Stage's own classes) and the same
@@ -15,7 +16,7 @@ import { StageConsole } from "../ui/StageConsole";
 //once instead of a dozen times.
 export function PokemonSkeleton() {
   return (
-    <div role="status" aria-label="Loading Pokémon">
+    <div role="status" aria-label={LOADING_LABEL}>
       <StageConsole
         stage={
           <Panel variant="tinted">
