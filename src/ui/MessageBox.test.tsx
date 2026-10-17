@@ -61,6 +61,20 @@ describe("MessageBox", () => {
     expect(typedText(container)).toBe("Pokémon not found");
   });
 
+  it("renders extra controls under the text without announcing them", () => {
+    render(
+      <PreferencesProvider>
+        <MessageBox text="Couldn't reach it." variant="error">
+          <button type="button">Retry</button>
+        </MessageBox>
+      </PreferencesProvider>,
+    );
+
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("Couldn't reach it.");
+    expect(screen.getByRole("alert")).not.toHaveTextContent("Retry");
+  });
+
   it("shows text instantly when animations are turned off", () => {
     localStorage.setItem(
       "pokemon_preferences",
