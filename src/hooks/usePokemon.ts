@@ -45,6 +45,7 @@ export function usePokemon(name: string): UsePokemonResult {
       try {
         const result = await fetchPokemon(name, { signal: controller.signal });
         setData(result);
+        setOutCome({ failure: null });
       } catch (err: unknown) {
         //abort = a newer request replaced this one. say nothing, change nothing
         if (err instanceof DOMException && err.name === "AbortError") return;
