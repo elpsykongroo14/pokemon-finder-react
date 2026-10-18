@@ -10,6 +10,7 @@ import type {
 } from "./type";
 
 import { HttpError } from "./httpError";
+import { POKEDEX_SIZE } from "./dex";
 
 //base URLs
 //POKE_API is a public, shared API - same url for every developer
@@ -107,7 +108,7 @@ export async function fetchAllpokemonNames(): Promise<string[]> {
   if (allNamesCache) return allNamesCache;
 
   const data = await getJSON<NamedAPIResourceList>(
-    `${POKE_API}/pokemon?limit=1025`,
+    `${POKE_API}/pokemon?limit=${POKEDEX_SIZE}`,
   );
   //the api returns {results: [{name, url}, ...]}
   //we only need the names
