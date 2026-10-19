@@ -1,8 +1,7 @@
-import "./Stage.css";
 import "./PokemonActions.css";
 import "./PokemonSkeleton.css";
-import { Panel } from "../ui/Panel";
 import { Skeleton } from "../ui/Skeleton";
+import { StageSkeleton } from "./StageSkeleton";
 import { StageConsole } from "../ui/StageConsole";
 import { LOADING_LABEL } from "../lib/copy";
 
@@ -17,23 +16,7 @@ import { LOADING_LABEL } from "../lib/copy";
 export function PokemonSkeleton() {
   return (
     <div role="status" aria-label={LOADING_LABEL}>
-      <StageConsole
-        stage={
-          <Panel variant="tinted">
-            <div className="stage">
-              <header className="stage__header">
-                <Skeleton width={48} height={14} decorative />
-                <Skeleton width={160} height={28} decorative />
-                <Skeleton width={120} height={24} decorative />
-              </header>
-              <div className="stage__sprite">
-                <Skeleton width={240} height={240} shape="circle" decorative />
-              </div>
-              <Skeleton width={120} height={24} decorative />
-            </div>
-          </Panel>
-        }
-      >
+      <StageConsole stage={<StageSkeleton />}>
         <div className="pokemon-actions">
           {[0, 1, 2, 3, 4].map((i) => (
             <Skeleton key={i} width={96} height={40} decorative />
