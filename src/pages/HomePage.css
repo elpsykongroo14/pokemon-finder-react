@@ -1,0 +1,14 @@
+@layer features {
+  /* the stage slot stays mounted while its content swaps (skeleton, error,
+     Pokémon), so keyboard focus has somewhere to land after Retry. it is a
+     landing spot, not a control, so no ring */
+  .home-stage:focus {
+    outline: none;
+  }
+
+  .home-console {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}
