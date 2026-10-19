@@ -6,9 +6,8 @@ import { PokemonSkeleton } from "../components/PokemonSkeleton";
 import { MessageBox } from "../ui/MessageBox";
 import { useTypeTheme } from "../hooks/useTypeTheme";
 import { getPokemonPageState } from "../lib/pokemonPageState";
-import { failureMessage, RETRY_LABEL } from "../lib/copy";
+import { FailureMessage } from "../components/FailureMessage";
 import "./PokemonPage.css";
-import { Button } from "../ui/Button";
 
 export function PokemonPage() {
   const { name } = useParams<{ name: string }>(); //this line reads the dynamic segment straight off the current URL.
@@ -45,20 +44,12 @@ export function PokemonPage() {
       case "loading":
         return <PokemonSkeleton />;
       case "failed":
-        //a search that matched nothing is an ordinary outcome (polite "status"),
-        //a dead connection is a real problem (assertive "alert")
-        //only the second kind can fix itself, so only it gets a retry button
-        return state.kind === "unreachable" ? (
-          <MessageBox
-            variant="error"
-            text={failureMessage(state.kind, state.name)}
-          >
-            <Button variant="secondary" onClick={handleRetry}>
-              {RETRY_LABEL}
-            </Button>
-          </MessageBox>
-        ) : (
-          <MessageBox text={failureMessage(state.kind, state.name)} />
+        return (
+          <FailureMessage
+            kind={state.kind}
+            query={state.name}
+            onRetry={handleRetry}
+          />
         );
       case "ready":
         return <PokemonCard pokemon={state.pokemon} />;
