@@ -21,4 +21,9 @@
   .message-box__actions {
     margin-top: var(--space-3);
   }
+
+  /* keep the line break that encounterMessage() puts between its two lines */
+  .message-box__text {
+    white-space: pre-line;
+  }
 }

@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { failureMessage } from "./copy";
+import { encounterMessage, failureMessage } from "./copy";
+
+describe("EncounterMessage", () => {
+  it("announces the wild pokemon in capitals, then ask what to do", () => {
+    expect(encounterMessage("pikachu")).toBe(
+      "A wild PIKACHU appeared!\nWhat will you do?",
+    );
+  });
+});
 
 describe("failureMessage", () => {
   it("names the query and says what to try when nothing was found", () => {

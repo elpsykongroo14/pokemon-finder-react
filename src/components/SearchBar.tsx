@@ -2,6 +2,7 @@ import "./SearchBar.css";
 import { useState, useRef, type FormEvent, type KeyboardEvent } from "react";
 import { useAutocomplete } from "../hooks/useAutocomplete";
 import { getSpriteUrl } from "../lib/sprites";
+import { SEARCH_INPUT_ID } from "../lib/ids";
 
 interface SearchBarProps {
   onSubmit: (query: string) => void;
@@ -78,6 +79,7 @@ export function SearchBar({
       <form onSubmit={handleSubmit} role="search">
         <input
           ref={inputRef}
+          id={SEARCH_INPUT_ID}
           type="text"
           value={query}
           onChange={(e) => {
