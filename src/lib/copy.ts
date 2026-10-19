@@ -10,6 +10,13 @@ import type { FetchFailureKind } from "./fetchErrors";
 
 export const LOADING_LABEL = "Searching the tall grass…";
 export const RETRY_LABEL = "Retry";
+export const MENU_PROMPT = "What will you do?";
+
+//the home greeting: two lines, the secon typed after the first (the
+//newline is kept by the message box's CSS). the name is shouted
+export function encounterMessage(name: string): string {
+  return `A wild ${name.toUpperCase()} appeared!\n${MENU_PROMPT}`;
+}
 
 export function failureMessage(kind: FetchFailureKind, query: string): string {
   switch (kind) {
