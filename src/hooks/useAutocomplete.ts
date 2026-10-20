@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useDebounce } from "./useDebounce";
-import { fetchAllpokemonNames, fetchPokemon } from "../lib/api";
+import { fetchPokemonIndex, fetchPokemon } from "../lib/api";
 import type { PokemonDetails } from "../lib/type";
-import { filterNames } from "../lib/autocomplete";
+import type { PokemonIndexEntry } from "../lib/pokemonIndex";
+import { filterEntries } from "../lib/autocomplete";
 
 interface UseAutocompleteResults {
-  matches: string[];
+  matches: PokemonIndexEntry[];
   highlightedIndex: number;
   setHighlightedIndex: (index: number) => void;
   preview: PokemonDetails | null;
@@ -15,7 +16,7 @@ interface UseAutocompleteResults {
 }
 
 export function useAutocomplete(query: string): UseAutocompleteResults {
-  const [allNames, setAllNames] = useState<string[]>([]);
+  const [allEntries, setAllEntries] = useState<PokemonIndexEntry[]>([]);
   const [dismissed, setDismissed] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [preview, setPreview] = useState<PokemonDetails | null>(null);
@@ -24,8 +25,8 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   //fetchAllPokemonNames already catches internally (allNamesCache in lib/api.ts) so even if useAutpcomplete were ever used in two place at once,
   //were not refetching all of the name list twice, react re running this effect on a remount just hits that in module cache
   useEffect(() => {
-    fetchAllpokemonNames()
-      .then(setAllNames)
+    fetchPokemonIndex()
+      .then(setAllEntries)
       .catch((err) =>
         console.error("Failed to load pokemon names for autocomplete:", err),
       );
@@ -38,8 +39,8 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   const debouncedQuery = useDebounce(query, 250);
 
   const matches = useMemo(
-    () => filterNames(debouncedQuery, allNames),
-    [debouncedQuery, allNames],
+    () => filterEntries(debouncedQuery, allEntries),
+    [debouncedQuery, allEntries],
   );
 
   //track the previous matches array reference to see if a new debounce tick occurs
@@ -53,7 +54,7 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   }
 
   const isOpen = matches.length > 0 && !dismissed;
-  const highlightedName = matches[highlightedIndex] ?? null;
+  const highlightedName = matches[highlightedIndex]?.name ?? null;
 
   //if the highlighted match goes away (dropdown closes or the list becomes empty),
   //clear the preview immediately this is derived state, not a sync with an external system so it belongs here
