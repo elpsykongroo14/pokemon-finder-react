@@ -47,11 +47,10 @@
     filter: brightness(1.08);
   }
 
-  .autocomplete-preview img {
-    width: 40px;
-    height: 40px;
-  }
-
+  /* Design idea: the dropdown reads like a page of the Pokédex index.
+     The preview strip on top is the "selected entry" (big sprite, name,
+     number); each row below is a number plus a name, and the highlighted
+     row gets the ▶ cursor, so keyboard position is visible without color alone. */
   .autocomplete-panel {
     position: absolute;
     top: 100%;
@@ -65,11 +64,62 @@
     overflow: hidden;
   }
 
+  .autocomplete-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg-surface-sunken);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .autocomplete-preview img {
+    width: 48px;
+    height: 48px;
+    image-rendering: pixelated;
+  }
+
+  .autocomplete-preview-name {
+    color: var(--color-text-primary);
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+
+  .autocomplete-preview-id {
+    color: var(--color-text-secondary);
+    margin-left: auto;
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+  }
+
   .autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
     list-style: none;
     padding: var(--space-2) var(--space-3);
     cursor: pointer;
     color: var(--color-text-primary);
+  }
+
+  .autocomplete-item__cursor {
+    width: 1ch;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition:
+      opacity var(--dur-fast) var(--ease-standard),
+      transform var(--dur-fast) var(--ease-standard);
+  }
+
+  .autocomplete-item__id {
+    min-width: 4.5ch;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+  }
+
+  .autocomplete-item__name {
     text-transform: capitalize;
   }
 
@@ -78,22 +128,15 @@
     color: var(--color-focus);
   }
 
-  .autocomplete-preview {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
-    border-bottom: 1px solid var(--color-border-subtle);
+  .autocomplete-item--active .autocomplete-item__cursor {
+    opacity: 1;
+    transform: translateX(0);
   }
 
-  .autocomplete-preview-name {
-    color: var(--color-text-primary);
-    text-transform: capitalize;
-  }
-
-  .autocomplete-preview-id {
-    color: var(--color-text-secondary);
-    margin-left: auto;
-    font-size: var(--text-sm);
+  @media (prefers-reduced-motion: reduce) {
+    .autocomplete-item__cursor {
+      transition: none;
+      transform: none;
+    }
   }
 }

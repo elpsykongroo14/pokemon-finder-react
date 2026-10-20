@@ -3,14 +3,19 @@ import { renderHook, waitFor, act } from "@testing-library/react";
 import { useAutocomplete } from "./useAutocomplete";
 import type { PokemonDetails } from "../lib/type";
 
-const { fetchAllpokemonNames, fetchPokemon } = vi.hoisted(() => ({
-  fetchAllpokemonNames: vi.fn(),
+const { fetchPokemonIndex, fetchPokemon } = vi.hoisted(() => ({
+  fetchPokemonIndex: vi.fn(),
   fetchPokemon: vi.fn(),
 }));
 
-vi.mock("../lib/api", () => ({ fetchAllpokemonNames, fetchPokemon }));
+vi.mock("../lib/api", () => ({ fetchPokemonIndex, fetchPokemon }));
 
-const NAMES = ["charmander", "charizard", "charmeleon", "pikachu"];
+const INDEX = [
+  { name: "charmander", id: 4 },
+  { name: "charizard", id: 6 },
+  { name: "charmeleon", id: 5 },
+  { name: "pikachu", id: 25 },
+];
 
 function makePokemon(name: string): PokemonDetails {
   return {
@@ -28,9 +33,9 @@ function makePokemon(name: string): PokemonDetails {
 
 describe("useAutocomplete", () => {
   beforeEach(() => {
-    fetchAllpokemonNames.mockReset();
+    fetchPokemonIndex.mockReset();
     fetchPokemon.mockReset();
-    fetchAllpokemonNames.mockResolvedValue(NAMES);
+    fetchPokemonIndex.mockResolvedValue(INDEX);
     fetchPokemon.mockResolvedValue(makePokemon("charmander"));
   });
 
@@ -44,10 +49,23 @@ describe("useAutocomplete", () => {
 
     await waitFor(() =>
       expect(result.current.matches).toEqual([
-        "charmander",
-        "charizard",
-        "charmeleon",
+        { name: "charmander", id: 4 },
+        { name: "charizard", id: 6 },
+        { name: "charmeleon", id: 5 },
       ]),
+    );
+  });
+
+  it("finds a Pokemon by its pokedex number", async () => {
+    const { result, rerender } = renderHook(
+      ({ query }) => useAutocomplete(query),
+      { initialProps: { query: "" } },
+    );
+
+    rerender({ query: "#025" });
+
+    await waitFor(() =>
+      expect(result.current.matches).toEqual([{ name: "pikachu", id: 25 }]),
     );
   });
 

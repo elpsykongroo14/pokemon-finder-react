@@ -3,6 +3,7 @@ import { useState, useRef, type FormEvent, type KeyboardEvent } from "react";
 import { useAutocomplete } from "../hooks/useAutocomplete";
 import { getSpriteUrl } from "../lib/sprites";
 import { SEARCH_INPUT_ID } from "../lib/ids";
+import { formatDexNumber } from "../lib/dex";
 
 interface SearchBarProps {
   onSubmit: (query: string) => void;
@@ -39,7 +40,7 @@ export function SearchBar({
   }
 
   function selectMatch(index: number) {
-    const name = matches[index];
+    const name = matches[index]?.name;
     if (!name) return;
     setQuery(name);
     submit(name);
@@ -108,15 +109,15 @@ export function SearchBar({
               />
               <div className="autocomplete-preview-name">{preview.name}</div>
               <div className="autocomplete-preview-id">
-                #{String(preview.id).padStart(3, "0")}
+                {formatDexNumber(preview.id)}
               </div>
             </div>
           )}
 
           <ul id="autocomplete-list" role="listbox">
-            {matches.map((name, index) => (
+            {matches.map((entry, index) => (
               <li
-                key={name}
+                key={entry.name}
                 id={`autocomplete-option-${index}`}
                 role="option"
                 aria-selected={index === highlightedIndex}
@@ -133,7 +134,17 @@ export function SearchBar({
                 //and onClick fires normally
                 onClick={() => selectMatch(index)}
               >
-                {name}
+                {/* the cursor and the number are for the eyes only: aria-hidden
+        keeps each option's accessible name as just the Pokémon's
+        name, so a screen reader is not read "number zero two five"
+        forty times while someone types */}
+                <span className="autocomplete-item__cursor" aria-hidden="true">
+                  ▶
+                </span>
+                <span className="autocomplete-item__id" aria-hidden="true">
+                  {formatDexNumber(entry.id ?? 0)}
+                </span>
+                <span className="autocomplete-item__name">{entry.name}</span>
               </li>
             ))}
           </ul>
