@@ -11,6 +11,7 @@ import type {
 
 import { HttpError } from "./httpError";
 import { POKEDEX_SIZE } from "./dex";
+import { toIndexEntry, type PokemonIndexEntry } from "./pokemonIndex";
 
 //base URLs
 //POKE_API is a public, shared API - same url for every developer
@@ -40,7 +41,31 @@ export function clearPokeCache(): void {
   for (const key in pokeCache) delete pokeCache[key];
   for (const key in speciesCache) delete speciesCache[key];
   for (const key in evoChainCache) delete evoChainCache[key];
-  allNamesCache = null;
+  indexCache = null;
+}
+
+//theres only ever one possible result here (theres no "which pokemon" argument to key bey)
+//so unlike pokeCache/speciesCache/evoChainCache this doesnt need to be an object
+//a single variable that starts out empty and gets filled in once is enough
+let indexCache: PokemonIndexEntry[] | null = null;
+
+//the whole pokedex as {name, id} pairs, from one request
+export async function fetchPokemonIndex(): Promise<PokemonIndexEntry[]> {
+  if (indexCache) return indexCache;
+
+  const data = await getJSON<NamedAPIResourceList>(
+    `${POKE_API}/pokemon?limit=${POKEDEX_SIZE}`,
+  );
+  //the api returns {results: [{name, url}, ...]}
+  //the number of each pokemon is inside its url
+  indexCache = data.results.map(toIndexEntry);
+  return indexCache;
+}
+
+//the same data, names only, for callers that never needed the numbers
+//it reads through fetchPokemonIndex, so both functions share one request and one cache
+export async function fetchAllpokemonNames(): Promise<string[]> {
+  return (await fetchPokemonIndex()).map((entry) => entry.name);
 }
 
 //----
@@ -97,23 +122,6 @@ export async function fetchEvolutionChain(
   const data = await getJSON<EvolutionChain>(url, { signal: options.signal });
   evoChainCache[url] = data;
   return data;
-}
-
-//theres only ever one possible result here (theres no "which pokemon" argument to key bey)
-//so unliike pokeCache/speciesCache/evoChainCache this doesnt need to be an object
-//a single variable that starts out empty and gets filled in once is enough
-let allNamesCache: string[] | null = null;
-
-export async function fetchAllpokemonNames(): Promise<string[]> {
-  if (allNamesCache) return allNamesCache;
-
-  const data = await getJSON<NamedAPIResourceList>(
-    `${POKE_API}/pokemon?limit=${POKEDEX_SIZE}`,
-  );
-  //the api returns {results: [{name, url}, ...]}
-  //we only need the names
-  allNamesCache = data.results.map((p) => p.name);
-  return allNamesCache;
 }
 
 //-------TCG

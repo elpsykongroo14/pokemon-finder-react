@@ -7,6 +7,7 @@ import {
   fetchTCGCardsBatch,
   fetchAllpokemonNames,
   clearPokeCache,
+  fetchPokemonIndex,
 } from "./api.ts";
 import { HttpError } from "./httpError.ts";
 
@@ -191,6 +192,40 @@ describe("fetchAllpokemonNames", () => {
     );
     await fetchAllpokemonNames();
     await fetchAllpokemonNames();
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("fetchPokemonIndex", () => {
+  it("pairs each name with the number found in its url", async () => {
+    mockFetch.mockResolvedValue(
+      fakeResponse(true, {
+        results: [
+          { name: "bulbasaur", url: "https://pokeapi.co/api/v2/pokemon/1/" },
+          { name: "pikachu", url: "https://pokeapi.co/api/v2/pokemon/25/" },
+        ],
+      }),
+    );
+
+    expect(await fetchPokemonIndex()).toEqual([
+      { name: "bulbasaur", id: 1 },
+      { name: "pikachu", id: 25 },
+    ]);
+  });
+
+  it("shares one request and one cache with fetchAllpokemonNames", async () => {
+    mockFetch.mockResolvedValue(
+      fakeResponse(true, {
+        results: [
+          { name: "bulbasaur", url: "https://pokeapi.co/api/v2/pokemon/1/" },
+        ],
+      }),
+    );
+
+    await fetchPokemonIndex();
+    const names = await fetchAllpokemonNames();
+
+    expect(names).toEqual(["bulbasaur"]);
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 });
