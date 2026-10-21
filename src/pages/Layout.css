@@ -69,11 +69,6 @@
     min-width: 0;
   }
 
-  .app-tray__favorites .status-message {
-    margin: 0;
-    font-size: var(--text-sm);
-  }
-
   @media (min-width: 768px) {
     .app-shell {
       --shell-gutter: var(--space-5);
