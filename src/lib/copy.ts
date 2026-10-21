@@ -12,6 +12,10 @@ export const LOADING_LABEL = "Searching the tall grass…";
 export const RETRY_LABEL = "Retry";
 export const MENU_PROMPT = "What will you do?";
 
+//empty states are invitations: say what is missing AND how to fill it
+export const EMPTY_FAVORITES =
+  "No favorites yet. Tap ♥ on any Pokémon to keep it here.";
+
 //the home greeting: two lines, the secon typed after the first (the
 //newline is kept by the message box's CSS). the name is shouted
 export function encounterMessage(name: string): string {
