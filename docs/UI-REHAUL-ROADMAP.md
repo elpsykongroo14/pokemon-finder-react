@@ -38,7 +38,7 @@ Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessio
 | ✓   | **R3**  | Primitives kit                         | L    | R2                     | Buttons, panels, bars look like the game       |
 | ✓   | **R4**  | App shell, navigation & theme engine   | L    | R3                     | **First "wow": whole app re-skinned**          |
 | ✓   | **R5**  | The Pokémon page                       | L    | R4                     | **Animated sprite stage, type-reactive world** |
-| ☐   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
+| ✓   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
 | ☐   | **R7**  | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
 | ☐   | **R8**  | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
 | ☐   | **R9**  | Juice, sound & settings                | M    | R5–R8                  | Celebrations, polish                           |
@@ -817,6 +817,11 @@ VM87:5 898 'calyrex' {animated: true, pixel: true, artwork: true}
 
 | D20 | response animations and the shiny sparkle move to R9 | The roadmap lists them under R5, but R9 is “Juice, sound & settings: celebrations, polish”. | Recommendation: Building the structure now and the sparkle later keeps this part about system design | Answer: moved from R5 to R9 |
 
+| D21 | Home encounter stability | Component state; module variable; sessionStorage | sessionStorage: stable across navigation and refresh, per tab | R6 | sessionStorage |
+| D22 | Autocomplete row contents | Names only; #id + name with the sprite in the preview; a sprite on every row | #id + name; sprite stays in the preview panel (no new requests) | R6 | #id + name; sprite in preview |
+| D23 | "Recently viewed" strip | Derive from existing data; add a persisted history; move to R12 | Move to R12: nothing persists viewing history, and pokeCache is memory-only and also filled by autocomplete previews | R6 | R12 ( confirmed) |
+| D24 | Tray empty-state component | MessageBox; plain line | MessageBox (roadmap task 5); fall back to a plain line if the framed box makes the tray too tall | R6 | MessageBox (pending your visual check) |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
@@ -908,3 +913,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-09-23 | Fonts locked: Jersey 10 + Nunito. D13 → B (slate/teal + gold selection). D14 added (elevation). primitives.css, semantic.css, motion.css written; contrast-checked; wired into index.css. | type-themes.css added: 18 types x deep/soft/ink derived and contrast-checked (zero AA failures), [data-type] mechanism wired. | R1 CLOSED. /styleguide route built (dev-only, lazy); full production exclusion deferred to R9/R10 per roadmap. D12 confirmed. All tokens (primitives, semantic, type-themes, motion) verified via tsc, vite build, and the existing test suite (all green). |
 
 | 2026-10-10 | add rows for today: “R4 complete: secondary theme variables, Backdrop, theme fades, route transitions (D17), OS-aware animation default.” |
+
+| 2026-10-20 | R6 complete: typed failures with Retry, derived loading, central copy module; wild-encounter Home with 2×2 menu; Pokédex-style autocomplete with number search; staggered favorites tray; token guardrail test. D21–D24 recorded (D23 pending confirmation). |

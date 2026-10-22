@@ -199,3 +199,13 @@ Stage + Console layout with Info/Stats/Evolution tabs; TabPanel keepMounted lets
 Compare and View Cards are now real links via TransitionLink, built on the Part 8 view-transition hook; Back/Forward stays instant.
 Page logic is one discriminated union (getPokemonPageState); loading is a skeleton built from the real layout; error and not-found use MessageBox.
 Deferred: shiny sparkle and button response animations; remaining getSpriteUrl callers (SearchBar, team, favorites) because they persist URL.
+
+10-20-2026: UI rehaul, R6 Home, search, favorites & states
+
+Errors became data: getJSON throws a typed HttpError (in its own file, so tests that mock api.ts can't swallow it) and classifyFetchError maps anything thrown to "not-found" or "unreachable". usePokemon now returns that kind, derives loading instead of storing it (fixed a one frame "not found" flash, and a stale finally that switched loading off after an abort), and exposes retry(). Every failure sentence lives in lib/copy.ts; FailureMessage decides alert vs status and whether Retry shows; focus moves to a stable wrapper before Retry removes itself.
+Home: pickEncounterId(random) is pure (the dice are injected). getSessionEncounterId reads before it writes, so StrictMode's double call is harmless, and the stored value is validated as untrusted input. D21 = sessionStorage. useEncounter reuses usePokemon. BattleMenu is a roving-tabindex 2x2 over a pure moveInGrid(index, key, cols, count); Alt/Ctrl/Meta+arrow are left to the browser.
+Search: fetchPokemonIndex keeps the number that was already inside every list url, and fetchAllpokemonNames now reads through it (one request, one cache, old contract intact for the Library). Rows show #id + name, filterEntries also accepts a number, and the cursor and number are aria-hidden so option names are unchanged.
+Favorites: staggerSlot (capped; later arrivals take slot 0) hands position to CSS through --fav-slot; the empty state is a MessageBox invitation. "No favorites yet." changed in the same commit as its three test assertions.
+Guardrails: tests/tokens.test.ts fails on an undefined var(--x) or a raw color in component CSS. preconnect hints for pokeapi.co (crossorigin, because fetch is CORS) and raw.githubusercontent.com (no crossorigin, because <img> isn't).
+Bundle: +3.95 kB JS (+1.37 gzip), +1.73 kB CSS (+0.28 gzip), no new dependencies.
+Deferred: recently viewed strip (needs new persistence, so R12); tray chips load artwork-size images at 32px (R12, needs a saved-data migration); two buttons named "Search" on Home; the Favorite button uses emoji hearts while the copy says ♥; ComparePage still uses status-message (R7).
