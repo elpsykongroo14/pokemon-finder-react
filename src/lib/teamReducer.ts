@@ -1,16 +1,17 @@
-import type { FavoritePokemon, PokemonDetails } from "./type";
-import { getSpriteUrl } from "./sprites";
+import type { PokemonDetails, TeamMember } from "./type";
+import { toTeamMember } from "./teamMember";
 
 export const MAX_TEAM = 6;
 
 export interface TeamState {
-  members: FavoritePokemon[];
+  members: TeamMember[];
   error: string | null;
 }
 
 export type TeamAction =
   | { type: "ADD"; payload: PokemonDetails }
   | { type: "REMOVE"; payload: string }
+  | { type: "BACKFILL"; payload: PokemonDetails }
   | { type: "CLEAR_ERROR" }
   | { type: "CLEAR" };
 
@@ -27,14 +28,7 @@ export function TeamReducer(state: TeamState, action: TeamAction): TeamState {
       }
 
       return {
-        members: [
-          ...state.members,
-          {
-            name: pokemon.name,
-            id: pokemon.id,
-            sprite: getSpriteUrl(pokemon.sprites),
-          },
-        ],
+        members: [...state.members, toTeamMember(pokemon)],
         error: null,
       };
     }
@@ -43,6 +37,22 @@ export function TeamReducer(state: TeamState, action: TeamAction): TeamState {
         members: state.members.filter((m) => m.name !== action.payload),
         error: null,
       };
+    case "BACKFILL": {
+      const fresh = toTeamMember(action.payload);
+
+      const needsBackfill = state.members.some(
+        (m) => m.name === fresh.name && m.types === undefined,
+      );
+      //returning the same object tells react (and our persistence effect) that nothing changed
+      if (!needsBackfill) return state;
+
+      return {
+        ...state,
+        members: state.members.map((m) =>
+          m.name === fresh.name ? { ...m, types: fresh.types } : m,
+        ),
+      };
+    }
     case "CLEAR_ERROR":
       return { ...state, error: null };
     case "CLEAR":
