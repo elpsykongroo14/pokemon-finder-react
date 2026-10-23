@@ -2,13 +2,14 @@ import { useReducer, useEffect, type ReactNode } from "react";
 import type { PokemonDetails } from "../lib/type";
 import { TeamContext } from "../hooks/useTeam";
 import { TeamReducer, type TeamState } from "../lib/teamReducer";
+import { parseStoredTeam } from "../lib/teamStorage";
 
 const TEAM_KEY = "pokemon_team";
 
 function loadInitialState(): TeamState {
   try {
     const stored = localStorage.getItem(TEAM_KEY);
-    return { members: stored ? JSON.parse(stored) : [], error: null };
+    return { members: parseStoredTeam(stored), error: null };
   } catch {
     return { members: [], error: null };
   }

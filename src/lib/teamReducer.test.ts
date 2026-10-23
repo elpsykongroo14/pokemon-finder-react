@@ -10,6 +10,7 @@ const mockPikachu = {
   name: "pikachu",
   id: 25,
   sprites: { front_default: "https://img.example/pikachu.png" },
+  types: [{ slot: 1, type: { name: "electric", url: "" } }],
 } as PokemonDetails;
 
 describe("TeamReducer", () => {
@@ -20,7 +21,12 @@ describe("TeamReducer", () => {
     });
 
     expect(result.members).toEqual([
-      { name: "pikachu", id: 25, sprite: "https://img.example/pikachu.png" },
+      {
+        name: "pikachu",
+        id: 25,
+        sprite: "https://img.example/pikachu.png",
+        types: ["electric"],
+      },
     ]);
     expect(result.error).toBeNull();
   });
@@ -99,5 +105,66 @@ describe("TeamReducer", () => {
     const result = TeamReducer(state, { type: "NOT_A_REAL_ACTION" });
 
     expect(result).toBe(state);
+  });
+  describe("BACKFILL", () => {
+    it("adds types to a memeber saved before types existed", () => {
+      const state = makeState({
+        members: [{ name: "pikachu", id: 25, sprite: "old.png" }],
+      });
+
+      const result = TeamReducer(state, {
+        type: "BACKFILL",
+        payload: mockPikachu,
+      });
+
+      expect(result.members).toEqual([
+        { name: "pikachu", id: 25, sprite: "old.png", types: ["electric"] },
+      ]);
+    });
+
+    it("returns the very same state when the member already has types", () => {
+      const state = makeState({
+        members: [
+          { name: "pikachu", id: 25, sprite: null, types: ["electric"] },
+        ],
+      });
+
+      const result = TeamReducer(state, {
+        type: "BACKFILL",
+        payload: mockPikachu,
+      });
+
+      expect(result).toBe(state);
+    });
+
+    it("returns the very same statet when the pokemon is not on the team", () => {
+      const state = makeState({
+        members: [{ name: "bulbasaur", id: 1, sprite: null }],
+      });
+
+      const result = TeamReducer(state, {
+        type: "BACKFILL",
+        payload: mockPikachu,
+      });
+
+      expect(result).toBe(state);
+    });
+
+    it("only touches the matching member and leaves error alone", () => {
+      const bulbasaur = { name: "bulbasaur", id: 1, sprite: null };
+      const state = makeState({
+        members: [bulbasaur, { name: "pikachu", id: 25, sprite: null }],
+        error: "Team is full (6/6)",
+      });
+
+      const result = TeamReducer(state, {
+        type: "BACKFILL",
+        payload: mockPikachu,
+      });
+
+      expect(result.members[0]).toBe(bulbasaur);
+      expect(result.members[1]?.types).toEqual(["electric"]);
+      expect(result.error).toBe("Team is full (6/6)");
+    });
   });
 });

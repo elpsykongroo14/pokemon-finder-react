@@ -24,6 +24,12 @@ export interface FavoritePokemon {
   sprite: string | null;
 }
 
+//what we persist for a team member: everything a favorite has, plus the extra detail a party card shows
+//`types` is OPTIONAL on purpose, teams saved before this field existed will not have it
+export interface TeamMember extends FavoritePokemon {
+  types?: string[];
+}
+
 //---pokeAPI's universal building blocks:
 //almost every pokeAPI object references other resources this way instead of embeding them.
 export interface NamedAPIResource {

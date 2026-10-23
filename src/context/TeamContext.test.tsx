@@ -16,7 +16,10 @@ function makePokemon(overrides: Partial<PokemonDetails> = {}): PokemonDetails {
     id: 6,
     height: 17,
     weight: 905,
-    types: [],
+    types: [
+      { slot: 1, type: { name: "fire", url: "" } },
+      { slot: 2, type: { name: "flying", url: "" } },
+    ],
     sprites: { front_default: "charizard.png" },
     abilities: [],
     stats: [],
@@ -43,6 +46,15 @@ describe("TeamProvider", () => {
     ]);
   });
 
+  it("survives valid JSON of the wrong shape instead crashing", () => {
+    localStorage.setItem("pokemon_team", '{"members": "oops"}');
+
+    const { result } = renderTeam();
+
+    expect(result.current.team).toEqual([]);
+    expect(result.current.isOnTeam("pikachu")).toBe(false);
+  });
+
   it("starts with an empty team when localStorage holds corrupted data", () => {
     localStorage.setItem("pokemon_team", "{not valid json");
 
@@ -61,7 +73,12 @@ describe("TeamProvider", () => {
 
     const stored = JSON.parse(localStorage.getItem("pokemon_team") ?? "[]");
     expect(stored).toEqual([
-      { name: "charizard", id: 6, sprite: "charizard.png" },
+      {
+        name: "charizard",
+        id: 6,
+        sprite: "charizard.png",
+        types: ["fire", "flying"],
+      },
     ]);
   });
 
@@ -79,7 +96,12 @@ describe("TeamProvider", () => {
     });
 
     expect(result.current.team).toEqual([
-      { name: "charizard", id: 6, sprite: "charizard.png" },
+      {
+        name: "charizard",
+        id: 6,
+        sprite: "charizard.png",
+        types: ["fire", "flying"],
+      },
     ]);
 
     setItemSpy.mockRestore();

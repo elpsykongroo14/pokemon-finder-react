@@ -3,10 +3,10 @@
 //(turn a silent null into a loud, immediate error pointing at the actual mistake)
 
 import { createContext, useContext } from "react";
-import type { FavoritePokemon, PokemonDetails } from "../lib/type";
+import type { PokemonDetails, TeamMember } from "../lib/type";
 
 export interface TeamContextValue {
-  team: FavoritePokemon[];
+  team: TeamMember[];
   error: string | null;
   addToTeam: (pokemon: PokemonDetails) => void;
   removeFromTeam: (name: string) => void;

@@ -556,7 +556,7 @@ Type colors: reuse the existing `--type-*` values as **primitives**; derive deep
 
 **Tasks**
 
-1. **Data decision (D10):** party cards want types (and maybe a stat total), but `FavoritePokemon` persists only `{ name, id, sprite }`. Options: (a) fetch details for the 6 members at render (network + loading states), (b) extend the persisted shape with optional fields and backfill lazily (requires tolerating old localStorage data with missing fields). Recommendation: **(b) with optional fields**, since it's cheaper at runtime. It touches `teamReducer` invariants, so add tests first.
+1. **Data decision (D10):** party cards want types (and maybe a stat total), but `FavoritePokemon` persists only `{ name, id, sprite }`. Options: (a) fetch details for the 6 members at render (network + loading states), (b) extend the persisted shape with optional fields and backfill lazily (requires tolerating old localStorage data with missing fields). Recommendation: **(b) with optional fields**, since it's cheaper at runtime. It touches `teamReducer` invariants, so add tests first. (final decision: Extend with optional fields; types only (no stat total), on a new TeamMember subtype; old entries backfilled lazily)
 2. Exit animations: decide D6. Options: CSS `@starting-style` + `transition-behavior` on removal, a "leaving" state before dispatch, or a small animation library. Pick with a concrete failing case in hand.
 3. `CompareStatRow`: add text/ARIA equivalent for win/lose; update its tests deliberately.
 4. Keep `TeamSlots` always rendering exactly `MAX_TEAM` slots (the invariant is tested).
