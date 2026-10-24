@@ -10,6 +10,7 @@ export interface TeamContextValue {
   error: string | null;
   addToTeam: (pokemon: PokemonDetails) => void;
   removeFromTeam: (name: string) => void;
+  backfillMember: (pokemon: PokemonDetails) => void;
   clearError: () => void;
   isOnTeam: (name: string) => boolean;
 }

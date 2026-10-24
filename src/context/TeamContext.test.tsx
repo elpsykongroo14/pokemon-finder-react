@@ -134,6 +134,31 @@ describe("TeamProvider", () => {
 
     expect(result.current.team).toHaveLength(0);
   });
+
+  it("backfills types onto a member saved without them", () => {
+    localStorage.setItem(
+      "pokemon_team",
+      JSON.stringify([{ name: "charizard", id: 6, sprite: "charizard.png" }]),
+    );
+    const { result } = renderTeam();
+
+    act(() => {
+      result.current.backfillMember(makePokemon());
+    });
+
+    expect(result.current.team[0]?.types).toEqual(["fire", "flying"]);
+  });
+
+  it("keeps backfillMember the same function across state changes", () => {
+    const { result } = renderTeam();
+    const before = result.current.backfillMember;
+
+    act(() => {
+      result.current.addToTeam(makePokemon());
+    });
+
+    expect(result.current.backfillMember).toBe(before);
+  });
 });
 
 //this file protects exactly the logic that belongs to it, localStorage loading (including the corrupted data fallback)
