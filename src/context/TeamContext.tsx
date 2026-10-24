@@ -1,4 +1,4 @@
-import { useReducer, useEffect, type ReactNode } from "react";
+import { useReducer, useEffect, useCallback, type ReactNode } from "react";
 import type { PokemonDetails } from "../lib/type";
 import { TeamContext } from "../hooks/useTeam";
 import { TeamReducer, type TeamState } from "../lib/teamReducer";
@@ -22,6 +22,12 @@ export function TeamProvider({ children }: { children: ReactNode }) {
     loadInitialState,
   ); //the three-argument, lazy-initializer form
   //undefined is the "initial arg" that gets handed to loadInitialState, which ignores it and reads localStorage instead. It only runs once, on moun
+
+  //dispatch is guaranteed stable by React, so this function can be too,
+  //an effect that lists it as a dependency will not restart on every render
+  const backfillMember = useCallback((pokemon: PokemonDetails) => {
+    dispatch({ type: "BACKFILL", payload: pokemon });
+  }, []);
 
   //only ever persists members, error is transient UI state
   //never disk state
@@ -54,6 +60,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         error: state.error,
         addToTeam,
         removeFromTeam,
+        backfillMember,
         clearError,
         isOnTeam,
       }}

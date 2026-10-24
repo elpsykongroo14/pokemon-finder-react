@@ -17,6 +17,7 @@ function setTeam(overrides: Partial<ReturnType<typeof useTeam>> = {}) {
     error: null,
     addToTeam: vi.fn(),
     removeFromTeam: vi.fn(),
+    backfillMember: vi.fn(),
     clearError: vi.fn(),
     isOnTeam: () => false,
     ...overrides,
