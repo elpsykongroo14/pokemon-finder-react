@@ -1,4 +1,5 @@
 import type { FetchFailureKind } from "./fetchErrors";
+import type { StatOutcome } from "./statComparison";
 
 //every sentence the user reads when something goes wrong lives here
 //components pick a massage by kind,
@@ -11,6 +12,15 @@ import type { FetchFailureKind } from "./fetchErrors";
 export const LOADING_LABEL = "Searching the tall grass…";
 export const RETRY_LABEL = "Retry";
 export const MENU_PROMPT = "What will you do?";
+
+//the words a screen reader says after a compared state value, so the result
+//never depends on color alone. Record<StatOutcome, ...? makes the compiler
+//demand a word for every outcome, the same safety net failureMessage has
+export const STAT_OUCOME_TEXT: Record<StatOutcome, string> = {
+  win: "higher",
+  lose: "lower",
+  tie: "tied",
+};
 
 //empty states are invitations: say what is missing AND how to fill it
 export const EMPTY_FAVORITES =
