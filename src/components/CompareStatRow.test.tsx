@@ -35,6 +35,63 @@ describe("CompareStatRow", () => {
     expect(rightEl).not.toHaveClass("stat-lose");
   });
 
+  //the tug of war: honest bars and a reading order that makes sense aloud
+  describe("tug-of-war bars", () => {
+    function getFills(container: HTMLElement) {
+      return Array.from(
+        container.querySelectorAll<HTMLElement>(".compare-stat-bar__fill"),
+      ).map((el) => el.style.getPropertyValue("--stat-bar-percent"));
+    }
+
+    it("sizes both bars against the same rule, left first", () => {
+      const { container } = render(
+        <CompareStatRow
+          label="Speed"
+          leftValue={50}
+          rightValue={100}
+          max={200}
+        />,
+      );
+
+      expect(getFills(container)).toEqual(["25%", "50%"]);
+    });
+
+    it("measures against the highest possible base stat by default", () => {
+      const { container } = render(
+        <CompareStatRow label="Speed" leftValue={255} rightValue={0} />,
+      );
+
+      expect(getFills(container)).toEqual(["100%", "0%"]);
+    });
+
+    it("hides the bars from assitive tech, since the numbers already say it", () => {
+      const { container } = render(
+        <CompareStatRow label="Speed" leftValue={90} rightValue={60} />,
+      );
+
+      const bars = container.querySelectorAll(".compare-stat-bar");
+      expect(bars).toHaveLength(2);
+      bars.forEach((bar) => expect(bar).toHaveAttribute("aria-hidden", "true"));
+    });
+
+    it("marks each bar with its side's outcome", () => {
+      const { container } = render(
+        <CompareStatRow label="Speed" leftValue={90} rightValue={60} />,
+      );
+
+      const [left, right] = container.querySelectorAll(".compare-stat-bar");
+      expect(left).toHaveAttribute("data-outcome", "win");
+      expect(right).toHaveAttribute("data-outcome", "lose");
+    });
+
+    it("puts the label first in the HTML, so a screen reader says it first", () => {
+      render(<CompareStatRow label="Speed" leftValue={90} rightValue={60} />);
+
+      const row = screen.getByText("Speed").closest(".compare-stat-row");
+      expect(row?.firstElementChild).toBe(screen.getByText("Speed"));
+    });
+  });
+
   //the accessible signal: the result must be available without seeing color
   describe("non-color signal", () => {
     it("says 'higher' for the winner and 'lower' for the loser, each on its own side", () => {
