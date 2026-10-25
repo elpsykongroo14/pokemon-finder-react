@@ -1,10 +1,47 @@
 import "./CompareStatRow.css";
-import { compareStat } from "../lib/statComparison";
+import {
+  compareStat,
+  outcomeForSide,
+  type StatOutcome,
+} from "../lib/statComparison";
+import { STAT_OUCOME_TEXT } from "../lib/copy";
 
 interface compareStatRowProps {
   label: string;
   leftValue: number;
   rightValue: number;
+}
+
+//class names are part of the test contract, so they stay as they were
+const OUTCOME_CLASS: Record<StatOutcome, string> = {
+  win: " stat-win",
+  lose: " stat-lose",
+  tie: "",
+};
+
+//the visible, non-color cue for sighted users who can't rely on the color change
+const OUTCOME_MARK: Record<StatOutcome, string> = {
+  win: "▲",
+  lose: "▼",
+  tie: "=",
+};
+
+function StatValue({
+  value,
+  outcome,
+}: {
+  value: number;
+  outcome: StatOutcome;
+}) {
+  return (
+    <span className={`compare-stat-value${OUTCOME_CLASS[outcome]}`}>
+      {value}
+      <span className="compare-stat-mark" aria-hidden="true">
+        {OUTCOME_MARK[outcome]}
+      </span>
+      <span className="visually-hidden">{STAT_OUCOME_TEXT[outcome]}</span>
+    </span>
+  );
 }
 
 export function CompareStatRow({
@@ -19,38 +56,9 @@ export function CompareStatRow({
 
   return (
     <div className="compare-stat-row">
-      <span
-        className={`compare-stat-value${
-          winner === "left"
-            ? " stat-win"
-            : winner === "right"
-              ? " stat-lose"
-              : ""
-        }`}
-      >
-        {leftValue}
-      </span>
+      <StatValue value={leftValue} outcome={outcomeForSide(winner, "left")} />
       <span className="compare-stat-label">{label}</span>
-      <span
-        className={`compare-stat-value${
-          winner === "right"
-            ? " stat-win"
-            : winner === "left"
-              ? " stat-lose"
-              : ""
-        }`}
-      >
-        {rightValue}
-      </span>
+      <StatValue value={rightValue} outcome={outcomeForSide(winner, "right")} />
     </div>
   );
 }
-
-//this the fix for the original bug in the vanilla version
-//highlighStats() had to reach the DOM twice per stat (pokemonStats.querySelectorAll(...)[indx] and compareStats.querySelectorAll(...)[index]),
-//trust that both queries returned elements in the same order the loop expected, and mutate className on  whatever it found
-//three seperate places index coupling could quietly break.
-//here, winner is computed once from two arguments that were handed to this component directly, by name.
-//theres no once from two arguments that were handed to this component directly by name.
-//theres no index anywhere in this file, the className is a direct, synchronous function of the two props
-//nothing to get out of sync because nothing is stored in between

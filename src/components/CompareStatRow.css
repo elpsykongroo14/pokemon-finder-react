@@ -8,6 +8,11 @@
     border-bottom: 1px solid var(--color-border-subtle);
   }
 
+  .compare-stat-mark {
+    margin-inline-start: var(--space-1);
+    font-size: var(--text-xs);
+  }
+
   .compare-stat-label {
     color: var(--color-text-secondary);
     font-size: var(--text-xs);
