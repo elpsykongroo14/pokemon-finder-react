@@ -1,9 +1,7 @@
 import "./StatBarChart.css";
 import { StatMeter } from "../ui/StatMeter";
 import type { PokemonStat } from "../lib/type";
-import { STAT_LABELS, getOrderedStats } from "../lib/stats";
-
-const MAX_STAT = 255;
+import { STAT_LABELS, MAX_BASE_STAT, getOrderedStats } from "../lib/stats";
 
 interface StatBarChartProps {
   stats: PokemonStat[];
@@ -23,7 +21,7 @@ export function StatBarChart({ stats }: StatBarChartProps) {
           key={stat.stat.name}
           label={STAT_LABELS[stat.stat.name] ?? stat.stat.name}
           value={stat.base_stat}
-          max={MAX_STAT}
+          max={MAX_BASE_STAT}
           variant={stat.base_stat === highestValue ? "highest" : "default"}
           index={index}
         />

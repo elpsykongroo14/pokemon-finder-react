@@ -1,19 +1,25 @@
 @layer features {
+  /* five pieces in one row: value | bar | label | bar | value.
+     The HTML order is label, left value, left bar, right bar, right value
+     (that is the order a screen reader speaks); grid-template-areas puts
+     each piece where the eye expects it. Nothing in the row is focusable,
+     so the two orders can safely differ. */
   .compare-stat-row {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: auto 1fr auto 1fr auto;
+    grid-template-areas: "lval lbar label rbar rval";
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-2) 0;
     border-bottom: 1px solid var(--color-border-subtle);
   }
 
-  .compare-stat-mark {
-    margin-inline-start: var(--space-1);
-    font-size: var(--text-xs);
+  .compare-stat-row:last-child {
+    border-bottom: none;
   }
 
   .compare-stat-label {
+    grid-area: label;
     color: var(--color-text-secondary);
     font-size: var(--text-xs);
     text-align: center;
@@ -27,14 +33,13 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .compare-stat-row:last-child {
-    border-bottom: none;
-  }
-
-  .compare-stat-row > .compare-stat-value:first-child {
+  .compare-stat-value[data-side="left"] {
+    grid-area: lval;
     text-align: right;
   }
-  .compare-stat-row > .compare-stat-value:last-child {
+
+  .compare-stat-value[data-side="right"] {
+    grid-area: rval;
     text-align: left;
   }
 
@@ -44,5 +49,46 @@
 
   .stat-lose {
     color: var(--color-text-secondary);
+  }
+
+  .compare-stat-mark {
+    margin-inline-start: var(--space-1);
+    font-size: var(--text-xs);
+  }
+
+  /* the tug-of-war: both bars are anchored at the centre (next to the label)
+     and grow outward, on the same ruler, so their lengths compare honestly */
+  .compare-stat-bar {
+    display: flex;
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-window-sunken);
+    overflow: hidden;
+  }
+
+  .compare-stat-bar[data-side="left"] {
+    grid-area: lbar;
+    justify-content: flex-end;
+  }
+
+  .compare-stat-bar[data-side="right"] {
+    grid-area: rbar;
+    justify-content: flex-start;
+  }
+
+  .compare-stat-bar__fill {
+    width: var(--stat-bar-percent, 0%);
+    background: var(--text-secondary);
+    animation: compare-stat-grow var(--dur-slow) var(--ease-tick) both;
+  }
+
+  .compare-stat-bar[data-outcome="win"] .compare-stat-bar__fill {
+    background: var(--accent-select);
+  }
+
+  @keyframes compare-stat-grow {
+    from {
+      width: 0;
+    }
   }
 }
