@@ -1,69 +1,151 @@
 @layer features {
+  /* phone: six equal cards in 2 columns x 3 rows */
   .team-slots {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--space-2);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
     list-style: none;
     padding: 0;
     margin: var(--space-4) 0;
+    max-width: 52rem;
   }
 
   .team-slot {
-    aspect-ratio: 1;
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-md);
+    position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: border-color var(--dur-fast) var(--ease-standard);
+    gap: var(--space-2);
+    min-height: 11rem;
+    padding: var(--space-3);
+    border: var(--border-width-line) solid transparent;
+    border-radius: var(--radius-md);
+    text-align: center;
   }
 
+  /* empty: a dashed, sunken socket with an outlined orb in it */
   .team-slot--empty {
-    background: var(--color-bg-surface-sunken);
-    color: var(--color-text-secondary);
+    background: var(--surface-window-sunken);
+    border-style: dashed;
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
   }
 
+  /* filled: tinted by the pokemon's own type (data-type on the <li>) */
   .team-slot--filled {
-    position: relative;
-    flex-direction: column;
-    background: var(--color-bg-surface);
-    border-color: var(--color-border-default);
-    padding: var(--space-1);
+    /* extra room on top for the LEAD tag and the remove button */
+    padding-top: var(--space-6);
+    background: var(--theme-accent-soft);
+    border-color: var(--theme-accent-deep);
+    color: var(--theme-soft-ink);
+    transition: transform var(--dur-fast) var(--ease-standard);
   }
 
   .team-slot--filled:hover {
-    border-color: var(--color-focus);
+    transform: translateY(-2px);
   }
 
-  .team-slot--filled a {
-    color: var(--color-text-primary);
+  .team-slot__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    color: inherit;
     text-decoration: none;
-    font-size: var(--text-xs);
-    text-align: center;
-    line-height: 1.2;
-    text-transform: capitalize;
-  }
-  .remove-team:hover {
-    color: var(--color-danger);
-    border-color: var(--color-danger);
   }
 
+  /* the whole card is clickable: the link's hit area stretches over the slot.
+     the remove button sits above it (z-index) so it stays separately clickable */
+  .team-slot__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .team-slot__sprite {
+    width: 6rem;
+    height: 6rem;
+    object-fit: contain;
+  }
+
+  .team-slot__name {
+    font-family: var(--font-display);
+    text-transform: capitalize;
+    overflow-wrap: anywhere;
+  }
+
+  /* reserve a row for the badges even before they exist, so cards do not
+     jump when the lazy backfill delivers types a moment later */
+  .team-slot__types {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-1);
+    min-height: 1.5rem;
+  }
+
+  .team-slot__tag {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    padding: 0 var(--space-2);
+    border: var(--border-width-line) solid var(--theme-accent-deep);
+    border-radius: var(--radius-pill);
+    background: var(--surface-window);
+    color: var(--text-primary);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* a small visible circle with a 44px touch target (the ::after) */
   .remove-team {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 16px;
-    height: 16px;
+    top: var(--space-2);
+    right: var(--space-2);
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-bg-surface-sunken);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-pill);
-    color: var(--color-text-secondary);
-    font-size: 10px;
-    line-height: 1;
+    width: 1.75rem;
+    height: 1.75rem;
     padding: 0;
+    border: var(--border-width-line) solid var(--border-line);
+    border-radius: var(--radius-pill);
+    background: var(--surface-window);
+    color: var(--text-primary);
+    font-size: var(--text-lg);
+    line-height: 1;
     cursor: pointer;
+  }
+
+  .remove-team::after {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
+  }
+
+  .remove-team:hover {
+    color: var(--text-danger);
+    border-color: var(--text-danger);
+  }
+
+  /* tablet and up: the lead slot becomes a big feature card (2x2 cells) and
+     the other five fill the remaining cells of a 3 x 3 grid */
+  @media (min-width: 768px) {
+    .team-slots {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .team-slot[data-lead] {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .team-slot[data-lead] .team-slot__sprite {
+      width: 10rem;
+      height: 10rem;
+    }
   }
 }

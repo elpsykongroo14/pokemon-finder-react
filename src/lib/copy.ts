@@ -31,6 +31,16 @@ export const STAT_OUCOME_TEXT: Record<StatOutcome, string> = {
 export const EMPTY_FAVORITES =
   "No favorites yet. Tap ♥ on any Pokémon to keep it here.";
 
+//party screen: an empty slot must still say something to a screen reader,
+//and the remove button must say WHICH pokemon it removes
+export const LEAD_LABEL = "Lead";
+export function emptySlotLabel(slotNumber: number): string {
+  return `Empty slot ${slotNumber}`;
+}
+export function removeFromTeamLabel(name: string): string {
+  return `Remove ${name} from team`;
+}
+
 //the home greeting: two lines, the secon typed after the first (the
 //newline is kept by the message box's CSS). the name is shouted
 export function encounterMessage(name: string): string {
