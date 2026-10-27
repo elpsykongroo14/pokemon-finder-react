@@ -17,13 +17,15 @@
   .stage__dex {
     font-size: var(--text-sm);
     letter-spacing: 0.1em;
-    color: var(--theme-accent-ink);
+    color: var(--theme-soft-ink);
     opacity: 0.8;
   }
 
   .stage__name {
     text-transform: capitalize;
     overflow-wrap: anywhere;
+    /* headings set their own color globally; inherit the panel's instead */
+    color: inherit;
   }
 
   .stage__sprite {

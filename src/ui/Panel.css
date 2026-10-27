@@ -27,7 +27,7 @@
 
   .panel[data-variant="tinted"] {
     background: var(--theme-accent-soft);
-    color: var(--theme-accent-ink);
+    color: var(--theme-soft-ink);
     border-color: var(--theme-accent-deep);
   }
 }
