@@ -13,6 +13,11 @@ export const LOADING_LABEL = "Searching the tall grass…";
 export const RETRY_LABEL = "Retry";
 export const MENU_PROMPT = "What will you do?";
 
+//compare page: the empty state invites, the self compare error says what to do
+export const EMPTY_COMPARE =
+  "Search for a Pokémon first, then hit Compare to bring it here.";
+export const SELF_COMPARE = "Choose a different Pokémon to compare.";
+
 //the words a screen reader says after a compared state value, so the result
 //never depends on color alone. Record<StatOutcome, ...? makes the compiler
 //demand a word for every outcome, the same safety net failureMessage has
