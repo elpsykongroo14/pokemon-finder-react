@@ -66,6 +66,7 @@
   --theme-accent-deep: var(--teal-700);
   --theme-accent-soft: var(--slate-100);
   --theme-accent-ink: var(--slate-900);
+  --theme-soft-ink: var(--slate-900);
   --theme-accent-2: var(--theme-accent);
   --theme-accent-2-deep: var(--theme-accent-deep);
 }
