@@ -1,17 +1,13 @@
 @layer features {
-  /* five pieces in one row: value | bar | label | bar | value.
-     The HTML order is label, left value, left bar, right bar, right value
-     (that is the order a screen reader speaks); grid-template-areas puts
-     each piece where the eye expects it. Nothing in the row is focusable,
-     so the two orders can safely differ. */
+  /* The value and label columns have FIXED widths, so every row's centre
+     line sits at the same x and the bars line up from one row to the next. */
   .compare-stat-row {
     display: grid;
-    grid-template-columns: auto 1fr auto 1fr auto;
+    grid-template-columns: 3.25rem minmax(0, 1fr) 4.5rem minmax(0, 1fr) 3.25rem;
     grid-template-areas: "lval lbar label rbar rval";
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--color-border-subtle);
+    gap: var(--space-2);
+    /* padding and border-bottom unchanged */
   }
 
   .compare-stat-row:last-child {

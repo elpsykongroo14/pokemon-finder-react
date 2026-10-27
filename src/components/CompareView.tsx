@@ -1,14 +1,49 @@
 //this is the container that puts two pokemon side by side
+//a split "versus" stage on top, the tug of war stat rows underneath
 
 import "./CompareView.css";
 import type { PokemonDetails } from "../lib/type";
 import { SpriteDisplay } from "./SpriteDisplay";
 import { TypeBadgeList } from "./TypeBadgeList";
 import { CompareStatsChart } from "./CompareStatsChart";
+import { usePreferences } from "../hooks/usePreferences";
 
 interface CompareViewProps {
   primary: PokemonDetails;
   secondary: PokemonDetails;
+}
+
+//one half of the stage. data type reskins only this half (the type themes
+//are attribute selectors, so any element can wear one), which is how  the two
+//halves get two differenet colors with no javaScipt doing any coloring
+function VersusSide({
+  pokemon,
+  side,
+}: {
+  pokemon: PokemonDetails;
+  side: "left" | "right";
+}) {
+  const { spriteMode, animationsEnabled } = usePreferences();
+
+  return (
+    <div
+      className="versus-side"
+      data-side={side}
+      data-type={pokemon.types[0]?.type.name}
+    >
+      <SpriteDisplay
+        sprites={pokemon.sprites}
+        name={pokemon.name}
+        shiny={false}
+        mode={spriteMode}
+        animate={animationsEnabled}
+        size={160}
+        plain
+      />
+      <h3 className="versus-side__name">{pokemon.name}</h3>
+      <TypeBadgeList types={pokemon.types} />
+    </div>
+  );
 }
 
 export function CompareView({ primary, secondary }: CompareViewProps) {
@@ -17,25 +52,12 @@ export function CompareView({ primary, secondary }: CompareViewProps) {
       className="compare-view"
       aria-label={`Comparing ${primary.name} and ${secondary.name}`}
     >
-      <div className="compare-heads">
-        <div className="compare-column">
-          <SpriteDisplay
-            sprites={primary.sprites}
-            name={primary.name}
-            shiny={false}
-          />
-          <h3>{primary.name}</h3>
-          <TypeBadgeList types={primary.types} />
-        </div>
-        <div className="compare-column">
-          <SpriteDisplay
-            sprites={secondary.sprites}
-            name={secondary.name}
-            shiny={false}
-          />
-          <h3>{secondary.name}</h3>
-          <TypeBadgeList types={secondary.types} />
-        </div>
+      <div className="versus-stage">
+        <VersusSide pokemon={primary} side="left" />
+        <span className="versus-stage__badge surface-window" aria-hidden="true">
+          VS
+        </span>
+        <VersusSide pokemon={secondary} side="right" />
       </div>
       <CompareStatsChart
         leftStats={primary.stats}

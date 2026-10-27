@@ -1,20 +1,99 @@
 @layer features {
-  /*missing compare-view class*/
-
-  .compare-heads {
+  .compare-view {
     display: flex;
-    justify-content: space-between;
-    gap: var(--space-5);
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--color-border-subtle);
+    flex-direction: column;
+    gap: var(--space-4);
+    width: 100%;
+    max-width: 60rem;
+    margin-inline: auto;
   }
 
-  .compare-column {
-    flex: 1;
+  /* two halves, each wearing its own Pokémon's type colors, cut on a
+     diagonal. the right half is pulled left by exactly the slant, so the two
+     slanted edges run parallel with only a thin gap between them */
+  .versus-stage {
+    --versus-slant: 28px;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-1);
+    filter: drop-shadow(var(--drop-raised));
+  }
+
+  .versus-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-3);
+    background: var(--theme-accent-soft);
+    color: var(--theme-accent-ink);
     text-align: center;
+    animation-duration: var(--dur-slow);
+    animation-timing-function: var(--ease-snap);
+    animation-fill-mode: both;
   }
 
-  .compare-column h3 {
+  .versus-side[data-side="left"] {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      calc(100% - var(--versus-slant)) 100%,
+      0 100%
+    );
+    padding-inline-end: calc(var(--space-3) + var(--versus-slant));
+    animation-name: versus-enter-left;
+  }
+
+  .versus-side[data-side="right"] {
+    clip-path: polygon(var(--versus-slant) 0, 100% 0, 100% 100%, 0 100%);
+    margin-inline-start: calc(var(--versus-slant) * -1);
+    padding-inline-start: calc(var(--space-3) + var(--versus-slant));
+    animation-name: versus-enter-right;
+  }
+
+  .versus-side__name {
+    color: inherit;
     text-transform: capitalize;
+    overflow-wrap: anywhere;
+  }
+
+  /* the VS badge sits on the middle of the seam, above both halves */
+  .versus-stage__badge {
+    position: absolute;
+    top: 50%;
+    left: calc(50% - var(--versus-slant) / 2);
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-width-thick) solid var(--border-line);
+    border-radius: var(--radius-pill);
+    background: var(--surface-window);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    letter-spacing: 0.1em;
+    animation: versus-badge-pop var(--dur-slow) var(--ease-snap) both;
+    animation-delay: var(--dur-base);
+  }
+
+  @keyframes versus-enter-left {
+    from {
+      transform: translateX(-24px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes versus-enter-right {
+    from {
+      transform: translateX(24px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes versus-badge-pop {
+    from {
+      transform: translate(-50%, -50%) scale(0.4);
+      opacity: 0;
+    }
   }
 }
