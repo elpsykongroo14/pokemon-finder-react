@@ -8,11 +8,14 @@ import { formatDexNumber } from "../lib/dex";
 interface SearchBarProps {
   onSubmit: (query: string) => void;
   placeholder?: string;
+  //names the search landmark, only needed when a page  has more than one search form
+  label?: string;
 }
 
 export function SearchBar({
   onSubmit,
   placeholder = "Search Pokémon by name or ID...",
+  label,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -77,7 +80,7 @@ export function SearchBar({
 
   return (
     <div className="search-bar-wrapper">
-      <form onSubmit={handleSubmit} role="search">
+      <form onSubmit={handleSubmit} role="search" aria-label={label}>
         <input
           ref={inputRef}
           id={SEARCH_INPUT_ID}

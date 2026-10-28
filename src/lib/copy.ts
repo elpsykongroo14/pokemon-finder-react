@@ -18,6 +18,12 @@ export const EMPTY_COMPARE =
   "Search for a Pokémon first, then hit Compare to bring it here.";
 export const SELF_COMPARE = "Choose a different Pokémon to compare.";
 
+//compare page: a heading for the page itself (visually hidden, so the headings
+//below it nest correctly) and a name for the second search landmark, so a
+//screen reader can tell it apart from the header search
+export const COMPARE_HEADING = "Compare Pokémon";
+export const OPPONENT_SEARCH_LABEL = "Choose an opponent";
+
 //the words a screen reader says after a compared state value, so the result
 //never depends on color alone. Record<StatOutcome, ...? makes the compiler
 //demand a word for every outcome, the same safety net failureMessage has

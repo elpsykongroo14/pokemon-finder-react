@@ -209,3 +209,13 @@ Favorites: staggerSlot (capped; later arrivals take slot 0) hands position to CS
 Guardrails: tests/tokens.test.ts fails on an undefined var(--x) or a raw color in component CSS. preconnect hints for pokeapi.co (crossorigin, because fetch is CORS) and raw.githubusercontent.com (no crossorigin, because <img> isn't).
 Bundle: +3.95 kB JS (+1.37 gzip), +1.73 kB CSS (+0.28 gzip), no new dependencies.
 Deferred: recently viewed strip (needs new persistence, so R12); tray chips load artwork-size images at 32px (R12, needs a saved-data migration); two buttons named "Search" on Home; the Favorite button uses emoji hearts while the copy says ♥; ComparePage still uses status-message (R7).
+
+10-28-2026: UI rehaul, Compare & Team
+
+Data first. Team members persist a TeamMember (a favorite plus optional types), so old saves are valid as they are. parseStoredTeam treats localStorage as untrusted input: valid JSON of the wrong shape ({"members":"oops"}) used to crash isOnTeam, and now loads as an empty team, with the reducer’s invariants (no duplicates, at most 6) enforced at that second entrance. BACKFILL returns the same state object when there is nothing to do; useTeamBackfill fills missing types one member per effect run, sequentially, with AbortController cleanup, on the Team page only.
+
+Compare: ComparePage is now one discriminated union (getComparePageState), drawn through FailureMessage/MessageBox, with the search kept open after a failed or rejected opponent. CompareStatRow is label-first in the HTML (grid places it visually), each value carries “higher/lower/tied” plus an aria-hidden arrow, and two decorative bars share one ruler (MAX_BASE_STAT, percentOf, now also used by StatMeter). Versus halves are re-skinned by data-type on any element, no JS theming.
+
+Team: the party is a lead slot plus five, always MAX_TEAM slots, empty ones spoken (“Empty slot 3”), the whole card a stretched link with a separate 44px remove target. a “leaving” state, animationend plus a 600 ms fallback, focus moves to the list, removal announced. “Team full” is explained up front from team.length (reducer untouched); “Team complete!” is an event decided at click time.
+
+what surprised me: the as PokemonDetails mock that lied about having types; a loop-shaped effect that restarted itself on every success; --theme-accent-ink (text for the accent) was used on the soft tint, giving ~1.9:1 for fighting/poison/ghost/dragon/dark, and axe missed the Stage name entirely, so I fixed it with --theme-soft-ink and a palette-wide contrast test; jsdom has no AnimationEvent and React picks the event name when react-dom loads, so the polyfill needed its own earlier setup file.

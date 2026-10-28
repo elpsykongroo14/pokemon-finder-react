@@ -11,7 +11,7 @@
   }
 
   .compare-stat-row:last-child {
-    border-bottom: none;
+    border-bottom: var(--border-width-hairline) solid var(--color-border-subtle);
   }
 
   .compare-stat-label {
@@ -56,7 +56,7 @@
      and grow outward, on the same ruler, so their lengths compare honestly */
   .compare-stat-bar {
     display: flex;
-    height: 8px;
+    height: var(--space-2);
     border-radius: var(--radius-pill);
     background: var(--surface-window-sunken);
     overflow: hidden;

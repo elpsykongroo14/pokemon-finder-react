@@ -5,7 +5,13 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ComparePage } from "./ComparePage";
 import { PreferencesProvider } from "../context/PreferencesContext";
 import { usePokemon } from "../hooks/usePokemon";
-import { EMPTY_COMPARE, LOADING_LABEL, SELF_COMPARE } from "../lib/copy";
+import {
+  COMPARE_HEADING,
+  EMPTY_COMPARE,
+  LOADING_LABEL,
+  OPPONENT_SEARCH_LABEL,
+  SELF_COMPARE,
+} from "../lib/copy";
 import type { PokemonDetails } from "../lib/type";
 
 vi.mock("../hooks/usePokemon");
@@ -13,8 +19,17 @@ const retryA = vi.fn();
 const retryB = vi.fn();
 
 vi.mock("../components/SearchBar", () => ({
-  SearchBar: ({ onSubmit }: { onSubmit: (query: string) => void }) => (
-    <button onClick={() => onSubmit("charmander")}>fake-search-submit</button>
+  SearchBar: ({
+    onSubmit,
+    label,
+  }: {
+    onSubmit: (query: string) => void;
+    label?: string;
+  }) => (
+    <div>
+      <button onClick={() => onSubmit("charmander")}>fake-search-submit</button>
+      <span data-testid="search-label">{label}</span>
+    </div>
   ),
 }));
 
@@ -187,6 +202,36 @@ describe("ComparePage", () => {
     expect(
       screen.getByRole("button", { name: "fake-search-submit" }),
     ).toBeInTheDocument();
+  });
+
+  it.each([
+    ["no first pokemon", "/compare", {}],
+    [
+      "a loaded comparison",
+      "/compare?a=pikachu&b=charmander",
+      { pikachu: { data: pikachuData }, charmander: { data: charmanderData } },
+    ],
+  ])(
+    "gives the page an h2 so the headings below it nest correctly (%s)",
+    (_name, path, lookups) => {
+      mockLooups(lookups);
+
+      renderComparePage(path);
+
+      expect(
+        screen.getByRole("heading", { level: 2, name: COMPARE_HEADING }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it("names the opponent search, so it is not confused with header search", () => {
+    mockLooups({ pikachu: { data: pikachuData } });
+
+    renderComparePage("/compare?a=pikachu");
+
+    expect(screen.getByTestId("search-label")).toHaveTextContent(
+      OPPONENT_SEARCH_LABEL,
+    );
   });
 
   it("renders the comparison when two differen pokemon have loaded", () => {

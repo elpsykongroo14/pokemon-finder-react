@@ -42,6 +42,17 @@ beforeEach(() => {
 });
 
 describe("SearchBar", () => {
+  it("leaves its search landmark unnamed by default, and names it when given a label", () => {
+    const { unmount } = render(<SearchBar onSubmit={vi.fn()} />);
+    expect(screen.getByRole("search")).not.toHaveAttribute("aria-label");
+    unmount();
+
+    render(<SearchBar onSubmit={vi.fn()} label="Choose an opponent" />);
+    expect(
+      screen.getByRole("search", { name: "Choose an opponent" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders a search input and submit button", () => {
     render(<SearchBar onSubmit={() => {}} />);
 
