@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { TeamSLots } from "./TeamSlots";
@@ -57,7 +57,7 @@ describe("TeamSLots", () => {
     expect(container.querySelectorAll(".team-slot--empty")).toHaveLength(5);
   });
 
-  it("removes a member and frees up their slot when the remove button is clicked", async () => {
+  it("removes a member and frees up their slot once the exit animation ends", async () => {
     const user = userEvent.setup();
     localStorage.setItem(
       "pokemon_team",
@@ -67,6 +67,10 @@ describe("TeamSLots", () => {
 
     await user.click(
       screen.getByRole("button", { name: "Remove pikachu from team" }),
+    );
+    //removal is now two steps: the card first plays its exit, then it is removed
+    fireEvent.animationEnd(
+      container.querySelector(".team-slot--filled") as HTMLElement,
     );
 
     expect(
@@ -183,6 +187,119 @@ describe("TeamSLots", () => {
       const [first, second] = container.querySelectorAll(".team-slot--filled");
       expect(first).toHaveAttribute("data-type", "fire");
       expect(second).not.toHaveAttribute("data-type");
+    });
+  });
+
+  describe("removing a member (exit animation, D6)", () => {
+    function clickRemove(name: string) {
+      fireEvent.click(
+        screen.getByRole("button", { name: `Remove ${name} from team` }),
+      );
+    }
+
+    function leavingCard(container: HTMLElement) {
+      return container.querySelector(".team-slot--filled") as HTMLElement;
+    }
+
+    beforeEach(() => {
+      seedTeam([
+        { name: "pikachu", id: 25, sprite: null },
+        { name: "charmander", id: 4, sprite: null },
+      ]);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("marks the card as leaving, but keeps it in place until the exit ends", () => {
+      const { container } = renderSlots();
+
+      clickRemove("pikachu");
+
+      expect(leavingCard(container)).toHaveAttribute("data-leaving", "true");
+      expect(screen.getByRole("link", { name: "pikachu" })).toBeInTheDocument();
+    });
+
+    it("removes the member when its own exit animation ends", () => {
+      const { container } = renderSlots();
+
+      clickRemove("pikachu");
+      fireEvent.animationEnd(leavingCard(container));
+
+      expect(
+        screen.queryByRole("link", { name: "pikachu" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "charmander" }),
+      ).toBeInTheDocument();
+    });
+
+    it("removes the member anyway if the animation never reports back", () => {
+      vi.useFakeTimers();
+      renderSlots();
+
+      clickRemove("pikachu");
+      expect(screen.getByRole("link", { name: "pikachu" })).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(600);
+      });
+
+      expect(
+        screen.queryByRole("link", { name: "pikachu" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("ignores an animation end that comes from a child of the card", () => {
+      renderSlots();
+
+      clickRemove("pikachu");
+      fireEvent.animationEnd(screen.getByRole("link", { name: "pikachu" }));
+
+      expect(screen.getByRole("link", { name: "pikachu" })).toBeInTheDocument();
+    });
+
+    it("ignores the animation end of a card that is not leaving (the enter animation)", () => {
+      const { container } = renderSlots();
+
+      fireEvent.animationEnd(leavingCard(container));
+
+      expect(screen.getByRole("link", { name: "pikachu" })).toBeInTheDocument();
+      expect(container.querySelector("[data-leaving]")).not.toBeInTheDocument();
+    });
+
+    it("lets only one card leave at a time", () => {
+      const { container } = renderSlots();
+
+      clickRemove("pikachu");
+      clickRemove("charmander");
+
+      expect(container.querySelectorAll("[data-leaving]")).toHaveLength(1);
+      expect(
+        screen.getByRole("link", { name: "pikachu" }).closest("li"),
+      ).toHaveAttribute("data-leaving");
+    });
+
+    it("announces the removal only after it has happened", () => {
+      const { container } = renderSlots();
+
+      clickRemove("pikachu");
+      expect(screen.getByRole("status")).toBeEmptyDOMElement();
+
+      fireEvent.animationEnd(leavingCard(container));
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "pikachu removed from your team.",
+      );
+    });
+
+    it("moves keyboard focus to the party list, so it is not lost with the button", () => {
+      const { container } = renderSlots();
+
+      clickRemove("pikachu");
+      fireEvent.animationEnd(leavingCard(container));
+
+      expect(screen.getByRole("list", { name: "Your party" })).toHaveFocus();
     });
   });
 });
