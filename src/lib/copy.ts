@@ -27,6 +27,20 @@ export const STAT_OUCOME_TEXT: Record<StatOutcome, string> = {
   tie: "tied",
 };
 
+//team button: when the party is full, say so AND say what to do about it.
+//the sentence is followed by a link whose text is TEAM_FULL_LINK
+export const TEAM_FULL_HINT =
+  "Your party is full. To add this Pokémon, remove another one on the";
+export const TEAM_FULL_LINK = "Team page";
+export const TEAM_FULL_ATTEMPT = "Couldn't add: your party is full.";
+export const TEAM_COMPLETE = "Team complete! Your party is ready.";
+
+//party screen announcements
+export const PARTY_LABEL = "Your party";
+export function removedFromTeamMessage(name: string): string {
+  return `${name} removed from your team.`;
+}
+
 //empty states are invitations: say what is missing AND how to fill it
 export const EMPTY_FAVORITES =
   "No favorites yet. Tap ♥ on any Pokémon to keep it here.";

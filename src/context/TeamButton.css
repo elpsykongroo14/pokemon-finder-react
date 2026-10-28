@@ -1,0 +1,52 @@
+@layer features {
+  .team-full-hint {
+    margin-top: var(--space-2);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+
+  .team-full-hint a {
+    color: var(--text-primary);
+  }
+
+  /* the celebration: six pips light up in order, then the words pop in.
+     every duration is a motion token, and so is the stagger step
+     (--dur-instant), so with reduced motion everything is simply there */
+  .team-complete {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    animation: team-complete-pop var(--dur-epic) var(--ease-bounce) backwards;
+  }
+
+  .team-complete__pips {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  .team-complete__pip {
+    width: var(--space-3);
+    height: var(--space-3);
+    border-radius: var(--radius-pill);
+    background: var(--theme-accent);
+    animation: team-complete-pip var(--dur-slow) var(--ease-snap) backwards;
+    animation-delay: calc(var(--i) * var(--dur-instant));
+  }
+
+  @keyframes team-complete-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+  }
+
+  @keyframes team-complete-pip {
+    from {
+      background: transparent;
+      transform: scale(0.4);
+    }
+  }
+}
