@@ -8,7 +8,13 @@ import { FailureMessage } from "../components/FailureMessage";
 import { MessageBox } from "../ui/MessageBox";
 import { usePokemon } from "../hooks/usePokemon";
 import { getComparePageState } from "../lib/comparePageState";
-import { EMPTY_COMPARE, LOADING_LABEL, SELF_COMPARE } from "../lib/copy";
+import {
+  EMPTY_COMPARE,
+  LOADING_LABEL,
+  SELF_COMPARE,
+  COMPARE_HEADING,
+  OPPONENT_SEARCH_LABEL,
+} from "../lib/copy";
 
 export function ComparePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,6 +40,13 @@ export function ComparePage() {
     retry();
   }
 
+  //a plain JSX value, not a component declared in here: a function componenet
+  //defined inside another component is brand new type on every render, so
+  //React would unmout and remount the search bar each time (losing what was typed)
+  const opponentSearch = (
+    <SearchBar onSubmit={handlePickSecond} label={OPPONENT_SEARCH_LABEL} />
+  );
+
   function renderState() {
     switch (state.status) {
       case "no-first":
@@ -53,7 +66,7 @@ export function ComparePage() {
         return (
           <>
             <h3>Comparing {state.first.name} with...</h3>
-            <SearchBar onSubmit={handlePickSecond} />
+            {opponentSearch}
           </>
         );
       //a failed or rejected opponent still leaves the way forward open:
@@ -66,14 +79,14 @@ export function ComparePage() {
               query={state.name}
               onRetry={() => handleRetry(second.retry)}
             />
-            <SearchBar onSubmit={handlePickSecond} />
+            {opponentSearch}
           </>
         );
       case "same-pokemon":
         return (
           <>
             <MessageBox variant="error" text={SELF_COMPARE} />
-            <SearchBar onSubmit={handlePickSecond} />
+            {opponentSearch}
           </>
         );
       case "ready":
@@ -85,6 +98,7 @@ export function ComparePage() {
 
   return (
     <div className="compare-page" ref={regionRef} tabIndex={-1}>
+      <h2 className="visually-hidden">{COMPARE_HEADING}</h2>
       {renderState()}
     </div>
   );
