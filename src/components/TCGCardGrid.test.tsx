@@ -52,7 +52,7 @@ describe("TCGCardGrid", () => {
 
     expect(screen.getByText("Charizard")).toBeInTheDocument();
     expect(screen.getByText("Blastoise")).toBeInTheDocument();
-    expect(screen.getAllByAltText(/Charizard|Blastoise/)).toHaveLength(2);
+    expect(screen.getAllByRole("button")).toHaveLength(2);
   });
 
   it("passes the onSelect callback through to each card so selection still works", async () => {
@@ -70,9 +70,7 @@ describe("TCGCardGrid", () => {
       />,
     );
 
-    const cardEl = screen.getByAltText("Charizard").closest(".tcg-card");
-    if (!cardEl) throw new Error("card element not found");
-    await user.click(cardEl);
+    await user.click(screen.getByRole("button", { name: /Charizard/ }));
 
     expect(handleSelect).toHaveBeenCalledWith(cards[0]);
   });

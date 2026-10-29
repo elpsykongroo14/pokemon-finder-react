@@ -1,5 +1,12 @@
 @layer features {
   .tcg-card {
+    /* a <button> arrives with browser styling; reset it so the card keeps its look */
+    display: block;
+    width: 100%;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
     background: var(--color-bg-surface);
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-md);
@@ -37,6 +44,11 @@
   .tcg-card-rarity {
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
+  }
+
+  .tcg-card:focus-visible {
+    outline: var(--border-width-line) solid var(--focus-ring);
+    outline-offset: 2px;
   }
 
   .tcg-card:hover {

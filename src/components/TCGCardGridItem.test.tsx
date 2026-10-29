@@ -18,21 +18,35 @@ describe("TCGCardGridItem", () => {
 
     render(<TCGCardGridItem card={card} onSelect={() => {}} />);
 
-    expect(screen.getByAltText("Charizard")).toHaveAttribute(
+    expect(screen.getByText("Charizard")).toBeInTheDocument();
+    expect(screen.getByText("Base Set")).toBeInTheDocument();
+    expect(screen.getByText("Rare Holo")).toBeInTheDocument();
+    expect(screen.getByRole("presentation")).toHaveAttribute(
       "src",
       "charizard.png",
     );
-    expect(screen.getByText("Base Set")).toBeInTheDocument();
-    expect(screen.getByText("Rare Holo")).toBeInTheDocument();
   });
 
   it("falls back to placeholder text when set or rarity is missing", () => {
     const card = makeCard({ set: undefined, rarity: undefined });
 
-    return <TCGCardGridItem card={card} onSelect={() => {}} />;
+    render(<TCGCardGridItem card={card} onSelect={() => {}} />);
 
-    expect(screen.getByText("Unknow set")).toBeInTheDocument();
-    expect(screen.getByText("unkown")).toBeInTheDocument();
+    expect(screen.getByText("Unknown set")).toBeInTheDocument();
+    expect(screen.getByText("unknown")).toBeInTheDocument();
+  });
+
+  it("is a real button whose name carries the name, set and rarity", () => {
+    const card = makeCard({
+      set: { name: "Base Set" },
+      rarity: "Rare Holo",
+    });
+
+    render(<TCGCardGridItem card={card} onSelect={() => {}} />);
+
+    expect(
+      screen.getByRole("button", { name: /Charizard.*Base Set.*Rare Holo/ }),
+    ).toBeInTheDocument();
   });
 
   it("calls onSelect with the card when clicked", async () => {
@@ -42,12 +56,26 @@ describe("TCGCardGridItem", () => {
 
     render(<TCGCardGridItem card={card} onSelect={handleSelect} />);
 
-    const cardEl = screen.getByAltText("Charizard").closest(".tcg-card");
-    if (!cardEl) throw new Error("card element not found");
-    await user.click(cardEl);
+    await user.click(screen.getByRole("button", { name: /Charizard/ }));
 
+    expect(handleSelect).toHaveBeenCalledTimes(1);
+    expect(handleSelect).toHaveBeenCalledWith(card);
+  });
+
+  it("can be opened with Space", async () => {
+    const user = userEvent.setup();
+    const handleSelect = vi.fn();
+    const card = makeCard();
+
+    render(<TCGCardGridItem card={card} onSelect={handleSelect} />);
+
+    await user.tab();
+    await user.keyboard(" ");
+
+    expect(handleSelect).toHaveBeenCalledTimes(1);
     expect(handleSelect).toHaveBeenCalledWith(card);
   });
 });
 
-//this test protects the three fallback strings and the click contract
+//this file protects the three fallback strings, the click contract,
+//and the keyboard contract: Tab reaches the card, Enter and Space open it
