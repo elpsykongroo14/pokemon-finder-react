@@ -8,13 +8,27 @@
     color: inherit;
     text-align: left;
     background: var(--color-bg-surface);
-    border: 1px solid var(--color-border-subtle);
+    border: 1px solid var(--tier-color, var(--color-border-subtle));
     border-radius: var(--radius-md);
     overflow: hidden;
     cursor: pointer;
     transition:
       border-color var(--dur-fast) var(--ease-standard),
       transform var(--dur-fast) var(--ease-standard);
+  }
+
+  /* each tier only sets ONE variable; the rules around it read it.
+     common sets nothing, so it falls back to the quiet defaults */
+  .tcg-card[data-rarity="rare"] {
+    --tier-color: var(--rarity-rare);
+  }
+
+  .tcg-card[data-rarity="holo"] {
+    --tier-color: var(--rarity-holo);
+  }
+
+  .tcg-card[data-rarity="ultra"] {
+    --tier-color: var(--rarity-ultra);
   }
 
   .tcg-card-img-wrap {
@@ -44,6 +58,10 @@
   .tcg-card-rarity {
     font-size: var(--text-xs);
     color: var(--color-text-secondary);
+  }
+
+  .tcg-card-rarity {
+    color: var(--tier-color, var(--color-text-secondary));
   }
 
   .tcg-card:focus-visible {

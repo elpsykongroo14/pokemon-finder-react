@@ -49,6 +49,24 @@ describe("TCGCardGridItem", () => {
     ).toBeInTheDocument();
   });
 
+  it("tags the button with its rarity tier so css can style it", () => {
+    const { rerender } = render(
+      <TCGCardGridItem
+        card={makeCard({ rarity: "Rare Holo" })}
+        onSelect={() => {}}
+      />,
+    );
+    expect(screen.getByRole("button")).toHaveAttribute("data-rarity", "holo");
+
+    rerender(
+      <TCGCardGridItem
+        card={makeCard({ rarity: undefined })}
+        onSelect={() => {}}
+      />,
+    );
+    expect(screen.getByRole("button")).toHaveAttribute("data-rarity", "common");
+  });
+
   it("calls onSelect with the card when clicked", async () => {
     const user = userEvent.setup();
     const handleSelect = vi.fn();
