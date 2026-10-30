@@ -53,7 +53,7 @@ const charmanderData = { name: "charmander", id: 4 } as PokemonDetails;
 //each name gets its own lookup result, and its own retry, so a test can tell
 //which retry the page called
 const idle = { data: null, loading: false, error: null };
-function mockLooups(
+function mockLookups(
   byName: Record<string, Partial<ReturnType<typeof usePokemon>>>,
 ) {
   vi.mocked(usePokemon).mockImplementation((name: string) => ({
@@ -83,7 +83,7 @@ beforeEach(() => {
 
 describe("ComparePage", () => {
   it("invites the use to search first when theres no 'a' param", () => {
-    mockLooups({});
+    mockLookups({});
 
     renderComparePage("/compare");
 
@@ -91,7 +91,7 @@ describe("ComparePage", () => {
   });
 
   it("shows the loading label while Pokemon A is loading", () => {
-    mockLooups({ pikachu: { loading: true } });
+    mockLookups({ pikachu: { loading: true } });
 
     renderComparePage("/compare?a=pikachu");
 
@@ -99,7 +99,7 @@ describe("ComparePage", () => {
   });
 
   it("explains a not found Pokemon A politely, without a retry button", () => {
-    mockLooups({ pikachu: { error: "not-found" } });
+    mockLookups({ pikachu: { error: "not-found" } });
 
     renderComparePage("/compare?a=pikachu");
 
@@ -112,7 +112,7 @@ describe("ComparePage", () => {
   });
 
   it("raises an alert with a retry that retries Pokemon A when its unreachable", async () => {
-    mockLooups({ pikachu: { error: "unreachable" } });
+    mockLookups({ pikachu: { error: "unreachable" } });
     const user = userEvent.setup();
 
     renderComparePage("/compare?a=pikachu");
@@ -126,7 +126,7 @@ describe("ComparePage", () => {
   });
 
   it("moves focus to the page wrapper before retrying, so focus is not lost", async () => {
-    mockLooups({ pikachu: { error: "unreachable" } });
+    mockLookups({ pikachu: { error: "unreachable" } });
     const user = userEvent.setup();
 
     const { container } = renderComparePage("/compare?a=pikachu");
@@ -136,7 +136,7 @@ describe("ComparePage", () => {
   });
 
   it("prompts for a second pokemon once the first loaded", () => {
-    mockLooups({ pikachu: { data: pikachuData } });
+    mockLookups({ pikachu: { data: pikachuData } });
 
     renderComparePage("/compare?a=pikachu");
 
@@ -149,7 +149,7 @@ describe("ComparePage", () => {
   });
 
   it("adds the second Pokemon to the comparison on submit", async () => {
-    mockLooups({
+    mockLookups({
       pikachu: { data: pikachuData },
       charmander: { data: charmanderData },
     });
@@ -166,7 +166,7 @@ describe("ComparePage", () => {
   });
 
   it("shows the loading label while Pokemon B is loading", () => {
-    mockLooups({
+    mockLookups({
       pikachu: { data: pikachuData },
       charmander: { loading: true },
     });
@@ -177,7 +177,7 @@ describe("ComparePage", () => {
   });
 
   it("retries pokemon B, not A, and keeps the search open when B is unreachable", async () => {
-    mockLooups({
+    mockLookups({
       pikachu: { data: pikachuData },
       charmander: { error: "unreachable" },
     });
@@ -194,7 +194,7 @@ describe("ComparePage", () => {
   });
 
   it("rejects comparing a pokemon against itself, and offers a new search", () => {
-    mockLooups({ pikachu: { data: pikachuData } });
+    mockLookups({ pikachu: { data: pikachuData } });
 
     renderComparePage("/compare?a=pikachu&b=pikachu");
 
@@ -214,7 +214,7 @@ describe("ComparePage", () => {
   ])(
     "gives the page an h2 so the headings below it nest correctly (%s)",
     (_name, path, lookups) => {
-      mockLooups(lookups);
+      mockLookups(lookups);
 
       renderComparePage(path);
 
@@ -225,7 +225,7 @@ describe("ComparePage", () => {
   );
 
   it("names the opponent search, so it is not confused with header search", () => {
-    mockLooups({ pikachu: { data: pikachuData } });
+    mockLookups({ pikachu: { data: pikachuData } });
 
     renderComparePage("/compare?a=pikachu");
 
@@ -235,7 +235,7 @@ describe("ComparePage", () => {
   });
 
   it("renders the comparison when two differen pokemon have loaded", () => {
-    mockLooups({
+    mockLookups({
       pikachu: { data: pikachuData },
       charmander: { data: charmanderData },
     });

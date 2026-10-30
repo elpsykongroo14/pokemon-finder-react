@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { useTeamBackfil } from "./useTeamBackfill";
+import { useTeamBackfill } from "./useTeamBackfill";
 import { useTeam } from "./useTeam";
 import { TeamProvider } from "../context/TeamContext";
 import type { PokemonDetails } from "../lib/type";
@@ -30,7 +30,7 @@ function seedTeam(members: object[]) {
 function renderBackfill() {
   return renderHook(
     () => {
-      useTeamBackfil();
+      useTeamBackfill();
       return useTeam();
     },
     {
@@ -92,12 +92,12 @@ describe("useTeamBackfill", () => {
     const first = deferred<PokemonDetails>();
     fetchPokemon
       .mockReturnValueOnce(first.promise)
-      .mockRejectedValue(makePokemon("charmander", "fire"));
+      .mockResolvedValue(makePokemon("charmander", "fire"));
 
     renderBackfill();
 
     await waitFor(() => expect(fetchPokemon).toHaveBeenCalledTimes(1));
-    expect(fetchPokemon).toHaveBeenCalledWith("pikachu", expect.anything());
+    expect(fetchPokemon).toHaveBeenLastCalledWith("pikachu", expect.anything());
 
     await act(async () => {
       first.resolve(makePokemon("pikachu", "electric"));

@@ -49,8 +49,8 @@ export function TeamButton({ pokemon }: TeamButtonProps) {
   const partyFull = team.length >= MAX_TEAM && !onTeam;
 
   //true only after this button's click filled the sixth slot
-  const [JustCompleted, setJustCompleted] = useState(false);
-  const celebrating = JustCompleted && onTeam && team.length >= MAX_TEAM;
+  const [justCompleted, setJustCompleted] = useState(false);
+  const celebrating = justCompleted && onTeam && team.length >= MAX_TEAM;
 
   //the auto dismiss timer lives here, in a component not in the reducer
   //reducers stay pure, sider effects like setTimeout belong in effects
@@ -90,7 +90,7 @@ export function TeamButton({ pokemon }: TeamButtonProps) {
       </Button>
       {partyFull && (
         <p id={hintId} className="team-full-hint">
-          {TEAM_FULL_HINT} <Link to="/team">{TEAM_FULL_LINK}</Link>
+          {TEAM_FULL_HINT} <Link to="/team">{TEAM_FULL_LINK}</Link>.
         </p>
       )}
 

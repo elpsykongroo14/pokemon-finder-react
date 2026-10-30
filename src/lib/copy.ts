@@ -28,7 +28,7 @@ export const OPPONENT_SEARCH_LABEL = "Choose an opponent";
 //the words a screen reader says after a compared state value, so the result
 //never depends on color alone. Record<StatOutcome, ...? makes the compiler
 //demand a word for every outcome, the same safety net failureMessage has
-export const STAT_OUCOME_TEXT: Record<StatOutcome, string> = {
+export const STAT_OUTCOME_TEXT: Record<StatOutcome, string> = {
   win: "higher",
   lose: "lower",
   tie: "tied",
