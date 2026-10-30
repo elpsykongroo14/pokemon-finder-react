@@ -3,13 +3,14 @@ import { render, screen } from "@testing-library/react";
 import { TCGCardGrid } from "./TCGCardGrid";
 import userEvent from "@testing-library/user-event";
 import type { TCGCard } from "../lib/type";
+import { CARDS_LOADING_LABEL } from "../lib/copy";
 
 function makeCard(id: string, name: string): TCGCard {
   return { id, name };
 }
 
 describe("TCGCardGrid", () => {
-  it("shows a loading message while status is loading", () => {
+  it("shows a loading status, and no cards, while status is loading ", () => {
     render(
       <TCGCardGrid
         cards={[]}
@@ -20,7 +21,11 @@ describe("TCGCardGrid", () => {
       />,
     );
 
-    expect(screen.getByText("Loading cards...")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: CARDS_LOADING_LABEL }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("shows the empty message when statu is empty", () => {
