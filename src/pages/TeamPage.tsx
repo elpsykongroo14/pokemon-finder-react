@@ -1,8 +1,8 @@
 import { TeamSLots } from "../context/TeamSlots";
-import { useTeamBackfil } from "../hooks/useTeamBackfill";
+import { useTeamBackfill } from "../hooks/useTeamBackfill";
 
 export function TeamPage() {
-  useTeamBackfil();
+  useTeamBackfill();
 
   return (
     <section>

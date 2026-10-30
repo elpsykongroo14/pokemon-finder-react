@@ -5,7 +5,7 @@ import { useTeam } from "./useTeam";
 //lazily fills in 'types' for team members saved before that field existed
 //each effect run does exactly one job (fetch next member who needs it)
 //finishing it changes the team, which changes 'next', which re-runs the effect
-export function useTeamBackfil(): void {
+export function useTeamBackfill(): void {
   const { team, backfillMember } = useTeam();
   //names that failed to load this visit, so one bad member cannot block the rest
   const [failed, setFailed] = useState<string[]>([]);

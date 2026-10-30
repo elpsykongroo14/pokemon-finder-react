@@ -2,6 +2,7 @@ import { useId, type CSSProperties } from "react";
 import { usePreferences } from "../hooks/usePreferences";
 import { usePrefersReduceMotion } from "../hooks/usePrefersReducedMotion";
 import { useCountUp } from "../hooks/useCountUp";
+import { percentOf } from "../lib/stats";
 import "./StatMeter.css";
 
 export type MeterVariant = "default" | "highest" | "tiered";
@@ -34,7 +35,7 @@ export function StatMeter({
   const animate = animationsEnabled && !prefersReduceMotion;
 
   const shown = useCountUp(value, animate);
-  const percent = Math.min(100, Math.max(0, (value / max) * 100));
+  const percent = percentOf(value, max);
   const labelId = useId(); //first instinct was id={`stat-meter-label-${label}`}
   //that breaks the instant two StatMeters share a label
   //and they will, the moment a Compare page shows two Pokémon's "HP" bars side by side.

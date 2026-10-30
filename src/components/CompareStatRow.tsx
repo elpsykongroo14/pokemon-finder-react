@@ -5,7 +5,7 @@ import {
   outcomeForSide,
   type StatOutcome,
 } from "../lib/statComparison";
-import { STAT_OUCOME_TEXT } from "../lib/copy";
+import { STAT_OUTCOME_TEXT } from "../lib/copy";
 import { MAX_BASE_STAT, percentOf } from "../lib/stats";
 
 type Side = "left" | "right";
@@ -50,7 +50,7 @@ function StatValue({
       <span className="compare-stat-mark" aria-hidden="true">
         {OUTCOME_MARK[outcome]}
       </span>
-      <span className="visually-hidden">{STAT_OUCOME_TEXT[outcome]}</span>
+      <span className="visually-hidden">{STAT_OUTCOME_TEXT[outcome]}</span>
     </span>
   );
 }

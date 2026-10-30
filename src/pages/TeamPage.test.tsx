@@ -10,10 +10,6 @@ vi.mock("../context/TeamSlots", () => ({
 const { fetchPokemon } = vi.hoisted(() => ({ fetchPokemon: vi.fn() }));
 vi.mock("../lib/api", () => ({ fetchPokemon }));
 
-vi.mock("../context/TeamSlots", () => ({
-  TeamSLots: () => <div data-testid="team-slots">team-slots</div>,
-}));
-
 beforeEach(() => {
   localStorage.clear();
   fetchPokemon.mockReset();

@@ -41,6 +41,14 @@ describe("StatMeter", () => {
     ).toBe("3");
   });
 
+  it("treats an empty bar with a max of 0 as low instead of NaN", () => {
+    const { container } = renderMeter({ value: 0, max: 0, variant: "tiered" });
+    expect(container.querySelector(".stat-meter")).toHaveAttribute(
+      "data-tier",
+      "low",
+    );
+  });
+
   it("colors by percentage when tiered", () => {
     const { container } = renderMeter({
       value: 10,

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { toTeamMember, parseTeamMember } from "./teamMember";
 import type { PokemonDetails } from "./type";
+import { parseStoredTeam } from "./teamStorage";
 
 const charizard = {
   name: "charizard",
@@ -53,10 +54,20 @@ describe("parseTeamMember", () => {
     },
   );
 
-  it("rejects a member witha missing, empty or non string name", () => {
+  it("rejects a member with a missing, empty or non string name", () => {
     expect(parseTeamMember({ id: 25, sprite: null })).toBeNull();
     expect(parseTeamMember({ name: "", id: 25, sprite: null })).toBeNull();
     expect(parseTeamMember({ name: 25, id: 25, sprite: null })).toBeNull();
+  });
+
+  it("rejects a member with a missing or non integer id", () => {
+    expect(parseTeamMember({ name: "Pikachu", sprite: null })).toBeNull();
+    expect(parseTeamMember({ name: "Pikachu", id: "25" })).toBeNull();
+    expect(parseTeamMember({ name: "Pikachu", id: 25.5 })).toBeNull();
+  });
+
+  it("returns an empty team when the stored text is an empty string", () => {
+    expect(parseStoredTeam("")).toEqual([]);
   });
 
   it("turns a missing or invalud sprite into null instead of rejecting", () => {
