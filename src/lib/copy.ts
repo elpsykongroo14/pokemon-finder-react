@@ -10,6 +10,7 @@ import type { StatOutcome } from "./statComparison";
 //message exists for it. the compiler is a reminder
 
 export const LOADING_LABEL = "Searching the tall grass…";
+export const CARDS_LOADING_LABEL = "Flipping through the binder…";
 export const RETRY_LABEL = "Retry";
 export const MENU_PROMPT = "What will you do?";
 

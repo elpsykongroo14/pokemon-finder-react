@@ -1,5 +1,6 @@
 import "./TCGCardGridItem.css";
 import type { TCGCard } from "../lib/type";
+import { getRarityTier } from "../lib/tcg";
 
 interface TCGCardGridItemProps {
   card: TCGCard;
@@ -8,7 +9,12 @@ interface TCGCardGridItemProps {
 
 export function TCGCardGridItem({ card, onSelect }: TCGCardGridItemProps) {
   return (
-    <button type="button" className="tcg-card" onClick={() => onSelect(card)}>
+    <button
+      type="button"
+      className="tcg-card"
+      data-rarity={getRarityTier(card.rarity)}
+      onClick={() => onSelect(card)}
+    >
       <span className="tcg-card-img-wrap">
         <img src={card.images?.small} alt="" loading="lazy" />
       </span>

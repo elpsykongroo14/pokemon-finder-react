@@ -1,5 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
-import { shuffleArray, sortTCGCards, getCardMetaRows } from "./tcg";
+import {
+  shuffleArray,
+  sortTCGCards,
+  getCardMetaRows,
+  getRarityRank,
+  getRarityTier,
+} from "./tcg";
 import type { TCGCard } from "./type";
 
 function makeCard(overrides: Partial<TCGCard> = {}): TCGCard {
@@ -84,6 +90,36 @@ describe("sortTCGCards", () => {
     const originalOrder = cards.map((c) => c.id);
     sortTCGCards(cards, "newest");
     expect(cards.map((c) => c.id)).toEqual(originalOrder);
+  });
+});
+
+describe("getRarityRank", () => {
+  it("ranks known rarities and gives anything else the lowest rank", () => {
+    expect(getRarityRank("Secret Rare")).toBe(9);
+    expect(getRarityRank("Common")).toBe(0);
+    expect(getRarityRank("Some Future Rarity")).toBe(0);
+    expect(getRarityRank(undefined)).toBe(0);
+  });
+});
+
+describe("getRarityTier", () => {
+  it.each([
+    ["Common", "common"],
+    ["Uncommon", "common"],
+    ["Rare", "rare"],
+    ["Rare Holo", "holo"],
+    ["Rare Holo GX", "holo"],
+    ["Rare Holo VMAX", "holo"],
+    ["Rare Rainbow", "ultra"],
+    ["Special Illustration Rare", "ultra"],
+    ["Secret Rare", "ultra"],
+  ] as const)("maps %s to the %s tier", (rarity, tier) => {
+    expect(getRarityTier(rarity)).toBe(tier);
+  });
+
+  it("falls back to common for a missing or unrecognised rarity", () => {
+    expect(getRarityTier(undefined)).toBe("common");
+    expect(getRarityTier("Some Future Rarity")).toBe("common");
   });
 });
 
