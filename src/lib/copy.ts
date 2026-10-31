@@ -34,6 +34,8 @@ export const STAT_OUTCOME_TEXT: Record<StatOutcome, string> = {
   tie: "tied",
 };
 
+export const LIBRARY_VIEW_LABEL = "Library view";
+
 //team button: when the party is full, say so AND say what to do about it.
 //the sentence is followed by a link whose text is TEAM_FULL_LINK
 export const TEAM_FULL_HINT =

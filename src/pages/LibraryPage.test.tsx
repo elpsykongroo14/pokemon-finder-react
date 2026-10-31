@@ -133,6 +133,58 @@ describe("LibraryPage", () => {
     expect(setSortMode).toHaveBeenCalledWith("oldest");
   });
 
+  it("shows the view toggle with Grid selected by default", () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
+
+    renderLibraryPage("/library");
+
+    expect(
+      screen.getByRole("group", { name: "Library view" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Grid" })).toBeChecked();
+  });
+
+  it("opens straight onto the view named in the URL", () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
+
+    renderLibraryPage("/library?view=binder");
+
+    expect(screen.getByRole("radio", { name: "Binder" })).toBeChecked();
+  });
+
+  it("switches view when a different option is chosen", async () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library");
+    await user.click(screen.getByRole("radio", { name: "Table" }));
+
+    expect(screen.getByRole("radio", { name: "Table" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Grid" })).not.toBeChecked();
+  });
+
+  it("keeps the chosen view when searching and when going back to Featured", async () => {
+    vi.mocked(useTCGLibrary).mockImplementation((name?: string) =>
+      makeLibraryState({ title: name ?? "Featured Cards" }),
+    );
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library?view=table");
+    await user.click(
+      screen.getByRole("button", { name: "fake-search-submit" }),
+    );
+
+    //we are now on /library/charmander?view=table
+    expect(
+      screen.getByRole("heading", { level: 3, name: "charmander" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Table" })).toBeChecked();
+    expect(screen.getByRole("link", { name: /Featured/ })).toHaveAttribute(
+      "href",
+      "/library?view=table",
+    );
+  });
+
   it("opens the modal on card select and closes it", async () => {
     vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
     const user = userEvent.setup();
@@ -154,5 +206,7 @@ describe("LibraryPage", () => {
 //useTCGLibrary, SearchBar,TCGCardGrid, and TCGCardModal are all mocked because
 //each already has its own dedicated test file, LibraryPage's own responsibility
 //and the only thing genuinely new here is the selectedCard state it alone owns
-//plus corectly wiring the URL, the hook's props and the sort control together
-//thatst what these five tests test actually exercise
+//plus correctly wiring the URL, the hook's props and the sort control together.
+//the view toggle is NOT mocked: it is the real SegmentedControl reading the real
+//URL through MemoryRouter, because "the URL is the source of truth" is exactly
+//the behavior these tests exist to protect
