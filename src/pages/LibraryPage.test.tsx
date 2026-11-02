@@ -35,6 +35,12 @@ vi.mock("../components/TCGCardGrid", () => ({
   ),
 }));
 
+vi.mock("../components/TCGCardTable", () => ({
+  TCGCardTable: ({ caption }: { caption: string }) => (
+    <div data-testid="tcg-card-table" data-caption={caption} />
+  ),
+}));
+
 vi.mock("../components/TCGCardModal", () => ({
   TCGCardModal: ({
     card,
@@ -183,6 +189,35 @@ describe("LibraryPage", () => {
       "href",
       "/library?view=table",
     );
+  });
+
+  it("shows the grid by default and the table for ?view=tabl, never both", () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(
+      makeLibraryState({ title: "Featured Cards" }),
+    );
+
+    const first = renderLibraryPage("/library");
+    expect(screen.getByTestId("tcg-card-grid")).toBeInTheDocument();
+    expect(screen.queryByTestId("tcg-card-table")).not.toBeInTheDocument();
+    first.unmount();
+
+    renderLibraryPage("/library?view=table");
+    expect(screen.getByTestId("tcg-card-table")).toHaveAttribute(
+      "data-caption",
+      "Featured Cards",
+    );
+    expect(screen.queryByTestId("tcg-card-grid")).not.toBeInTheDocument();
+  });
+
+  it("swaps the grid for the table when the Table option s chosen", async () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library");
+    await user.click(screen.getByRole("radio", { name: "Table" }));
+
+    expect(screen.getByTestId("tcg-card-table")).toBeInTheDocument();
+    expect(screen.queryByTestId("tcg-card-grid")).not.toBeInTheDocument();
   });
 
   it("opens the modal on card select and closes it", async () => {

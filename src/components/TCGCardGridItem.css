@@ -17,19 +17,8 @@
       transform var(--dur-fast) var(--ease-standard);
   }
 
-  /* each tier only sets ONE variable; the rules around it read it.
-     common sets nothing, so it falls back to the quiet defaults */
-  .tcg-card[data-rarity="rare"] {
-    --tier-color: var(--rarity-rare);
-  }
-
-  .tcg-card[data-rarity="holo"] {
-    --tier-color: var(--rarity-holo);
-  }
-
-  .tcg-card[data-rarity="ultra"] {
-    --tier-color: var(--rarity-ultra);
-  }
+  /* --tier-color is set once, for every view, in styles/rarity-tiers.css;
+     this file only READS it, with a quiet fallback for common cards */
 
   .tcg-card-img-wrap {
     aspect-ratio: 5 / 7;
