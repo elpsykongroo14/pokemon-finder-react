@@ -14,6 +14,7 @@ import type { TCGCard } from "../lib/type";
 import type { SortMode } from "../lib/tcg";
 import type { LibraryView } from "../lib/libraryView";
 import { LIBRARY_VIEW_LABEL } from "../lib/copy";
+import { TCGCardTable } from "../components/TCGCardTable";
 
 const VIEW_OPTIONS: { value: LibraryView; label: string }[] = [
   { value: "grid", label: "Grid" },
@@ -31,6 +32,17 @@ export function LibraryPage() {
   const { title, cards, status, error, sortMode, setSortMode } =
     useTCGLibrary(name);
   const [selectedCard, setSelectedCard] = useState<TCGCard | null>(null);
+
+  //every view is handed the same data and the same callbacks
+  const viewProps = {
+    cards,
+    status,
+    error,
+    emptyMessage: name
+      ? `No TCG cards found for "${name}".`
+      : "No cards loaded.",
+    onSelect: setSelectedCard,
+  };
 
   function handleSearch(query: string) {
     navigate({ pathname: `/library/${encodeURIComponent(query)}`, search });
@@ -71,15 +83,13 @@ export function LibraryPage() {
         </div>
       </div>
 
-      <TCGCardGrid
-        cards={cards}
-        status={status}
-        error={error}
-        emptyMessage={
-          name ? `No TCG cards found for "${name}".` : "No cards loaded."
-        }
-        onSelect={setSelectedCard}
-      />
+      {/* the table has its own component now; "binder" still falls back to
+          the grid until Part 6 gives it one */}
+      {view === "table" ? (
+        <TCGCardTable {...viewProps} caption={title} />
+      ) : (
+        <TCGCardGrid {...viewProps} />
+      )}
 
       {selectedCard && (
         <TCGCardModal

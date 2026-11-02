@@ -1,0 +1,78 @@
+@layer features {
+  .tcg-table-wrap {
+    overflow-x: auto;
+  }
+
+  .tcg-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .tcg-table th,
+  .tcg-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .tcg-table thead th {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .tcg-table tbody th {
+    font-weight: 600;
+  }
+
+  .tcg-table tbody tr:hover {
+    background: var(--color-bg-surface-sunken);
+  }
+
+  /* header and name buttons look like text, not like boxed buttons */
+  .tcg-table__sort,
+  .tcg-table__open {
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .tcg-table__sort {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .tcg-table__sort:hover,
+  .tcg-table__open:hover {
+    color: var(--color-text-primary);
+  }
+
+  .tcg-table__sort:focus-visible,
+  .tcg-table__open:focus-visible {
+    outline: var(--border-width-line) solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* reserve room for the arrow so headers don't jiggle when it appears */
+  .tcg-table__arrow {
+    display: inline-block;
+    min-width: 1ch;
+    font-size: var(--text-xs);
+  }
+
+  .tcg-table__rarity {
+    color: var(--tier-color, var(--color-text-secondary));
+  }
+
+  .tcg-table-loading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
