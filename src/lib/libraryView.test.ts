@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { isLibraryView, parseLibraryView, withLibrayView } from "./libraryView";
+import {
+  isLibraryView,
+  parseLibraryView,
+  withLibraryView,
+} from "./libraryView";
 
 describe("parseLibraryView", () => {
   it.each(["grid", "table", "binder"] as const)("accept %s", (view) => {
@@ -29,24 +33,24 @@ describe("isLibraryView", () => {
 
 describe("withLibraryView", () => {
   it("writes a non default view", () => {
-    const next = withLibrayView(new URLSearchParams(), "table");
+    const next = withLibraryView(new URLSearchParams(), "table");
     expect(next.toString()).toBe("view=table");
   });
 
   it("removes the param for the default view, keeping the URL clean", () => {
-    const next = withLibrayView(new URLSearchParams("view=table"), "grid");
+    const next = withLibraryView(new URLSearchParams("view=table"), "grid");
     expect(next.toString()).toBe("");
   });
 
   it("keeps every other param untouched", () => {
-    const next = withLibrayView(new URLSearchParams("sort=rarity"), "binder");
+    const next = withLibraryView(new URLSearchParams("sort=rarity"), "binder");
     expect(next.get("sort")).toBe("rarity");
     expect(next.get("view")).toBe("binder");
   });
 
   it("does not mutate the params it was given", () => {
     const original = new URLSearchParams("view=table");
-    withLibrayView(original, "binder");
+    withLibraryView(original, "binder");
     expect(original.toString()).toBe("view=table");
   });
 });

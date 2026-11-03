@@ -11,7 +11,7 @@ export function parseLibraryView(raw: string | null): LibraryView {
   return isLibraryView(raw) ? raw : DEFAULT_LIBRARY_VIEW;
 }
 
-export function withLibrayView(
+export function withLibraryView(
   params: URLSearchParams,
   view: LibraryView,
 ): URLSearchParams {

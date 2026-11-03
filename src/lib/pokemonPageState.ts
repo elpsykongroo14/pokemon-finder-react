@@ -34,5 +34,6 @@ export function getPokemonPageState({
   if (loading) return { status: "loading" };
   if (error) return { status: "failed", kind: error, name };
   if (data) return { status: "ready", pokemon: data };
+  //finished, no error, nothing to show: the name was blank or matched nothing
   return { status: "failed", kind: "not-found", name };
 }
