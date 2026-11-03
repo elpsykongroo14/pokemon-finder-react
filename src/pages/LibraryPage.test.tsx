@@ -13,6 +13,20 @@ vi.mock("../components/SearchBar", () => ({
   ),
 }));
 
+vi.mock("../components/TCGCardBinder", () => ({
+  TCGCardBinder: ({
+    page,
+    onPageChange,
+  }: {
+    page: number;
+    onPageChange: (page: number) => void;
+  }) => (
+    <div data-testid="tcg-card-binder" data-page={page}>
+      <button onClick={() => onPageChange(3)}>fake-go-to-page-3</button>
+    </div>
+  ),
+}));
+
 vi.mock("../components/TCGCardGrid", () => ({
   TCGCardGrid: ({
     status,
@@ -218,6 +232,61 @@ describe("LibraryPage", () => {
 
     expect(screen.getByTestId("tcg-card-table")).toBeInTheDocument();
     expect(screen.queryByTestId("tcg-card-grid")).not.toBeInTheDocument();
+  });
+
+  it("opens the binder on the page named in the URL, and flipping updates it", async () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library?view=binder&page=2");
+    expect(screen.getByTestId("tcg-card-binder")).toHaveAttribute(
+      "data-page",
+      "2",
+    );
+    expect(screen.queryByTestId("tcg-card-grid")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "fake-go-to-page-3" }));
+    expect(screen.getByTestId("tcg-card-binder")).toHaveAttribute(
+      "data-page",
+      "3",
+    );
+  });
+
+  it("starts the binder on page 1 when the URL has no usable page", () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
+
+    renderLibraryPage("/library?view=binder&page=banana");
+
+    expect(screen.getByTestId("tcg-card-binder")).toHaveAttribute(
+      "data-page",
+      "1",
+    );
+  });
+
+  it("keeps the view but drops the page on a new search and on the way back to Featured", async () => {
+    vi.mocked(useTCGLibrary).mockImplementation((name?: string) =>
+      makeLibraryState({ title: name ?? "Featured Cards" }),
+    );
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library?view=binder&page=2");
+    await user.click(
+      screen.getByRole("button", { name: "fake-search-submit" }),
+    );
+
+    //now on /library/charmander?view=binder, page reset
+    expect(
+      screen.getByRole("heading", { level: 3, name: "charmander" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Binder" })).toBeChecked();
+    expect(screen.getByTestId("tcg-card-binder")).toHaveAttribute(
+      "data-page",
+      "1",
+    );
+    expect(screen.getByRole("link", { name: /Featured/ })).toHaveAttribute(
+      "href",
+      "/library?view=binder",
+    );
   });
 
   it("opens the modal on card select and closes it", async () => {

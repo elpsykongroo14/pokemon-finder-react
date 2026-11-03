@@ -10,7 +10,7 @@ import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 
 export function Layout() {
   const navigate = useViewTransitionNavigate();
-  //we use useNavigate() in this file because
+  //we use useViewTransitionNavigate() in this file because
   //submitting the search form is an action with a side effect
   //(validate, then go somewhere), not a plain click on a link
 

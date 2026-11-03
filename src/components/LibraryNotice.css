@@ -1,0 +1,7 @@
+@layer features {
+  .library-empty {
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: var(--space-7) 0;
+  }
+}

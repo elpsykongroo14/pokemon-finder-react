@@ -3,6 +3,7 @@ import type { TCGCard } from "../lib/type";
 import type { libraryStatus } from "../lib/tcgLibraryReducer";
 import { TCGCardGridItem } from "./TCGCardGridItem";
 import { TCGCardSkeleton } from "./TCGCardSkeleton";
+import { LibraryNotice } from "./LibraryNotice";
 import { CARDS_LOADING_LABEL } from "../lib/copy";
 
 const SKELETON_COUNT = 16;
@@ -31,11 +32,14 @@ export function TCGCardGrid({
       </div>
     );
   }
-  if (status === "error") {
-    return <p className="library-empty">{error}</p>;
-  }
-  if (status === "empty") {
-    return <p className="library-empty">{emptyMessage}</p>;
+  if (status === "error" || status === "empty") {
+    return (
+      <LibraryNotice
+        status={status}
+        error={error}
+        emptyMessage={emptyMessage}
+      />
+    );
   }
 
   return (

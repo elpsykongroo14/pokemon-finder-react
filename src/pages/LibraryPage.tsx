@@ -6,15 +6,18 @@ import { useState } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { useTCGLibrary } from "../hooks/useTCGLibrary";
 import { useLibraryView } from "../hooks/useLibraryView";
+import { useBinderPage } from "../hooks/useBinderPage";
 import { SegmentedControl } from "../ui/SegmentedControl";
 import { SearchBar } from "../components/SearchBar";
 import { TCGCardGrid } from "../components/TCGCardGrid";
+import { TCGCardTable } from "../components/TCGCardTable";
+import { TCGCardBinder } from "../components/TCGCardBinder";
 import { TCGCardModal } from "../components/TCGCardModal";
 import type { TCGCard } from "../lib/type";
 import type { SortMode } from "../lib/tcg";
 import type { LibraryView } from "../lib/libraryView";
+import { withoutPage } from "../lib/pagination";
 import { LIBRARY_VIEW_LABEL } from "../lib/copy";
-import { TCGCardTable } from "../components/TCGCardTable";
 
 const VIEW_OPTIONS: { value: LibraryView; label: string }[] = [
   { value: "grid", label: "Grid" },
@@ -29,9 +32,14 @@ export function LibraryPage() {
   //search and the way back to Featured. or the page would forget the view
   const { search } = useLocation();
   const { view, setView } = useLibraryView();
+  const { page, setPage } = useBinderPage();
   const { title, cards, status, error, sortMode, setSortMode } =
     useTCGLibrary(name);
   const [selectedCard, setSelectedCard] = useState<TCGCard | null>(null);
+
+  //a new set of results (a new search, or back to featured) keeps the view
+  //but drops the page: "page 3" of the old results means nothing for the new ones
+  const searchForNewResults = withoutPage(search);
 
   //every view is handed the same data and the same callbacks
   const viewProps = {
@@ -45,14 +53,35 @@ export function LibraryPage() {
   };
 
   function handleSearch(query: string) {
-    navigate({ pathname: `/library/${encodeURIComponent(query)}`, search });
+    navigate({
+      pathname: `/library/${encodeURIComponent(query)}`,
+      search: searchForNewResults,
+    });
+  }
+
+  //one branch per LibraryView. the switch lists all three, so adding a
+  //fourth view LIBRARY_VIEWS makes TypeScript flag this function
+  function renderCards() {
+    switch (view) {
+      case "table":
+        return <TCGCardTable {...viewProps} caption={title} />;
+      case "binder":
+        return (
+          <TCGCardBinder {...viewProps} page={page} onPageChange={setPage} />
+        );
+      case "grid":
+        return <TCGCardGrid {...viewProps} />;
+    }
   }
 
   return (
     <section className="library-view">
       <div className="library-header">
         <h2 className="library-title">TCG Library</h2>
-        <Link to={{ pathname: "/library", search }} className="library-back">
+        <Link
+          to={{ pathname: "/library", search: searchForNewResults }}
+          className="library-back"
+        >
           ← Featured
         </Link>
       </div>
@@ -63,7 +92,7 @@ export function LibraryPage() {
 
       <div className="card-panel-header">
         <h3 className="card-panel-title">{title}</h3>
-        <div className="card-panel-control">
+        <div className="card-panel-controls">
           <SegmentedControl
             label={LIBRARY_VIEW_LABEL}
             options={VIEW_OPTIONS}
@@ -83,13 +112,7 @@ export function LibraryPage() {
         </div>
       </div>
 
-      {/* the table has its own component now; "binder" still falls back to
-          the grid until Part 6 gives it one */}
-      {view === "table" ? (
-        <TCGCardTable {...viewProps} caption={title} />
-      ) : (
-        <TCGCardGrid {...viewProps} />
-      )}
+      {renderCards()}
 
       {selectedCard && (
         <TCGCardModal

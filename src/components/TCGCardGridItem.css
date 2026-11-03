@@ -17,7 +17,7 @@
       transform var(--dur-fast) var(--ease-standard);
   }
 
-  /* --tier-color is set once, for every view, in styles/rarity-tiers.css;
+    /* --tier-color is set once, for every view, in styles/rarity-tiers.css;
      this file only READS it, with a quiet fallback for common cards */
 
   .tcg-card-img-wrap {

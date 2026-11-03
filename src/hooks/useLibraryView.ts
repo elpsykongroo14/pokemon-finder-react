@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   parseLibraryView,
-  withLibrayView,
+  withLibraryView,
   type LibraryView,
 } from "../lib/libraryView";
 
@@ -13,7 +13,7 @@ export function useLibraryView() {
   const setView = useCallback(
     (next: LibraryView) => {
       //accepts a function that receives the current params and returns the new ones.
-      setSearchParams((previous) => withLibrayView(previous, next), {
+      setSearchParams((previous) => withLibraryView(previous, next), {
         replace: true,
       });
     },
