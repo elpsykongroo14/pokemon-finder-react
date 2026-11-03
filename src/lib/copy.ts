@@ -11,6 +11,7 @@ import type { StatOutcome } from "./statComparison";
 
 export const LOADING_LABEL = "Searching the tall grass…";
 export const CARDS_LOADING_LABEL = "Flipping through the binder…";
+export const BINDER_PAGES_LABEL = "Binder pages";
 export const RETRY_LABEL = "Retry";
 export const MENU_PROMPT = "What will you do?";
 
