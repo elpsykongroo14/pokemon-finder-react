@@ -17,16 +17,61 @@
       transform var(--dur-fast) var(--ease-standard);
   }
 
-    /* --tier-color is set once, for every view, in styles/rarity-tiers.css;
-     this file only READS it, with a quiet fallback for common cards */
+  /* --tier-color is set once, for every view, in styles/rarity-tiers.css;
+     this file only READS it, with a quiet fallback for common cards.
+
+     the shine strength per tier is set here. common sets nothing, which is
+     how "common has no effect" is built: it has no shine layer at all */
+  .tcg-card[data-rarity="rare"] {
+    --gloss-rest: 0.12;
+    --gloss-hover: 0.35;
+  }
+
+  .tcg-card[data-rarity="holo"] {
+    --gloss-rest: 0.2;
+    --gloss-hover: 0.6;
+    --foil-layer: var(--holo-foil);
+  }
+
+  .tcg-card[data-rarity="ultra"] {
+    --gloss-rest: 0.3;
+    --gloss-hover: 0.85;
+    --foil-layer: var(--holo-foil);
+  }
 
   .tcg-card-img-wrap {
+    position: relative;
     aspect-ratio: 5 / 7;
     background: var(--color-bg-surface-sunken);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--space-2);
+  }
+
+  /* the shine. useHoloPointer writes --mx / --my while the mouse moves; with
+     no mouse (touch, or animations off) the fallbacks keep it as a static gloss */
+  .tcg-card:not([data-rarity="common"]) .tcg-card-img-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(
+        circle at var(--mx, 30%) var(--my, 20%),
+        var(--gloss-highlight),
+        transparent 55%
+      ),
+      var(--foil-layer, none);
+    background-size:
+      100% 100%,
+      300% 300%;
+    background-position:
+      0 0,
+      var(--mx, 30%) var(--my, 20%);
+    mix-blend-mode: soft-light;
+    opacity: var(--gloss-rest);
+    transition: opacity var(--dur-fast) var(--ease-standard);
   }
 
   .tcg-card-info {
@@ -58,9 +103,26 @@
     outline-offset: 2px;
   }
 
-  .tcg-card:hover {
-    border-color: var(--color-border-default);
-    transform: translateY(-2px);
+  /* keyboard users get the bright shine too, just without the tilt */
+  .tcg-card:not([data-rarity="common"]):focus-visible
+    .tcg-card-img-wrap::after {
+    opacity: var(--gloss-hover);
+  }
+
+  /* hover effects only for a real mouse. on a touch screen a tap leaves
+     :hover "stuck" on, so the lift, tilt and bright shine stay out of it.
+     will-change is set on the ONE hovered card, never on the whole grid */
+  @media (hover: hover) and (pointer: fine) {
+    .tcg-card:hover {
+      border-color: var(--tier-color, var(--color-border-default));
+      transform: perspective(600px) translateY(-2px) rotateX(var(--rx, 0deg))
+        rotateY(var(--ry, 0deg));
+      will-change: transform;
+    }
+
+    .tcg-card:not([data-rarity="common"]):hover .tcg-card-img-wrap::after {
+      opacity: var(--gloss-hover);
+    }
   }
 
   .tcg-card-img-wrap img {

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TCGCardGridItem } from "./TCGCardGridItem";
 import type { TCGCard } from "../lib/type";
@@ -92,6 +92,56 @@ describe("TCGCardGridItem", () => {
 
     expect(handleSelect).toHaveBeenCalledTimes(1);
     expect(handleSelect).toHaveBeenCalledWith(card);
+  });
+});
+
+describe("TCGCardGridItem holo effect", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  //frames run the moment they are requested, so no waiting in these tests
+  function runFramesImmediately() {
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+  }
+
+  function renderCard(rarity: string) {
+    runFramesImmediately();
+    render(<TCGCardGridItem card={makeCard({ rarity })} onSelect={() => {}} />);
+    const button = screen.getByRole("button");
+    button.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 200, height: 100 }) as DOMRect;
+    return button;
+  }
+
+  it("a holo card follows the mouse through CSS variables", () => {
+    const button = renderCard("Rare Holo");
+
+    fireEvent.pointerMove(button, {
+      clientX: 150,
+      clientY: 25,
+      pointerType: "mouse",
+    });
+
+    expect(button.style.getPropertyValue("--mx")).toBe("75%");
+    expect(button.style.getPropertyValue("--ry")).toBe("4deg");
+  });
+
+  it("a common card never gets the variables: common has no effect", () => {
+    const button = renderCard("common");
+
+    fireEvent.pointerMove(button, {
+      clientX: 150,
+      clientY: 25,
+      pointerType: "mouse",
+    });
+    fireEvent.pointerLeave(button);
+
+    expect(button.style.getPropertyValue("--mx")).toBe("");
   });
 });
 
