@@ -35,12 +35,22 @@
   --accent-select: var(--gold-400);
   --focus-ring: var(--teal-500);
 
-  /* Rarity tiers (R8). "common" has no token on purpose: no effect. */
+  /* Rarity tiers. "common" has no token on purpose: no effect. */
   --rarity-rare: var(--slate-300);
   --rarity-holo: var(--teal-500);
   --rarity-ultra: var(--gold-400);
 
-  /* Elevation (D14 — see design-brief.md) */
+  /* Holo effect: the shine laid over cards of rare tiers and up */
+  --gloss-highlight: rgba(255, 255, 255, 0.55);
+  --holo-foil: linear-gradient(
+    115deg,
+    var(--teal-500),
+    var(--gold-400),
+    var(--type-psychic),
+    var(--teal-500)
+  );
+
+  /* Elevation */
   --shadow-raised: 0 3px 0 0 var(--slate-900);
   --shadow-pressed: 0 0 0 0 transparent;
   --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
