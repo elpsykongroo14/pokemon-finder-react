@@ -8,6 +8,7 @@ import { useTCGLibrary } from "../hooks/useTCGLibrary";
 import { useLibraryView } from "../hooks/useLibraryView";
 import { useBinderPage } from "../hooks/useBinderPage";
 import { SegmentedControl } from "../ui/SegmentedControl";
+import { Select } from "../ui/Select";
 import { SearchBar } from "../components/SearchBar";
 import { TCGCardGrid } from "../components/TCGCardGrid";
 import { TCGCardTable } from "../components/TCGCardTable";
@@ -99,7 +100,7 @@ export function LibraryPage() {
             value={view}
             onChange={setView}
           />
-          <select
+          <Select
             value={sortMode}
             onChange={(e) => setSortMode(e.target.value as SortMode)}
             aria-label={SORT_CARDS_LABEL}
@@ -107,7 +108,7 @@ export function LibraryPage() {
             <option value="newest">Newest</option>
             <option value="oldest">Oldest</option>
             <option value="rarity">Rarity</option>
-          </select>
+          </Select>
         </div>
       </div>
 
