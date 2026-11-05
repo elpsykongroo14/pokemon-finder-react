@@ -1,0 +1,69 @@
+/* The holo shine, shared by every surface that shows a card image:
+   the grid card and the card dialog.
+
+   how to use it: put data-rarity="<tier>" on an ancestor, and give the
+   element that wraps the image the class "holo-shine". this file draws the
+   shine on that wrapper's ::after. the ancestor decides when it is bright
+   (hover or keyboard focus). useHoloPointer writes --mx / --my onto the
+   ancestor while a real mouse moves; without them the fallbacks below keep
+   a static gloss, which is what touch and reduced-motion users see. */
+@layer features {
+  /* the strength per tier is data; one rule below reads it.
+     common sets nothing: no layer, no effect */
+  [data-rarity="rare"] {
+    --gloss-rest: 0.12;
+    --gloss-hover: 0.35;
+  }
+
+  [data-rarity="holo"] {
+    --gloss-rest: 0.2;
+    --gloss-hover: 0.6;
+    --foil-layer: var(--holo-foil);
+  }
+
+  [data-rarity="ultra"] {
+    --gloss-rest: 0.3;
+    --gloss-hover: 0.85;
+    --foil-layer: var(--holo-foil);
+  }
+
+  .holo-shine {
+    position: relative;
+  }
+
+  [data-rarity]:not([data-rarity="common"]) .holo-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(
+        circle at var(--mx, 30%) var(--my, 20%),
+        var(--gloss-highlight),
+        transparent 55%
+      ),
+      var(--foil-layer, none);
+    background-size:
+      100% 100%,
+      300% 300%;
+    background-position:
+      0 0,
+      var(--mx, 30%) var(--my, 20%);
+    mix-blend-mode: soft-light;
+    opacity: var(--gloss-rest);
+    transition: opacity var(--dur-fast) var(--ease-standard);
+  }
+
+  /* keyboard users get the bright shine too, just without the tilt */
+  [data-rarity]:not([data-rarity="common"]):focus-visible .holo-shine::after {
+    opacity: var(--gloss-hover);
+  }
+
+  /* bright shine on hover only for a real mouse: on a touch screen a tap
+     leaves :hover stuck on */
+  @media (hover: hover) and (pointer: fine) {
+    [data-rarity]:not([data-rarity="common"]):hover .holo-shine::after {
+      opacity: var(--gloss-hover);
+    }
+  }
+}

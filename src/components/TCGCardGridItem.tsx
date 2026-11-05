@@ -24,7 +24,7 @@ export function TCGCardGridItem({ card, onSelect }: TCGCardGridItemProps) {
       data-rarity={tier}
       onClick={() => onSelect(card)}
     >
-      <span className="tcg-card-img-wrap">
+      <span className="tcg-card-img-wrap holo-shine">
         <img src={card.images?.small} alt="" loading="lazy" />
       </span>
       <span className="tcg-card-info">
