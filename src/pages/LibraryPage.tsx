@@ -17,7 +17,7 @@ import type { TCGCard } from "../lib/type";
 import type { SortMode } from "../lib/tcg";
 import type { LibraryView } from "../lib/libraryView";
 import { withoutPage } from "../lib/pagination";
-import { LIBRARY_VIEW_LABEL } from "../lib/copy";
+import { LIBRARY_VIEW_LABEL, SORT_CARDS_LABEL } from "../lib/copy";
 
 const VIEW_OPTIONS: { value: LibraryView; label: string }[] = [
   { value: "grid", label: "Grid" },
@@ -100,10 +100,9 @@ export function LibraryPage() {
             onChange={setView}
           />
           <select
-            className="sort-select"
             value={sortMode}
             onChange={(e) => setSortMode(e.target.value as SortMode)}
-            aria-label="Sort cards"
+            aria-label={SORT_CARDS_LABEL}
           >
             <option value="newest">Newest</option>
             <option value="oldest">Oldest</option>

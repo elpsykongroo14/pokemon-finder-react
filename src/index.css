@@ -9,6 +9,7 @@
 @import "./styles/motion.css" layer(tokens);
 @import "./styles/utilities.css";
 @import "./styles/rarity-tiers.css";
+@import "./styles//holo.css";
 @import "./styles/theme-transition.css";
 
 /* Global reset 

@@ -12,6 +12,15 @@ import type { StatOutcome } from "./statComparison";
 export const LOADING_LABEL = "Searching the tall grass…";
 export const CARDS_LOADING_LABEL = "Flipping through the binder…";
 export const BINDER_PAGES_LABEL = "Binder pages";
+
+export const SORT_CARDS_LABEL = "Sort cards";
+export const CARD_ZOOM_LABEL = "Zoom card";
+
+//the dialog's accessible name: a screen reader says "Charizard card details, dialog"
+export function cardDialogLabel(name: string): string {
+  return `${name} card details`;
+}
+
 export const RETRY_LABEL = "Retry";
 export const MENU_PROMPT = "What will you do?";
 
