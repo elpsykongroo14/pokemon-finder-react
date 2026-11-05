@@ -145,5 +145,18 @@ describe("TCGCardGridItem holo effect", () => {
   });
 });
 
+describe("TCGCardGridItem performance contract", () => {
+  it("keeps its image lazy, so a library of 50+ cards does not load all at once", () => {
+    const { container } = render(
+      <TCGCardGridItem
+        card={makeCard({ images: { small: "small.png" } })}
+        onSelect={() => {}}
+      />,
+    );
+
+    expect(container.querySelector("img")).toHaveAttribute("loading", "lazy");
+  });
+});
+
 //this file protects the three fallback strings, the click contract,
 //and the keyboard contract: Tab reaches the card, Enter and Space open it

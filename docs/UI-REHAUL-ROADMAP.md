@@ -40,7 +40,7 @@ Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessio
 | ✓   | **R5**  | The Pokémon page                       | L    | R4                     | **Animated sprite stage, type-reactive world** |
 | ✓   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
 | ✓   | **R7**  | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
-| ☐   | **R8**  | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
+| ✓   | **R8**  | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
 | ☐   | **R9**  | Juice, sound & settings                | M    | R5–R8                  | Celebrations, polish                           |
 | ☐   | **R10** | Quality gates & launch                 | M    | R9                     | Confidence + merge to `main`                   |
 | ☐   | **R11** | Port to the vanilla version            | L    | R10                    | Both apps match                                |
@@ -920,3 +920,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-10-20 | R6 complete: typed failures with Retry, derived loading, central copy module; wild-encounter Home with 2×2 menu; Pokédex-style autocomplete with number search; staggered favorites tray; token guardrail test. D21–D24 recorded (D23 pending confirmation). |
 
 | 2026-10-28 | R7 complete: Versus screen (split stage, tug-of-war bars on one ruler, non-color win/lose), Party screen (lead slot, spoken empties), optional-field team migration with tolerant loader and lazy backfill, D6 exit animations, full-party guidance, Team-complete moment. Palette contrast defect found and fixed with a guard test. D6, D10, D25–D27 recorded. R7 changed the ADD test and its fixture on purpose (D10); the other reducer tests are unchanged. |
+
+| 2026-11-05 | R8 complete: card is a real button; ?view= and ?page= in the URL; Grid, Table (sortable) and Binder (3x3) over the same data; holo tilt and shine via CSS variables and requestAnimationFrame (hovered card only, will-change on hover only); card dialog on ui/Dialog with zoom, tilt and set/rarity chips; sort uses ui/Select; shared animationsAreOff() and styles/holo.css. Measured on 60 cards: no layout work and no React re-render per mouse move. |
