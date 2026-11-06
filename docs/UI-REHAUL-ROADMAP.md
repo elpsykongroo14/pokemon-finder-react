@@ -41,7 +41,7 @@ Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessio
 | ✓   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
 | ✓   | **R7**  | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
 | ✓   | **R8**  | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
-| ☐   | **R9**  | Juice, sound & settings                | M    | R5–R8                  | Celebrations, polish                           |
+| ☐   | **R9**  | Juice, settings & presentation         | M    | R5–R8                  | Celebrations, polish                           |
 | ☐   | **R10** | Quality gates & launch                 | M    | R9                     | Confidence + merge to `main`                   |
 | ☐   | **R11** | Port to the vanilla version            | L    | R10                    | Both apps match                                |
 | ☐   | **R12** | Backlog (game-depth features)          | —    | —                      | Only after R11                                 |
@@ -683,7 +683,6 @@ Not commitments. Each needs its own mini-roadmap before it starts.
 - **Drag-to-reorder team** (new reducer action + tests)
 - **"Who's that Pokémon?"** silhouette mini-game
 - **Evolution conditions** (level/stone) (requires modeling `evolution_details`, deliberately omitted so far)
-- **Cries** on the Stage (opt-in; PokeAPI provides audio URLs)
 - **Gen IV / Gen V skin packs** (a third theme axis)
 - **Dark/light variants** (a second theme axis, doubles QA, so not before the type axis is solid)
 - **Optional console-shell chrome** (bezel/hinge) as a toggleable skin
@@ -824,6 +823,7 @@ VM87:5 898 'calyrex' {animated: true, pixel: true, artwork: true}
 | D25 | Text color on soft tints | Reuse --theme-accent-ink; new token | New --theme-soft-ink | R7 | --theme-soft-ink (slate-900). ink stays “text on the accent color”. Guarded by a 36-case palette test. |
 | D26 | Where “team full” guidance lives | Change the reducer’s error; derive in the button| Derive in the button | R7 | Derived in TeamButton from team.length; reducer and its tests untouched. Hint is persistent (no timer) because it contains a link. |
 | D27 | “Team complete!” trigger | State-based; event-based | Event-based | R7 | Event: decided at click time from the pre-click team size; announced via a live region; decorative banner is aria-hidden. |
+the D28 row above, plus D29: Animation preference = stored intent (“auto” | “on” | “off”), resolved per render; explicit choice beats the OS everywhere; migration by shape detection, add a version field if a third shape ever appears.
 
 ## 11. Component map (current → target)
 

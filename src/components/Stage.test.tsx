@@ -68,8 +68,7 @@ describe("Stage", () => {
     localStorage.setItem(
       "pokemon_preferences",
       JSON.stringify({
-        animatiosEnabled: true,
-        soundEnabled: true,
+        animations: "off",
         spriteMode: "pixel",
       }),
     );

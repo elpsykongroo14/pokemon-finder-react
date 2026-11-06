@@ -1,17 +1,17 @@
 import { createContext, useContext } from "react";
+import type { AnimationMode, Preferences } from "../lib/preferences";
 import type { SpriteMode } from "../lib/sprites";
 
-export type { SpriteMode };
+export type { AnimationMode, Preferences, SpriteMode };
 
-export interface Preferences {
-  animationsEnabled: boolean;
-  soundEnabled: boolean;
-  spriteMode: SpriteMode;
-}
-
+//two different things live side by side here on purpose:
+//  animations         = what the person chose ("auto" | "on" | "off"), for the settings UI
+//  animationsEnabled  = what that choice means right now, for everything that animates
+//components that animate only ever read the second one, so they never have to
+//know that "auto" exists or ask the OS themselves
 export interface PreferencesContextValue extends Preferences {
-  setAnimationsEnabled: (enabled: boolean) => void;
-  setSoundEnabled: (enabled: boolean) => void;
+  animationsEnabled: boolean;
+  setAnimations: (mode: AnimationMode) => void;
   setSpriteMode: (mode: SpriteMode) => void;
 }
 

@@ -79,8 +79,7 @@ describe("MessageBox", () => {
     localStorage.setItem(
       "pokemon_preferences",
       JSON.stringify({
-        animationsEnabled: false,
-        soundEnabled: true,
+        animations: "off",
         spriteMode: "pixel",
       }),
     );
