@@ -1,5 +1,4 @@
 import { usePreferences } from "../hooks/usePreferences";
-import { usePrefersReduceMotion } from "../hooks/usePrefersReducedMotion";
 import { useTypewriter } from "../hooks/useTypewriter";
 import { Panel } from "./Panel";
 import "./MessageBox.css";
@@ -20,11 +19,10 @@ export function MessageBox({
   children,
 }: MessageBoxProps) {
   const { animationsEnabled } = usePreferences();
-  const prefersReduceMotion = usePrefersReduceMotion();
-  const animate =
-    animationsEnabled && !prefersReduceMotion && variant !== "error";
-  //animate combines three conditions:
-  //animate only if the in app setting allows it, the OS hasnt asked for reduced motion, and this isnt an error. any "no" means the text appears instantly
+  const animate = animationsEnabled && variant !== "error";
+  //animationsEnabled is already the final answer (the person's choice, with
+  //"auto" resolved against the OS PreferencesProvider), so this component
+  //no longer asks the OS itself, errors always appear instantly
 
   const typed = useTypewriter(text, animate);
   const rest = text.slice(typed.length);

@@ -1,6 +1,5 @@
 import { useId, type CSSProperties } from "react";
 import { usePreferences } from "../hooks/usePreferences";
-import { usePrefersReduceMotion } from "../hooks/usePrefersReducedMotion";
 import { useCountUp } from "../hooks/useCountUp";
 import { percentOf } from "../lib/stats";
 import "./StatMeter.css";
@@ -31,10 +30,9 @@ export function StatMeter({
   index = 0,
 }: statMeterProps) {
   const { animationsEnabled } = usePreferences();
-  const prefersReduceMotion = usePrefersReduceMotion();
-  const animate = animationsEnabled && !prefersReduceMotion;
-
-  const shown = useCountUp(value, animate);
+  //animationsEnabled is already the final answer: PreferencesProvider resolved
+  //the person's choice ("auto" against the OS), so no second OS check here
+  const shown = useCountUp(value, animationsEnabled);
   const percent = percentOf(value, max);
   const labelId = useId(); //first instinct was id={`stat-meter-label-${label}`}
   //that breaks the instant two StatMeters share a label
