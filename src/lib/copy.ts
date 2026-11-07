@@ -1,5 +1,6 @@
 import type { FetchFailureKind } from "./fetchErrors";
 import type { StatOutcome } from "./statComparison";
+import type { AnimationMode } from "./preferences";
 
 //every sentence the user reads when something goes wrong lives here
 //components pick a massage by kind,
@@ -87,4 +88,29 @@ export function failureMessage(kind: FetchFailureKind, query: string): string {
     case "unreachable":
       return "Couldn't reach the Pokédex. Check your connection and try again.";
   }
+}
+
+//settings dialog. the dialog's accessible name and its visible heading are
+//the same word on purpose: what a screen reader announces matches what a
+//sighted person reads
+export const SETTINGS_LABEL = "Settings";
+export const SETTINGS_NOTE = "Saved in this browser, on this device.";
+export const ANIMATIONS_LABEL = "Animations";
+export const SPRITES_LABEL = "Sprites";
+export const SPRITES_HINT =
+  "Pixel sprites move when animations are on. Artwork is always still.";
+
+//the hint under Animations explains the choice AND what it means right now.
+//"auto" is the interesting case: same choice, two possible outcomes, so the
+//hint reads the resolved answer instead of guessing
+export function animationsHint(
+  mode: AnimationMode,
+  animationsEnabled: boolean,
+): string {
+  if (mode === "on")
+    return "Always on, even if your device asks for less motion.";
+  if (mode === "off") return "Off everywhere in the app.";
+  return animationsEnabled
+    ? "Following your device: motion is on."
+    : "Following your device: it asks for less motion, so motion is off.";
 }

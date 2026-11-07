@@ -6,6 +6,7 @@ import { MainNav } from "../components/MainNav";
 import { BrandMark } from "../components/BrandMark";
 import { PartyCounter } from "../components/PartyCounter";
 import { Backdrop } from "../components/Backdrop";
+import { SettingsButton } from "../components/SettingsButton";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 
 export function Layout() {
@@ -32,6 +33,10 @@ export function Layout() {
 
         <div className="app-search">
           <SearchBar onSubmit={handleSearch} />
+        </div>
+
+        <div className="app-settings">
+          <SettingsButton />
         </div>
       </header>
 

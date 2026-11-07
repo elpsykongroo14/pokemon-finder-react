@@ -24,10 +24,17 @@
   }
 
   /* Header */
+  /* Every header child is placed by name. Phone: title and gear share the
+     first row, nav and search get a full row each. */
   .app-header {
     grid-area: header;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "title settings"
+      "nav nav"
+      "search search";
+    align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--shell-gutter);
     background: var(--surface-chrome);
@@ -35,6 +42,7 @@
   }
 
   .app-title {
+    grid-area: title;
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -42,6 +50,19 @@
     font-family: var(--font-display);
     font-weight: 400;
     line-height: 1;
+  }
+
+  .main-nav {
+    grid-area: nav;
+  }
+
+  .app-search {
+    grid-area: search;
+  }
+
+  .app-settings {
+    grid-area: settings;
+    justify-self: end;
   }
 
   /* Main and tray */
@@ -75,24 +96,14 @@
     }
 
     .app-header {
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: auto minmax(0, 1fr) auto;
       grid-template-areas:
-        "title nav"
-        "search search";
-      align-items: center;
-    }
-
-    .app-title {
-      grid-area: title;
+        "title nav settings"
+        "search search search";
     }
 
     .main-nav {
-      grid-area: nav;
       justify-self: end;
-    }
-
-    .app-search {
-      grid-area: search;
     }
   }
 
@@ -102,8 +113,8 @@
     }
 
     .app-header {
-      grid-template-columns: auto minmax(0, 1fr) minmax(16rem, 24rem);
-      grid-template-areas: "title nav search";
+      grid-template-columns: auto minmax(0, 1fr) minmax(16rem, 24rem) auto;
+      grid-template-areas: "title nav search settings";
     }
 
     .main-nav {

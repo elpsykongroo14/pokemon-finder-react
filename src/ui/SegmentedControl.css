@@ -1,34 +1,63 @@
 @layer features {
   .segmented {
-    display: inline-flex;
-    gap: var(--space-1);
+    display: inline-block;
     margin: 0;
     padding: 0;
     border: 0;
     min-width: 0;
   }
 
+  .segmented__legend {
+    padding: 0;
+    margin-bottom: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    color: var(--text-primary);
+  }
+
+  .segmented__options {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  /* Semantic tokens only (not the legacy --color-* aliases): the aliases are
+     resolved once on :root, so they ignore the .surface-window override and
+     stay "light text" even inside a light panel. These follow the surface. */
   .segmented__label {
     display: inline-block;
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--color-border-default);
+    border: var(--border-width-line) solid var(--border-hairline);
     border-radius: var(--radius-md);
     font-size: var(--text-sm);
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
     cursor: pointer;
     transition:
       color var(--dur-fast) var(--ease-standard),
-      border-color var(--dur-fast) var(--ease-standard);
+      border-color var(--dur-fast) var(--ease-standard),
+      background-color var(--dur-fast) var(--ease-standard);
   }
 
+  .segmented__option:hover .segmented__label {
+    color: var(--text-primary);
+  }
+
+  /* Selected = gold, the same "this one" signal as the nav cursor and the
+     primary button, with the same dark ink on top. */
   .segmented__option input:checked + .segmented__label {
-    color: var(--color-text-primary);
-    border-color: var(--border-line);
-    background: var(--color-bg-surface-sunken);
+    color: var(--surface-frame);
+    border-color: var(--accent-select);
+    background: var(--accent-select);
   }
 
   .segmented__option input:focus-visible + .segmented__label {
     outline: var(--border-width-line) solid var(--focus-ring);
     outline-offset: 2px;
+  }
+
+  .segmented__description {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
   }
 }
