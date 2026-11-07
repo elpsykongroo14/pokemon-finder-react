@@ -95,6 +95,14 @@ describe("Layout", () => {
     ).toBeInTheDocument();
   });
 
+  it("puts the Settings button in the header, on every page", () => {
+    renderLayout("/");
+
+    expect(screen.getByRole("banner")).toContainElement(
+      screen.getByRole("button", { name: "Settings" }),
+    );
+  });
+
   it("keeps favorites and the party counter together in the tray", () => {
     renderLayout("/");
 

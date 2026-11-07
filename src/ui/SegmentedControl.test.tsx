@@ -63,3 +63,64 @@ describe("SegmentedControl", () => {
     expect(handleChange).toHaveBeenCalledWith("b");
   });
 });
+
+describe("SegmentedControl, labelled and described", () => {
+  it("keeps its legend visually hidden by default", () => {
+    render(
+      <SegmentedControl
+        label="Pick one"
+        options={OPTIONS}
+        value="a"
+        onChange={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Pick one")).toHaveClass("visually-hidden");
+  });
+
+  it("shows its legend when labelVisible is set, keeping the same name", () => {
+    render(
+      <SegmentedControl
+        label="Pick one"
+        labelVisible
+        options={OPTIONS}
+        value="a"
+        onChange={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Pick one")).not.toHaveClass("visually-hidden");
+    expect(screen.getByRole("group", { name: "Pick one" })).toBeInTheDocument();
+  });
+
+  it("links a description to the group with aria-describedby", () => {
+    render(
+      <SegmentedControl
+        label="Pick one"
+        options={OPTIONS}
+        value="a"
+        onChange={() => {}}
+        description="Only one at a time."
+      />,
+    );
+
+    expect(
+      screen.getByRole("group", { name: "Pick one" }),
+    ).toHaveAccessibleDescription("Only one at a time.");
+  });
+
+  it("has no aria-describedby when there is no description", () => {
+    render(
+      <SegmentedControl
+        label="Pick one"
+        options={OPTIONS}
+        value="a"
+        onChange={() => {}}
+      />,
+    );
+
+    expect(screen.getByRole("group", { name: "Pick one" })).not.toHaveAttribute(
+      "aria-describedby",
+    );
+  });
+});

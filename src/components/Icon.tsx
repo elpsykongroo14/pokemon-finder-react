@@ -5,6 +5,7 @@ export type IconName =
   | "discord"
   | "documentation"
   | "github"
+  | "settings"
   | "social"
   | "x";
 

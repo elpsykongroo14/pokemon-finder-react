@@ -1,0 +1,33 @@
+@layer features {
+  .settings {
+    display: grid;
+    gap: var(--space-5);
+    /* room on the right so the title never runs under the Close button */
+    padding-inline-end: var(--space-6);
+  }
+
+  .settings__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--text-xl);
+    color: var(--text-primary);
+  }
+
+  .settings__note {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .settings__rows {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  /* one row per setting, separated by a hairline like menu entries */
+  .settings__rows > * + * {
+    padding-top: var(--space-4);
+    border-top: var(--border-width-line) solid var(--border-hairline);
+  }
+}
