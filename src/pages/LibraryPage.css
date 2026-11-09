@@ -1,17 +1,6 @@
 @layer features {
   /*missing library-view class*/
 
-  .library-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--space-4);
-  }
-
-  .library-title {
-    margin: 0;
-  }
-
   .library-back {
     color: var(--color-text-secondary);
     text-decoration: none;

@@ -18,7 +18,13 @@ import type { TCGCard } from "../lib/type";
 import type { SortMode } from "../lib/tcg";
 import type { LibraryView } from "../lib/libraryView";
 import { withoutPage } from "../lib/pagination";
-import { LIBRARY_VIEW_LABEL, SORT_CARDS_LABEL } from "../lib/copy";
+import { PageHeader } from "../ui/PageHeader";
+import {
+  LIBRARY_VIEW_LABEL,
+  SORT_CARDS_LABEL,
+  LIBRARY_HEADING,
+  LIBRARY_SUBTITLE,
+} from "../lib/copy";
 
 const VIEW_OPTIONS: { value: LibraryView; label: string }[] = [
   { value: "grid", label: "Grid" },
@@ -77,15 +83,18 @@ export function LibraryPage() {
 
   return (
     <section className="library-view">
-      <div className="library-header">
-        <h2 className="library-title">TCG Library</h2>
-        <Link
-          to={{ pathname: "/library", search: searchForNewResults }}
-          className="library-back"
-        >
-          ← Featured
-        </Link>
-      </div>
+      <PageHeader
+        title={LIBRARY_HEADING}
+        subtitle={LIBRARY_SUBTITLE}
+        actions={
+          <Link
+            to={{ pathname: "/library", search: searchForNewResults }}
+            className="library-back"
+          >
+            ← Featured
+          </Link>
+        }
+      />
       <SearchBar
         onSubmit={handleSearch}
         placeholder="Search cards by Pokémon  name"

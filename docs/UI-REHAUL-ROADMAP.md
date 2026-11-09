@@ -720,6 +720,7 @@ Your tests assert on **behavior**: roles, accessible names, visible text. So:
 - **Load-bearing:** `role` attributes (`combobox`, `listbox`, `option`, `status`, `alert`, `dialog` when added), accessible names (`aria-label`s, the "Shiny" checkbox name, `Remove X from team`), visible strings that tests query (e.g., "Attack"), `aria-pressed` states, and the sprite `alt` convention.
 - If a change _must_ alter one of these, update the test **in the same commit** and say why in the commit message.
 - New logic gets tests first or alongside: sprite fallback chain, `useTypeTheme`, `useTypewriter`, `PreferencesProvider`, view-mode URL param, party data shape.
+- jsdom/Testing Library treat every <header>/<footer> as banner/contentinfo regardless of nesting. Landmark claims about nested headers are checked in a real browser, not in unit tests
 
 ### 8.4 Progressive enhancement rule
 

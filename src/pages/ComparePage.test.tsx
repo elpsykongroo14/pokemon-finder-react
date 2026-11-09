@@ -7,6 +7,7 @@ import { PreferencesProvider } from "../context/PreferencesContext";
 import { usePokemon } from "../hooks/usePokemon";
 import {
   COMPARE_HEADING,
+  COMPARE_SUBTITLE,
   EMPTY_COMPARE,
   LOADING_LABEL,
   OPPONENT_SEARCH_LABEL,
@@ -223,6 +224,17 @@ describe("ComparePage", () => {
       ).toBeInTheDocument();
     },
   );
+
+  it("shows its title and purpose (the heading is no longer hidden)", () => {
+    mockLookups({});
+
+    renderComparePage("/compare");
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: COMPARE_HEADING }),
+    ).not.toHaveClass("visually-hidden");
+    expect(screen.getByText(COMPARE_SUBTITLE)).toBeInTheDocument();
+  });
 
   it("names the opponent search, so it is not confused with header search", () => {
     mockLookups({ pikachu: { data: pikachuData } });

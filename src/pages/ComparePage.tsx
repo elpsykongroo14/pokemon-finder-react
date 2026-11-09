@@ -13,8 +13,10 @@ import {
   LOADING_LABEL,
   SELF_COMPARE,
   COMPARE_HEADING,
+  COMPARE_SUBTITLE,
   OPPONENT_SEARCH_LABEL,
 } from "../lib/copy";
+import { PageHeader } from "../ui/PageHeader";
 
 export function ComparePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -98,7 +100,7 @@ export function ComparePage() {
 
   return (
     <div className="compare-page" ref={regionRef} tabIndex={-1}>
-      <h2 className="visually-hidden">{COMPARE_HEADING}</h2>
+      <PageHeader title={COMPARE_HEADING} subtitle={COMPARE_SUBTITLE} />
       {renderState()}
     </div>
   );

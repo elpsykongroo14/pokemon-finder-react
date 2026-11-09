@@ -95,6 +95,15 @@ describe("Layout", () => {
     ).toBeInTheDocument();
   });
 
+  it("has exactly one banner and one contentinfo landmark", () => {
+    renderLayout("/");
+
+    //the shell's own header and footer. (the Home router no
+    //PageHeader; jsdom would wrongly count one as a second banner)
+    expect(screen.getAllByRole("banner")).toHaveLength(1);
+    expect(screen.getAllByRole("contentinfo")).toHaveLength(1);
+  });
+
   it("puts the Settings button in the header, on every page", () => {
     renderLayout("/");
 
