@@ -84,7 +84,7 @@ describe("SettingsDialog", () => {
     const user = userEvent.setup();
     render(
       <PreferencesProvider>
-        <Stage pokemon={pokemon} shiny={false} />
+        <Stage pokemon={pokemon} />
         <SettingsDialog onClose={vi.fn()} />
       </PreferencesProvider>,
     );

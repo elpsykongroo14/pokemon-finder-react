@@ -1,8 +1,62 @@
+/* Two labelled groups. Inside each, a two-column grid of equal-width
+   controls, so the four actions line up as a tidy 2 x 2 block instead of
+   wrapping wherever their text happens to end. From 480px the two groups
+   sit side by side. */
 @layer features {
   .pokemon-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .pokemon-actions__group {
+    display: grid;
     gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .pokemon-actions__caption {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .pokemon-actions__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    align-items: start;
+  }
+
+  /* The TeamButton's wrapper steps out of the way (display: contents), so
+     its button becomes a normal cell next to Favorite, and its messages
+     (full-party hint, celebration, error) become full-width rows below
+     BOTH buttons instead of squeezing into one half-width column. */
+  .pokemon-actions__row > .team-builder-wrap {
+    display: contents;
+  }
+
+  .pokemon-actions__row .team-full-hint,
+  .pokemon-actions__row .team-complete,
+  .pokemon-actions__row .status-message {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  /* every control fills its cell, at one shared height: an emoji label can
+     no longer make its button a few pixels taller than its neighbour, and
+     44px is the comfortable touch-target size */
+  .pokemon-actions__row .btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  @media (min-width: 480px) {
+    .pokemon-actions {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 }

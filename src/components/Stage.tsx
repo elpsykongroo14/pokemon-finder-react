@@ -1,22 +1,31 @@
 import "./Stage.css";
+import { useState } from "react";
 import { Panel } from "../ui/Panel";
 import { Toggle } from "../ui/Toggle";
 import { SpriteDisplay } from "./SpriteDisplay";
 import { TypeBadgeList } from "./TypeBadgeList";
 import { usePreferences } from "../hooks/usePreferences";
 import { formatDexNumber } from "../lib/dex";
+import { SPRITE_OPTIONS_LABEL } from "../lib/copy";
 import type { PokemonDetails } from "../lib/type";
 
 interface StageProps {
   pokemon: PokemonDetails;
-  shiny: boolean;
+  //the pokemon page offers a shiny switch; the Home encouter does not
+  shinyToggle?: boolean;
 }
 
-//the "top screen": identity (dex, number, name, types) and the sprite.
-//it is the only place that reads sprite preferences, so SpriteDisplay
-//stays a plain component that is easy to test and reuse
-export function Stage({ pokemon, shiny }: StageProps) {
+//the "top screen": identity (dex, number, name, types) the sprite,
+//and every control that changes how the sprite looks. it is the only place that
+//reads sprite preferences, so SpriteDisplay stays a plain, reusable component
+export function Stage({ pokemon, shinyToggle = false }: StageProps) {
   const { spriteMode, setSpriteMode, animationsEnabled } = usePreferences();
+
+  //shiny moved DOM into Stage: the switch and the sprite now live in the
+  //same component, so the closest owner is this one. it is page-only state
+  //(not a preference), so it starts false for every new Pokemon (see the
+  //key={pokemon.name} in PokemonCard) and is never saved
+  const [shiny, setShiny] = useState(false);
 
   return (
     <Panel variant="tinted">
@@ -39,11 +48,20 @@ export function Stage({ pokemon, shiny }: StageProps) {
           />
         </div>
 
-        <Toggle
-          label="Pixel sprites"
-          checked={spriteMode === "pixel"}
-          onChange={(checked) => setSpriteMode(checked ? "pixel" : "artwork")}
-        />
+        <div
+          className="stage__controls"
+          role="group"
+          aria-label={SPRITE_OPTIONS_LABEL}
+        >
+          <Toggle
+            label="Pixel sprites"
+            checked={spriteMode === "pixel"}
+            onChange={(checked) => setSpriteMode(checked ? "pixel" : "artwork")}
+          />
+          {shinyToggle && (
+            <Toggle label="Shiny" checked={shiny} onChange={setShiny} />
+          )}
+        </div>
       </div>
     </Panel>
   );
