@@ -33,6 +33,14 @@
     padding-bottom: var(--space-3);
   }
 
+  /* every "how does the sprite look" switch, on one centered row */
+  .stage__controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3) var(--space-4);
+  }
+
   /* ground shadow under the sprite */
   .stage__sprite::after {
     content: "";

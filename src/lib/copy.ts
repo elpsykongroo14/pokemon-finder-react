@@ -45,6 +45,12 @@ export const STAT_OUTCOME_TEXT: Record<StatOutcome, string> = {
   tie: "tied",
 };
 
+//pokemon page. controls are grouped by WHAT they act on: the sprite (on the
+//Stage), our collection (keep it), or another page (go somewhere)
+export const SPRITE_OPTIONS_LABEL = "Sprite options";
+export const ACTIONS_COLLECT_LABEL = "Collect";
+export const ACTIONS_EXPLORE_LABEL = "Explore";
+
 export const LIBRARY_VIEW_LABEL = "Library view";
 
 //team button: when the party is full, say so AND say what to do about it.

@@ -97,4 +97,23 @@ describe("PokemonCard", () => {
       "true",
     );
   });
+
+  it("starts every Pokemon with Shiny off", async () => {
+    const user = userEvent.setup();
+    const { rerender } = renderCard();
+    await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
+    expect(screen.getByRole("checkbox", { name: "Shiny" })).toBeChecked();
+
+    //same pokemonCard, new pokemon: what happens when we search again
+    rerender(
+      <MemoryRouter>
+        <PreferencesProvider>
+          <PokemonCard pokemon={{ ...mockPokemon, name: "raichu", id: 26 }} />
+        </PreferencesProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("checkbox", { name: "Shiny" })).not.toBeChecked();
+    expect(screen.getByRole("img", { name: "raichu" })).toBeInTheDocument();
+  });
 });

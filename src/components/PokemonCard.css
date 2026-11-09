@@ -9,4 +9,11 @@
     gap: var(--space-6);
     box-shadow: var(--shadow-raised);
   }
+
+  /* the "bottom screen": actions, then the tabs, with real air between */
+  .pokemon-card__console {
+    display: grid;
+    gap: var(--space-5);
+    align-content: start;
+  }
 }

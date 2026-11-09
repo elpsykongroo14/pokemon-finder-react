@@ -38,7 +38,7 @@ export function HomePage() {
     stage = <StageSkeleton />;
     message = LOADING_LABEL;
   } else {
-    stage = <Stage pokemon={data} shiny={false} />;
+    stage = <Stage pokemon={data} />;
     message = encounterMessage(data.name);
   }
 

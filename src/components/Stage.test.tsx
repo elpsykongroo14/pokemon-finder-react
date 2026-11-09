@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PreferencesProvider } from "../context/PreferencesContext";
 import { Stage } from "./Stage";
@@ -14,16 +14,18 @@ const pokemon = {
     other: { "official-artwork": { front_default: "art.png" } },
     versions: {
       "generation-v": {
-        "black-white": { animated: { front_default: "a.gif" } },
+        "black-white": {
+          animated: { front_default: "a.gif", front_shiny: "as.gif" },
+        },
       },
     },
   },
 } as PokemonDetails;
 
-function renderStage(shiny = false) {
+function renderStage(shinyToggle = false) {
   return render(
     <PreferencesProvider>
-      <Stage pokemon={pokemon} shiny={shiny} />
+      <Stage pokemon={pokemon} shinyToggle={shinyToggle} />
     </PreferencesProvider>,
   );
 }
@@ -78,6 +80,38 @@ describe("Stage", () => {
     expect(screen.getByRole("img", { name: "pikachu" })).toHaveAttribute(
       "src",
       "p.png",
+    );
+  });
+
+  it("keeps every sprite switch together in a 'Sprite options' group", () => {
+    renderStage(true);
+
+    const group = screen.getByRole("group", { name: "Sprite options" });
+    expect(
+      within(group).getByRole("checkbox", { name: "Pixel sprites" }),
+    ).toBeInTheDocument();
+    expect(
+      within(group).getByRole("checkbox", { name: "Shiny" }),
+    ).toBeInTheDocument();
+  });
+
+  it("has no Shiny switch unless asked for one (the Home encounter)", () => {
+    renderStage();
+
+    expect(
+      screen.queryByRole("checkbox", { name: "Shiny" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("swaps to the shiny sprite when Shiny is switched on", async () => {
+    const user = userEvent.setup();
+    renderStage(true);
+
+    await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
+
+    expect(screen.getByRole("img", { name: "pikachu(shiny)" })).toHaveAttribute(
+      "src",
+      "as.gif",
     );
   });
 });
