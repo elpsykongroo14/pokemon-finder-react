@@ -8,6 +8,7 @@ import { PartyCounter } from "../components/PartyCounter";
 import { Backdrop } from "../components/Backdrop";
 import { SettingsButton } from "../components/SettingsButton";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
+import { AppFooter } from "../components/AppFooter";
 
 export function Layout() {
   const navigate = useViewTransitionNavigate();
@@ -51,6 +52,8 @@ export function Layout() {
         </div>
         <PartyCounter />
       </aside>
+
+      <AppFooter />
     </div>
   );
 }

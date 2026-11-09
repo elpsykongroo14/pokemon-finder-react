@@ -1,0 +1,50 @@
+/* Quiet on purpose: small, secondary text below everything else. It must be
+   findable, never compete with the app. */
+@layer features {
+  .app-footer {
+    grid-area: footer;
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--shell-gutter) var(--space-6);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+  }
+
+  .app-footer p {
+    margin: 0;
+  }
+
+  .app-footer__disclaimer {
+    max-width: 70ch;
+  }
+
+  .app-footer__credits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .app-footer__label {
+    font-family: var(--font-display);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .app-footer__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .app-footer a {
+    color: var(--text-primary);
+    text-underline-offset: 2px;
+  }
+
+  .app-footer a:hover {
+    color: var(--accent-select);
+  }
+}

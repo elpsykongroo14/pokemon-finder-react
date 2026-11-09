@@ -74,6 +74,26 @@ export const EMPTY_FAVORITES =
 //party screen: an empty slot must still say something to a screen reader,
 //and the remove button must say WHICH pokemon it removes
 export const LEAD_LABEL = "Lead";
+//page headers: a name, and one sentence saying what the page is FOR
+export const COMPARE_SUBTITLE =
+  "Two Pokémon side by side: see who wins each stat.";
+export const TEAM_HEADING = "Your Team";
+export const TEAM_SUBTITLE =
+  "Build a party of up to six. It stays saved in this browser.";
+export const LIBRARY_HEADING = "TCG Library";
+export const LIBRARY_SUBTITLE =
+  "Trading cards for any Pokémon, as a grid, a table or a binder.";
+export const NOT_FOUND_HEADING = "Page not found";
+export const NOT_FOUND_SUBTITLE = "This path doesn't lead anywhere in the app.";
+export const NOT_FOUND_LINK = "Back to search";
+
+//footer. a fan project should say plainly what it is and is not, and who
+//made the things it shows (roadmap section 8.6)
+export const FOOTER_DISCLAIMER =
+  "Pokémon Finder is an unofficial fan project. It is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company. Pokémon names, sprites and card art belong to their respective owners.";
+export const FOOTER_SOURCES_LABEL = "Credits";
+export const FOOTER_MADE_BY = "Made by";
+
 export function emptySlotLabel(slotNumber: number): string {
   return `Empty slot ${slotNumber}`;
 }
