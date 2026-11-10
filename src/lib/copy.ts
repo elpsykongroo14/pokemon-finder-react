@@ -85,13 +85,17 @@ export const LIBRARY_SUBTITLE =
   "Trading cards for any Pokémon, as a grid, a table or a binder.";
 export const NOT_FOUND_HEADING = "Page not found";
 export const NOT_FOUND_SUBTITLE = "This path doesn't lead anywhere in the app.";
-export const NOT_FOUND_LINK = "Back to search";
+export const NOT_FOUND_LINK = "Run back to search";
+//the 404 as a wild encounter: the message box line, and what the picture shows
+export const NOT_FOUND_ENCOUNTER =
+  "A wild 404 appeared! This route isn't on any map.";
+export const NOT_FOUND_SCENE_LABEL =
+  'A wooden route sign reading "404" in tall grass, with an exclamation mark popping up from the grass beside it.';
 
 //footer. a fan project should say plainly what it is and is not, and who
 //made the things it shows (roadmap section 8.6)
 export const FOOTER_DISCLAIMER =
-  "Pokémon Finder is an unofficial fan project. It is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company. Pokémon names, sprites and card art belong to their respective owners.";
-export const FOOTER_SOURCES_LABEL = "Credits";
+  "Unofficial fan project, not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.";
 export const FOOTER_MADE_BY = "Made by";
 
 export function emptySlotLabel(slotNumber: number): string {

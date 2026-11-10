@@ -1,17 +1,34 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { PokemonActions } from "./PokemonActions";
 import type { PokemonDetails } from "../lib/type";
 
-const { toggleFavorite } = vi.hoisted(() => ({ toggleFavorite: vi.fn() }));
+const { toggleFavorite, teamAction } = vi.hoisted(() => ({
+  toggleFavorite: vi.fn(),
+  //a plain object the tests can change: the real TeamToggle and TeamStatus
+  //render from it, only the hook (and so the team state) is faked
+  teamAction: {
+    onTeam: false,
+    partyFull: false,
+    celebrating: false,
+    error: null as string | null,
+    announcement: "",
+    hintId: "team-hint",
+    toggle: () => {},
+  },
+}));
+
+beforeEach(() => {
+  teamAction.partyFull = false;
+});
 
 vi.mock("../hooks/useFavorites", () => ({
   useFavorites: () => ({ isFavorite: () => false, toggleFavorite }),
 }));
-vi.mock("../context/TeamButton", () => ({
-  TeamButton: () => <button type="button">Team stub</button>,
+vi.mock("../hooks/useTeamAction", () => ({
+  useTeamAction: () => teamAction,
 }));
 
 function Probe() {
@@ -37,7 +54,7 @@ describe("PokemonActions", () => {
       within(collect).getByRole("button", { name: /favorite/i }),
     ).toBeInTheDocument();
     expect(
-      within(collect).getByRole("button", { name: "Team stub" }),
+      within(collect).getByRole("button", { name: "+ Add to Team" }),
     ).toBeInTheDocument();
   });
 
@@ -51,6 +68,24 @@ describe("PokemonActions", () => {
     expect(
       within(explore).getByRole("link", { name: "View Cards" }),
     ).toBeInTheDocument();
+  });
+
+  it("draws the party-full hint under both groups, not inside one", () => {
+    teamAction.partyFull = true;
+    renderActions();
+
+    const hint = screen.getByText(/party is full/i);
+    expect(screen.getByRole("group", { name: "Collect" })).not.toContain(hint);
+    expect(screen.getByRole("group", { name: "Explore" })).not.toContain(hint);
+  });
+
+  it("keeps the Team button described by the hint, wherever the hint sits", () => {
+    teamAction.partyFull = true;
+    renderActions();
+
+    expect(
+      screen.getByRole("button", { name: "+ Add to Team" }),
+    ).toHaveAccessibleDescription(/party is full/i);
   });
 
   it("no longer holds sprites switches (they live on the stage)", () => {

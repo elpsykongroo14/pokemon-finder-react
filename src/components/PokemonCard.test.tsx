@@ -19,7 +19,11 @@ vi.mock("./TypeBadgeList", () => ({ TypeBadgeList: () => null }));
 vi.mock("./StatBarChart", () => ({ StatBarChart: () => null }));
 vi.mock("./MetaInfo", () => ({ MetaInfo: () => null }));
 vi.mock("./EvolutionSection", () => ({ EvolutionSection: () => null }));
-vi.mock("../context/TeamButton", () => ({ TeamButton: () => null }));
+vi.mock("../hooks/useTeamAction", () => ({ useTeamAction: () => ({}) }));
+vi.mock("../context/TeamButton", () => ({
+  TeamToggle: () => null,
+  TeamStatus: () => null,
+}));
 
 const mockPokemon: PokemonDetails = {
   name: "pikachu",

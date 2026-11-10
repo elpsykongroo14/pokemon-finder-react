@@ -1,12 +1,13 @@
-/* Quiet on purpose: small, secondary text below everything else. It must be
-   findable, never compete with the app. */
+/* Two quiet lines of fine print: small, secondary, tight. The credits sit on
+   one line separated by dots and wrap only when the screen is too narrow. */
 @layer features {
   .app-footer {
     grid-area: footer;
     display: grid;
-    gap: var(--space-2);
-    padding: var(--space-4) var(--shell-gutter) var(--space-6);
+    gap: var(--space-1);
+    padding: var(--space-3) var(--shell-gutter) var(--space-4);
     font-size: var(--text-xs);
+    line-height: 1.4;
     color: var(--text-secondary);
   }
 
@@ -14,29 +15,21 @@
     margin: 0;
   }
 
-  .app-footer__disclaimer {
-    max-width: 70ch;
-  }
-
   .app-footer__credits {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-1) var(--space-2);
-  }
-
-  .app-footer__label {
-    font-family: var(--font-display);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .app-footer__list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1) var(--space-3);
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  /* a middle dot between items. CSS-generated text CAN be read aloud by
+     screen readers, so the second line gives it empty alternative text
+     ("/ ''"); browsers that do not know that syntax keep the first line */
+  .app-footer__credits li + li::before {
+    content: "·";
+    content: "·" / "";
+    padding-inline: var(--space-2);
   }
 
   .app-footer a {

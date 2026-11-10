@@ -1,7 +1,8 @@
 import "./PokemonActions.css";
 import { useId } from "react";
 import { FavoriteButton } from "./FavoriteButton";
-import { TeamButton } from "../context/TeamButton";
+import { TeamStatus, TeamToggle } from "../context/TeamButton";
+import { useTeamAction } from "../hooks/useTeamAction";
 import { TransitionLink } from "./TransitionLink";
 import { useFavorites } from "../hooks/useFavorites";
 import { ACTIONS_COLLECT_LABEL, ACTIONS_EXPLORE_LABEL } from "../lib/copy";
@@ -11,17 +12,21 @@ interface PokemonActionsProps {
   pokemon: PokemonDetails;
 }
 
-//what we can collect with this pokemon, sorted by what each contol acts on
+//what we can do with this pokemon, sorted by what each contol acts on
 //  Collect  = buttons that change our collection (favorites, team)
 //  Explore  = links that take us to another page (compare, cards)
 //how the sprite looks is not here anymore: those switches live on the Stage,
 //next to the sprite they change
+//the team feature's messages (party full, party complete, errors) are about
+//the whole party, not one button, so they are drawn once, under both  groups
+//instead of inside "Collect" where they could only make one group taller
 
 export function PokemonActions({ pokemon }: PokemonActionsProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const name = encodeURIComponent(pokemon.name);
   const collectId = useId();
   const exploreId = useId();
+  const teamAction = useTeamAction(pokemon);
 
   return (
     <div className="pokemon-actions">
@@ -40,7 +45,7 @@ export function PokemonActions({ pokemon }: PokemonActionsProps) {
             isFavorite={isFavorite(pokemon.name)}
             onToggle={() => toggleFavorite(pokemon)}
           />
-          <TeamButton pokemon={pokemon} />
+          <TeamToggle action={teamAction} />
         </div>
       </div>
 
@@ -61,6 +66,8 @@ export function PokemonActions({ pokemon }: PokemonActionsProps) {
           </TransitionLink>
         </div>
       </div>
+
+      <TeamStatus action={teamAction} />
     </div>
   );
 }
