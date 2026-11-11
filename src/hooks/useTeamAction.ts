@@ -15,6 +15,7 @@ export interface TeamAction {
   celebrating: boolean;
   error: string | null;
   announcement: string;
+  popKey: number; //goes up by one each time this click adds the pokemon
   hintId: string;
   toggle: () => void;
 }
@@ -32,6 +33,10 @@ export function useTeamAction(pokemon: PokemonDetails): TeamAction {
   //true only after this button's click filled the sixth slot
   const [justCompleted, setJustCompleted] = useState(false);
   const celebrating = justCompleted && onTeam && team.length >= MAX_TEAM;
+
+  //an event counter for the icon pop, set in the click handler (see
+  //useFavoriteAction for why evernts are recorded there, not derived later)
+  const [popKey, setPopKey] = useState(0);
 
   //the auto dismiss timer lives here, in a hook not in the reducer
   //reucers stay pure, side effects like setTimeout belong in effects
@@ -52,6 +57,8 @@ export function useTeamAction(pokemon: PokemonDetails): TeamAction {
     //decide before adding, from what the team looked like at click time
     const completesParty = team.length === MAX_TEAM - 1;
     addToTeam(pokemon);
+    //a full party rejects the add, so only pop when there was room
+    if (team.length < MAX_TEAM) setPopKey((key) => key + 1);
     if (completesParty) setJustCompleted(true);
   }
 
@@ -65,6 +72,7 @@ export function useTeamAction(pokemon: PokemonDetails): TeamAction {
     celebrating,
     error,
     announcement,
+    popKey,
     hintId,
     toggle,
   };

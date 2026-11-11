@@ -9,6 +9,7 @@ import { useTeamAction, type TeamAction } from "../hooks/useTeamAction";
 import { MAX_TEAM } from "../lib/teamReducer";
 import { TEAM_COMPLETE, TEAM_FULL_HINT, TEAM_FULL_LINK } from "../lib/copy";
 import type { PokemonDetails } from "../lib/type";
+import { PopIcon } from "../ui/PopIcon";
 
 //the visible celebration: six pips lighting up one after another, like the
 //party counter filling, decorative: the words are announced by the live region
@@ -40,7 +41,8 @@ export function TeamToggle({ action }: { action: TeamAction }) {
       //described by the hint even when the hint is drawn somewhere else
       aria-describedby={action.partyFull ? action.hintId : undefined}
     >
-      {action.onTeam ? "✅ On Team" : "+ Add to Team"}
+      <PopIcon popKey={action.popKey}>{action.onTeam ? "✅" : "+"}</PopIcon>{" "}
+      {action.onTeam ? "On Team" : "Add to Team"}
     </Button>
   );
 }

@@ -144,3 +144,6 @@ export function animationsHint(
     ? "Following your device: motion is on."
     : "Following your device: it asks for less motion, so motion is off.";
 }
+
+//celebrations: rare, and only right after the person caused them
+export const FIRST_FAVORITE = "First favorite! It's waiting in your tray.";

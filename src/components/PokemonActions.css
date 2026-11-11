@@ -33,6 +33,7 @@
 
   /* the team messages are direct children of .pokemon-actions (TeamStatus
      renders no wrapper), so they take a full-width row under BOTH groups */
+  .pokemon-actions > .favorite-first,
   .pokemon-actions > .team-full-hint,
   .pokemon-actions > .team-complete,
   .pokemon-actions > .status-message {

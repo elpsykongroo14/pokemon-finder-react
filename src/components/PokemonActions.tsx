@@ -1,12 +1,12 @@
 import "./PokemonActions.css";
 import { useId } from "react";
-import { FavoriteButton } from "./FavoriteButton";
+import { FavoriteButton, FavoriteStatus } from "./FavoriteButton";
 import { TeamStatus, TeamToggle } from "../context/TeamButton";
 import { useTeamAction } from "../hooks/useTeamAction";
 import { TransitionLink } from "./TransitionLink";
-import { useFavorites } from "../hooks/useFavorites";
 import { ACTIONS_COLLECT_LABEL, ACTIONS_EXPLORE_LABEL } from "../lib/copy";
 import type { PokemonDetails } from "../lib/type";
+import { useFavoriteAction } from "../hooks/useFavoriteAction";
 
 interface PokemonActionsProps {
   pokemon: PokemonDetails;
@@ -22,7 +22,7 @@ interface PokemonActionsProps {
 //instead of inside "Collect" where they could only make one group taller
 
 export function PokemonActions({ pokemon }: PokemonActionsProps) {
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const FavoriteAction = useFavoriteAction(pokemon);
   const name = encodeURIComponent(pokemon.name);
   const collectId = useId();
   const exploreId = useId();
@@ -42,8 +42,9 @@ export function PokemonActions({ pokemon }: PokemonActionsProps) {
         </span>
         <div className="pokemon-actions__row">
           <FavoriteButton
-            isFavorite={isFavorite(pokemon.name)}
-            onToggle={() => toggleFavorite(pokemon)}
+            isFavorite={FavoriteAction.isFavorite}
+            onToggle={FavoriteAction.toggle}
+            popKey={FavoriteAction.popKey}
           />
           <TeamToggle action={teamAction} />
         </div>
@@ -67,6 +68,7 @@ export function PokemonActions({ pokemon }: PokemonActionsProps) {
         </div>
       </div>
 
+      <FavoriteStatus action={FavoriteAction} />
       <TeamStatus action={teamAction} />
     </div>
   );
