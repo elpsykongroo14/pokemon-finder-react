@@ -1,0 +1,63 @@
+/* The scene scales to its container but always in whole-pixel steps of
+   feel: crispEdges keeps every art pixel a sharp square.
+
+   Motion, and why it is safe:
+   - the tuft sways and the "!" hops, both slowly (well under 3 changes
+     per second) and with no change in brightness: nothing flashes, so
+     WCAG 2.3.1 (three flashes) is not in play at all
+   - both run ONLY under :root[data-motion="on"], the app's resolved
+     answer, so "Off" or "Auto + reduce motion" gives a still picture */
+@layer features {
+  .lost-route {
+    display: grid;
+    place-items: center;
+    padding: var(--space-5) var(--space-4) 0;
+    background: var(--surface-well);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .lost-route__art {
+    display: block;
+    width: min(100%, 36rem);
+    height: auto;
+  }
+
+  /* each layer moves around its own box, not the whole SVG's */
+  .lost-route .pixel-art__layer {
+    transform-box: fill-box;
+  }
+
+  :root[data-motion="on"] .lost-route .pixel-art__layer--rustle {
+    transform-origin: 50% 100%;
+    animation: lost-route-rustle 1.6s steps(2, jump-none) infinite;
+  }
+
+  :root[data-motion="on"] .lost-route .pixel-art__layer--bubble {
+    animation: lost-route-hop 1.6s steps(2, jump-none) infinite;
+  }
+
+  /* steps(): the art moves in whole pixels, like a DS sprite, instead of
+     gliding smoothly between them */
+  @keyframes lost-route-rustle {
+    0%,
+    100% {
+      transform: skewX(0deg);
+    }
+
+    50% {
+      transform: skewX(-12deg);
+    }
+  }
+
+  @keyframes lost-route-hop {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-1px);
+    }
+  }
+}

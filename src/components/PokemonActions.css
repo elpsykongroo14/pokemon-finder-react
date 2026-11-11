@@ -6,6 +6,7 @@
   .pokemon-actions {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+    align-items: start;
     gap: var(--space-4);
   }
 
@@ -30,17 +31,11 @@
     align-items: start;
   }
 
-  /* The TeamButton's wrapper steps out of the way (display: contents), so
-     its button becomes a normal cell next to Favorite, and its messages
-     (full-party hint, celebration, error) become full-width rows below
-     BOTH buttons instead of squeezing into one half-width column. */
-  .pokemon-actions__row > .team-builder-wrap {
-    display: contents;
-  }
-
-  .pokemon-actions__row .team-full-hint,
-  .pokemon-actions__row .team-complete,
-  .pokemon-actions__row .status-message {
+  /* the team messages are direct children of .pokemon-actions (TeamStatus
+     renders no wrapper), so they take a full-width row under BOTH groups */
+  .pokemon-actions > .team-full-hint,
+  .pokemon-actions > .team-complete,
+  .pokemon-actions > .status-message {
     grid-column: 1 / -1;
     margin-top: 0;
   }
