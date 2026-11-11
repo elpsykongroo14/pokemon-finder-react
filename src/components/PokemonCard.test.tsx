@@ -3,15 +3,20 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PokemonCard } from "./PokemonCard";
 import type { PokemonDetails } from "../lib/type";
+import type { FavoritesContextValue } from "../hooks/useFavorites";
 import { PreferencesProvider } from "../context/PreferencesContext";
 import { MemoryRouter } from "react-router-dom";
 
 const { toggleFavorite } = vi.hoisted(() => ({ toggleFavorite: vi.fn() }));
 
 vi.mock("../hooks/useFavorites", () => ({
-  useFavorites: () => ({
+  //typed as the real context value, so if the context gains a field the
+  //compiler points here instead of a test failing for a confusing reason
+  useFavorites: (): FavoritesContextValue => ({
+    favorites: [],
     isFavorite: () => false,
     toggleFavorite,
+    removeFavorite: () => {},
   }),
 }));
 

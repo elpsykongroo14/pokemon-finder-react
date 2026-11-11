@@ -27,7 +27,9 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
         stage={<Stage key={pokemon.name} pokemon={pokemon} shinyToggle />}
       >
         <div className="pokemon-card__console">
-          <PokemonActions pokemon={pokemon} />
+          {/* keyed like the Stage: celebrations belong to the Pokémon they
+              happened on, so moving to another one starts the actions fresh */}
+          <PokemonActions key={pokemon.name} pokemon={pokemon} />
 
           <Tabs defaultValue="info">
             <TabList aria-label="Pokémon details">

@@ -114,4 +114,44 @@ describe("Stage", () => {
       "as.gif",
     );
   });
+
+  it("sparkles at the moment Shiny is switched on, and not before", async () => {
+    const user = userEvent.setup();
+    const { container } = renderStage(true);
+    expect(container.querySelector(".shiny-sparkle")).toBeNull();
+
+    await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
+
+    const burst = container.querySelector(".shiny-sparkle");
+    expect(burst).not.toBeNull();
+    //decorative: the switch already says Shiny is on
+    expect(burst).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("plays a fresh burst each time Shiny is switched on again", async () => {
+    const user = userEvent.setup();
+    const { container } = renderStage(true);
+    const shinySwitch = screen.getByRole("checkbox", { name: "Shiny" });
+
+    await user.click(shinySwitch); //on
+    const first = container.querySelector(".shiny-sparkle");
+    await user.click(shinySwitch); //off: nothing new plays
+    expect(container.querySelector(".shiny-sparkle")).toBe(first);
+    await user.click(shinySwitch); //on again
+
+    expect(container.querySelector(".shiny-sparkle")).not.toBe(first);
+  });
+
+  it("does not sparkle at all when animations are off", async () => {
+    localStorage.setItem(
+      "pokemon_preferences",
+      JSON.stringify({ animations: "off", spriteMode: "pixel" }),
+    );
+    const user = userEvent.setup();
+    const { container } = renderStage(true);
+
+    await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
+
+    expect(container.querySelector(".shiny-sparkle")).toBeNull();
+  });
 });

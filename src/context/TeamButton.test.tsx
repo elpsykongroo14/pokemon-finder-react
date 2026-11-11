@@ -55,6 +55,29 @@ afterEach(() => {
 });
 
 describe("TeamButton", () => {
+  it("pops its icon when the click adds the Pokémon, not before", async () => {
+    vi.useRealTimers();
+    setTeam({ isOnTeam: () => false });
+    const user = userEvent.setup();
+    render(<TeamButton pokemon={pikachu} />);
+    expect(screen.getByText("+")).not.toHaveAttribute("data-pop");
+
+    await user.click(screen.getByRole("button", { name: "+ Add to Team" }));
+
+    expect(screen.getByText("+")).toHaveAttribute("data-pop");
+  });
+
+  it("does not pop when a full party rejects the add", async () => {
+    vi.useRealTimers();
+    setTeam({ team: makeMembers(MAX_TEAM) });
+    const user = userEvent.setup();
+    renderButton();
+
+    await user.click(screen.getByRole("button", { name: "+ Add to Team" }));
+
+    expect(screen.getByText("+")).not.toHaveAttribute("data-pop");
+  });
+
   it("shows 'Add to Team' and calls addToTeam when not on the team", async () => {
     vi.useRealTimers();
     const addToTeam = vi.fn();

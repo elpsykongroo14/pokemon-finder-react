@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Panel } from "../ui/Panel";
 import { Toggle } from "../ui/Toggle";
 import { SpriteDisplay } from "./SpriteDisplay";
+import { ShinySparkle } from "./ShinySparkle";
 import { TypeBadgeList } from "./TypeBadgeList";
 import { usePreferences } from "../hooks/usePreferences";
 import { formatDexNumber } from "../lib/dex";
@@ -27,6 +28,17 @@ export function Stage({ pokemon, shinyToggle = false }: StageProps) {
   //key={pokemon.name} in PokemonCard) and is never saved
   const [shiny, setShiny] = useState(false);
 
+  //how many times shiny has been switched on, an event encounter, bumped in
+  //the switch's handler: the sparkle celebrates the moment of switching,
+  //not the state of being shiny (switching OFF, on arriving at a page,
+  //plays nothing)
+  const [sparkleKey, setSparkleKey] = useState(0);
+
+  function handleShinyChange(checked: boolean) {
+    setShiny(checked);
+    if (checked) setSparkleKey((key) => key + 1);
+  }
+
   return (
     <Panel variant="tinted">
       <div className="stage">
@@ -46,6 +58,12 @@ export function Stage({ pokemon, shinyToggle = false }: StageProps) {
             size={240}
             plain
           />
+          {/* JS gate, not CSS: a one-shot effect with motion off should not
+              exist at all, rather than exist invisibly. a new key = a fresh
+              burst, so switching on again replays it */}
+          {animationsEnabled && sparkleKey > 0 && (
+            <ShinySparkle key={sparkleKey} />
+          )}
         </div>
 
         <div
@@ -59,7 +77,11 @@ export function Stage({ pokemon, shinyToggle = false }: StageProps) {
             onChange={(checked) => setSpriteMode(checked ? "pixel" : "artwork")}
           />
           {shinyToggle && (
-            <Toggle label="Shiny" checked={shiny} onChange={setShiny} />
+            <Toggle
+              label="Shiny"
+              checked={shiny}
+              onChange={handleShinyChange}
+            />
           )}
         </div>
       </div>
