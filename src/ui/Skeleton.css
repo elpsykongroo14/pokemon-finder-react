@@ -3,6 +3,13 @@
     display: inline-block;
     border-radius: var(--radius-md);
     background: var(--surface-window-sunken);
+    /* the still look; the pulse below takes over opacity while it runs */
+    opacity: 0.7;
+  }
+
+  /* Feedback (loading). Motion gate: pulses ONLY under
+     :root[data-motion="on"] */
+  :root[data-motion="on"] .skeleton {
     animation: skeleton-pulse 1200ms ease-in-out infinite;
   }
 
@@ -18,20 +25,5 @@
     50% {
       opacity: 0.4;
     }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .skeleton {
-      animation: none;
-      opacity: 0.7;
-    }
-  }
-
-  :root[data-motion="reduced"] .skeleton {
-    animation: none;
-    opacity: 0.7;
-  }
-  :root[data-motion="on"] .skeleton {
-    animation: skeleton-pulse 1200ms ease-in-out infinite;
   }
 }

@@ -5,6 +5,13 @@
     color: var(--accent-select);
     transform: translateY(var(--cursor-offset, 0px));
     transition: transform var(--dur-fast) var(--ease-standard);
+  }
+
+  /* Ambient tier (the one allowed outside the Stage). About one blink a
+     second: well under 3 flashes per second (WCAG 2.3.1), and stoppable
+     from Settings (WCAG 2.2.2). Motion gate: blinks ONLY under
+     :root[data-motion="on"] */
+  :root[data-motion="on"] .cursor {
     animation: cursor-blink 900ms steps(1) infinite;
   }
 
@@ -24,22 +31,5 @@
     100% {
       opacity: 0;
     }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cursor {
-      animation: none;
-      opacity: 1;
-    }
-  }
-
-  :root[data-motion="reduced"] .cursor {
-    animation: none;
-    opacity: 1;
-  }
-
-  :root[data-motion="on"] .cursor {
-    animation: cursor-blink 900ms steps(1) infinite;
-    opacity: 1;
   }
 }
