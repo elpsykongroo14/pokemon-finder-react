@@ -58,8 +58,11 @@
     );
   }
 
-  /* idle bob, only for sprites that are not already animated GIFs */
-  .stage__sprite .sprite-display:not([data-kind="animated"]) {
+  /* idle bob, only for sprites that are not already animated GIFs.
+     Ambient tier. Motion gate: runs ONLY under :root[data-motion="on"] */
+  :root[data-motion="on"]
+    .stage__sprite
+    .sprite-display:not([data-kind="animated"]) {
     animation: stage-idle 2.4s ease-in-out infinite alternate;
   }
 
@@ -70,20 +73,6 @@
 
     to {
       transform: translateY(-6px);
-    }
-  }
-
-  :root[data-motion="reduced"]
-    .stage__sprite
-    .sprite-display:not([data-kind="animated"]) {
-    animation: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    :root:not([data-motion="on"])
-      .stage__sprite
-      .sprite-display:not([data-kind="animated"]) {
-      animation: none;
     }
   }
 }

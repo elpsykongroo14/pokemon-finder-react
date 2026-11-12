@@ -21,6 +21,11 @@
       color-mix(in srgb, var(--theme-accent-deep) 8%, transparent),
       transparent 60%
     );
+  }
+
+  /* Ambient tier, very slow. Motion gate: runs ONLY under
+     :root[data-motion="on"] */
+  :root[data-motion="on"] .backdrop::before {
     animation: backdrop-drift 24s ease-in-out infinite alternate;
   }
 
@@ -31,16 +36,6 @@
 
     to {
       transform: translate3d(4%, 3%, 0);
-    }
-  }
-
-  :root[data-motion="reduced"] .backdrop::before {
-    animation: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    :root:not([data-motion="on"]) .backdrop::before {
-      animation: none;
     }
   }
 }

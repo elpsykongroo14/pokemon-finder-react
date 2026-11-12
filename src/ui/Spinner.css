@@ -16,6 +16,12 @@
         var(--text-danger) 0 50%,
         var(--surface-frame) 50% 100%
       );
+  }
+
+  /* Feedback (loading). Motion gate: spins ONLY under
+     :root[data-motion="on"]; otherwise a still ball (the busy state is
+     also announced, so nothing is lost) */
+  :root[data-motion="on"] .spinner {
     animation: spinner-spin 800ms linear infinite;
   }
 
@@ -32,18 +38,5 @@
     to {
       transform: rotate(360deg);
     }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .spinner {
-      animation: none;
-    }
-  }
-
-  :root[data-motion="reduced"] .spinner {
-    animation: none;
-  }
-  :root[data-motion="on"] .spinner {
-    animation: spinner-spin 800ms linear infinite;
   }
 }

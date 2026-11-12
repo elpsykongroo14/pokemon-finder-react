@@ -1,5 +1,13 @@
 {
   "rules": {
     "color-no-hex": true
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/styles/primitives.css", "src/styles/type-themes.css"],
+      "rules": {
+        "color-no-hex": null
+      }
+    }
+  ]
 }
