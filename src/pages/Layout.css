@@ -122,4 +122,44 @@
       justify-self: center;
     }
   }
+
+  /* The one orchestrated page-load moment (R9). Like a DS powering on:
+     the top bar drops in, the page rises into place, then the tray slides
+     up from the bottom, each a beat after the last.
+
+     - plays once per page load: Layout mounts once, and route changes swap
+       only the <Outlet />, so navigating never replays it
+     - Transition tier, motion tokens only: motion.css sets them to 0ms when
+       animations are off, which removes the intro with no extra rule
+     - total = 2 x --dur-instant (stagger) + --dur-slow = 580ms, inside the
+       --dur-epic ceiling
+     - animates header/main/tray only, never .app-shell itself: a transform
+       there would become the reference box for the fixed Backdrop and toast */
+  .app-header {
+    animation: shell-drop var(--dur-slow) var(--ease-standard) backwards;
+  }
+
+  .app-main {
+    animation: shell-rise var(--dur-slow) var(--ease-standard) backwards;
+    animation-delay: var(--dur-instant);
+  }
+
+  .app-tray {
+    animation: shell-rise var(--dur-slow) var(--ease-standard) backwards;
+    animation-delay: calc(2 * var(--dur-instant));
+  }
+
+  @keyframes shell-drop {
+    from {
+      opacity: 0;
+      transform: translateY(calc(-1 * var(--space-3)));
+    }
+  }
+
+  @keyframes shell-rise {
+    from {
+      opacity: 0;
+      transform: translateY(var(--space-3));
+    }
+  }
 }
