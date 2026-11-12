@@ -41,7 +41,7 @@ Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessio
 | ✓   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
 | ✓   | **R7**  | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
 | ✓   | **R8**  | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
-| ☐   | **R9**  | Juice, settings & presentation         | M    | R5–R8                  | Celebrations, polish                           |
+| ✓   | **R9**  | Juice, settings & presentation         | M    | R5–R8                  | Celebrations, polish                           |
 | ☐   | **R10** | Quality gates & launch                 | M    | R9                     | Confidence + merge to `main`                   |
 | ☐   | **R11** | Port to the vanilla version            | L    | R10                    | Both apps match                                |
 | ☐   | **R12** | Backlog (game-depth features)          | —    | —                      | Only after R11                                 |
@@ -603,15 +603,15 @@ Type colors: reuse the existing `--type-*` values as **primitives**; derive deep
 
 **Goal:** the last 10 % that makes it feel _cared for_. Deliberately late: polish is easy to over-do before the structure is settled.
 
-**Deliverables**
+**Deliverables (as shipped)**
 
-- **Settings panel:** Animations (Auto / On / Off), Sound (Off / On), Sprite mode (Pixel / Art)
-- **One orchestrated page-load moment** (a single signature intro, not scattered fades)
-- Micro-interactions audit: every button, toggle and card has a response; every list has a tasteful enter
-- **Celebration moments:** shiny reveal, first favorite, team complete, all with `--dur-epic` ceiling
-- **Optional sound:** off by default; synthesized retro blips (Web Audio API), no copied audio. Autoplay policies mean sound only starts after a user gesture
-- 404 as a "glitch" page (tasteful, no rapid flashing)
-- Easter egg(s) (e.g., a Konami-code effect). Optional and fun.
+- **Settings model:** animations stored as intent (Auto / On / Off), resolved per render against the live OS setting; tolerant loader migrates the old shape;
+- **Settings dialog:** gear in the header; Animations (Auto / On / Off) and Sprites (Pixel / Artwork); one source of truth with the Stage's switch
+- **Presentation & organization:** shared PageHeader on every page; Pokémon page controls grouped by what they act on; party messages span both groups; two-line credits footer
+- **One orchestrated page-load moment:** header, page, tray (580 ms)
+- **Celebrations:** shiny sparkle, first favorite , team complete, icon pops; all events, all within --dur-epic
+- **404:** original pixel-art "wild 404" encounter; nothing flashes
+- **Motion audit:** one opt-in gate for every loop, guard test in CI.
 
 **Tasks**
 
@@ -619,7 +619,6 @@ Type colors: reuse the existing `--type-*` values as **primitives**; derive deep
 2. Motion audit: list every animation in the app; classify by tier (§5.5); remove any that aren't earning their place.
 3. Reduced-motion audit: with OS setting on, everything is static but fully functional.
 4. Flashing audit: nothing flashes more than 3 times per second (WCAG 2.3.1).
-5. Sound module isolated behind a tiny interface so it can be omitted from the vanilla port if desired.
 
 **Checkpoint:** settings persist across reloads; reduced-motion pass done; no animation left unclassified; sound is silent by default.
 
@@ -640,7 +639,7 @@ Type colors: reuse the existing `--type-*` values as **primitives**; derive deep
 3. **Cross-browser:** Chromium, Firefox, WebKit (Safari); check View Transitions and any newer CSS features degrade cleanly.
 4. **Responsive matrix:** 360 / 375 / 768 / 1024 / 1440 / 1920, portrait + landscape phone.
 5. **Visual regression:** adopt Playwright `toHaveScreenshot` for the key pages, with animations disabled, run in CI's container (Decision D8).
-6. **CI:** optional Lighthouse CI budget assertion; keep tests/lint/Stylelint/build as required checks.
+6. **CI:** optional Lighthouse CI budget assertion; keep tests/lint/Stylelint/build as required checks. Pin Prettier as an exact devDependency, add a format:check script, and run it in CI.
 7. **Cleanup:** delete alias tokens and dead CSS; ensure `/styleguide` is not in the production bundle (verify in build output).
 8. **Launch:** update README screenshots, write a DEVLOG chapter, open the `ui/rehaul` → `main` PR, deploy, smoke-test production.
 
@@ -826,6 +825,16 @@ VM87:5 898 'calyrex' {animated: true, pixel: true, artwork: true}
 | D27 | “Team complete!” trigger | State-based; event-based | Event-based | R7 | Event: decided at click time from the pre-click team size; announced via a live region; decorative banner is aria-hidden. |
 the D28 row above, plus D29: Animation preference = stored intent (“auto” | “on” | “off”), resolved per render; explicit choice beats the OS everywhere; migration by shape detection, add a version field if a third shape ever appears.
 
+D29 Animation preference Stored intent "auto" | "on" | "off", resolved per render; an explicit choice beats the OS everywhere; migration by shape detection (add a version field if a third shape appears).
+
+D30 404 art Original pixel art drawn from text rows; no franchise sprites or Poké Ball design; art palettes are literals, not tokens.
+
+D31 “First favorite” The list goes from empty to one via a click, decided at click time; not a stored lifetime flag.
+
+D32 Ambient motion Stage, ▶ cursor, the 24 s backdrop drift, the 404 scene. Rule: nothing ambient may compete with content being read.
+
+D33 Fifth motion tier, Status Spinner and skeleton: allowed where loading happens, gated, with a static fallback that still communicates.
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
@@ -923,3 +932,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-10-28 | R7 complete: Versus screen (split stage, tug-of-war bars on one ruler, non-color win/lose), Party screen (lead slot, spoken empties), optional-field team migration with tolerant loader and lazy backfill, D6 exit animations, full-party guidance, Team-complete moment. Palette contrast defect found and fixed with a guard test. D6, D10, D25–D27 recorded. R7 changed the ADD test and its fixture on purpose (D10); the other reducer tests are unchanged. |
 
 | 2026-11-05 | R8 complete: card is a real button; ?view= and ?page= in the URL; Grid, Table (sortable) and Binder (3x3) over the same data; holo tilt and shine via CSS variables and requestAnimationFrame (hovered card only, will-change on hover only); card dialog on ui/Dialog with zoom, tilt and set/rarity chips; sort uses ui/Select; shared animationsAreOff() and styles/holo.css. Measured on 60 cards: no layout work and no React re-render per mouse move. |
+
+| 2026-11-12 | R9 complete: settings model (intent + resolver + tolerant migration), Settings dialog, PageHeader on every page, Pokémon page regrouped, credits footer, pixel-art 404, celebrations as events (shiny sparkle, first favorite, icon pops), one opt-in motion gate with a CI guard and a classified inventory, page-load intro, StyleGuide no longer shipped. Sound dropped (D28). D28–D33 recorded. 807 → 910 tests; +3.30 kB JS gzip, +0.96 kB CSS gzip. |
