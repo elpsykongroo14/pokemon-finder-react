@@ -7,7 +7,7 @@
 
   .library-loading,
   .library-empty {
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
     text-align: center;
     padding: var(--space-7) 0;
   }

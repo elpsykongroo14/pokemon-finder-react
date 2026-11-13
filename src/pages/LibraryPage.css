@@ -2,13 +2,13 @@
   /*missing library-view class*/
 
   .library-back {
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
     text-decoration: none;
     font-size: var(--text-sm);
   }
 
   .library-back:hover {
-    color: var(--color-text-primary);
+    color: var(--text-primary);
   }
 
   /* on a narrow screen the title and the controls cannot share one row:

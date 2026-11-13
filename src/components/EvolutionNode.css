@@ -22,7 +22,7 @@
   .evolution-arrow {
     width: 24px;
     height: 1px;
-    background: var(--color-border-default);
+    background: var(--border-hairline);
     position: relative;
     flex-shrink: 0;
     /* the arrow is revealed left to right, deeper levels a beat later.
@@ -57,7 +57,7 @@
       bottom: 0;
       transform: translateX(-50%);
       border-color: transparent;
-      border-top-color: var(--color-border-default);
+      border-top-color: var(--border-hairline);
     }
   }
 

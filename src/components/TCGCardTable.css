@@ -13,11 +13,11 @@
   .tcg-table td {
     padding: var(--space-2) var(--space-3);
     text-align: left;
-    border-bottom: 1px solid var(--color-border-subtle);
+    border-bottom: 1px solid var(--border-hairline);
   }
 
   .tcg-table thead th {
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
     font-weight: 600;
     white-space: nowrap;
   }
@@ -27,7 +27,7 @@
   }
 
   .tcg-table tbody tr:hover {
-    background: var(--color-bg-surface-sunken);
+    background: var(--surface-well);
   }
 
   /* header and name buttons look like text, not like boxed buttons */
@@ -50,7 +50,7 @@
 
   .tcg-table__sort:hover,
   .tcg-table__open:hover {
-    color: var(--color-text-primary);
+    color: var(--text-primary);
   }
 
   .tcg-table__sort:focus-visible,
@@ -67,7 +67,7 @@
   }
 
   .tcg-table__rarity {
-    color: var(--tier-color, var(--color-text-secondary));
+    color: var(--tier-color, var(--text-secondary));
   }
 
   .tcg-table-loading {
