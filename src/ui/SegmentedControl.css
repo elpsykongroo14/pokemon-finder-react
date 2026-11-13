@@ -21,9 +21,9 @@
     gap: var(--space-1);
   }
 
-  /* Semantic tokens only (not the legacy --color-* aliases): the aliases are
-     resolved once on :root, so they ignore the .surface-window override and
-     stay "light text" even inside a light panel. These follow the surface. */
+  /* Semantic tokens follow the surface: inside .surface-window they
+     re-bind to their on-light values. (The old --color-* aliases were
+     resolved once on :root and ignored that re-binding; retired in R10.) */
   .segmented__label {
     display: inline-block;
     padding: var(--space-1) var(--space-3);

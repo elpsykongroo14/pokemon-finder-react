@@ -2,7 +2,6 @@
    every other layer in this file (and every future component
    file) will be judged against. */
 @import "./styles/layers.css";
-@import "./styles/token-aliases.css";
 @import "./styles/primitives.css" layer(tokens);
 @import "./styles/semantic.css" layer(tokens);
 @import "./styles/type-themes.css" layer(themes);
@@ -25,8 +24,8 @@
 @layer base {
   body {
     margin: 0;
-    background: var(--color-bg-canvas);
-    color: var(--color-text-primary);
+    background: var(--surface-frame);
+    color: var(--text-primary);
     font-family: var(--font-body);
   }
 
@@ -39,7 +38,7 @@
   h3 {
     font-family: var(--font-display);
     font-weight: 400;
-    color: var(--color-text-heading);
+    color: var(--text-primary);
     margin: 0 0 var(--space-2);
   }
 
@@ -61,7 +60,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-focus);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 }

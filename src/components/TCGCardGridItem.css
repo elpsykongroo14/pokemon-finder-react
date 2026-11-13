@@ -7,8 +7,8 @@
     font: inherit;
     color: inherit;
     text-align: left;
-    background: var(--color-bg-surface);
-    border: 1px solid var(--tier-color, var(--color-border-subtle));
+    background: var(--surface-chrome);
+    border: 1px solid var(--tier-color, var(--border-hairline));
     border-radius: var(--radius-md);
     overflow: hidden;
     cursor: pointer;
@@ -23,7 +23,7 @@
 
   .tcg-card-img-wrap {
     aspect-ratio: 5 / 7;
-    background: var(--color-bg-surface-sunken);
+    background: var(--surface-well);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,18 +40,18 @@
   .tcg-card-name {
     font-weight: 600;
     font-size: 0.95rem;
-    color: var(--color-text-primary);
+    color: var(--text-primary);
     margin-bottom: 2px;
   }
 
   .tcg-card-set,
   .tcg-card-rarity {
     font-size: var(--text-xs);
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
   }
 
   .tcg-card-rarity {
-    color: var(--tier-color, var(--color-text-secondary));
+    color: var(--tier-color, var(--text-secondary));
   }
 
   .tcg-card:focus-visible {
@@ -64,7 +64,7 @@
      will-change is set on the ONE hovered card, never on the whole grid */
   @media (hover: hover) and (pointer: fine) {
     .tcg-card:hover {
-      border-color: var(--tier-color, var(--color-border-default));
+      border-color: var(--tier-color, var(--border-hairline));
       transform: perspective(600px) translateY(-2px) rotateX(var(--rx, 0deg))
         rotateY(var(--ry, 0deg));
       will-change: transform;

@@ -50,9 +50,8 @@
     min-width: 200px;
   }
 
-  /* this content sits on the Dialog's light panel. only the NEW tokens
-     (--text-*) are re-bound for light panels; the older --color-text-*
-     aliases are fixed to the dark theme and would be invisible here */
+  /* this content sits on the Dialog's light panel; --text-* re-binds there.
+     The explicit color predates the alias removal and is kept as-is. */
   .card-modal-name {
     margin-bottom: var(--space-3);
     color: var(--text-primary);
