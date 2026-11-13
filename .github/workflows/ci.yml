@@ -23,6 +23,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+        # Cheapest gate first: a formatting slip fails in seconds,
+      # not after the full test run (fail fast).
+      - name: Check formatting
+        run: npm run format:check
+
       - name: Lint
         run: npm run lint
 
@@ -31,6 +36,11 @@ jobs:
 
       - name: Build
         run: npm run build
+
+        # Reads dist/, the thing we deploy, and fails if dev-only
+      # code (the /styleguide page) leaked into it.
+      - name: Check build output
+        run: npm run check:dist
 
   # Preview deploy: only when code is pushed (i.e. merged) into ui/rehaul,
   # and only after the test job above passed.
