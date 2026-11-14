@@ -8,6 +8,7 @@ import { useTypeTheme } from "../hooks/useTypeTheme";
 import { getPokemonPageState } from "../lib/pokemonPageState";
 import { FailureMessage } from "../components/FailureMessage";
 import "./PokemonPage.css";
+import { PageTitle } from "../ui/PageTitle";
 
 export function PokemonPage() {
   const { name } = useParams<{ name: string }>(); //this line reads the dynamic segment straight off the current URL.
@@ -58,6 +59,9 @@ export function PokemonPage() {
 
   return (
     <div className="pokemon-page" ref={regionRef} tabIndex={-1}>
+      {/* the name from the URL, so the tab is right even while loading
+          or when the search failed ("Missingno · Pokémon Finder") */}
+      <PageTitle page={name && name.charAt(0).toUpperCase() + name.slice(1)} />
       {renderState()}
     </div>
   );

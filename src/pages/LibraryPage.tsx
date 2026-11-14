@@ -85,6 +85,7 @@ export function LibraryPage() {
     <section className="library-view">
       <PageHeader
         title={LIBRARY_HEADING}
+        documentTitle={name ? `${LIBRARY_HEADING}: ${name}` : undefined}
         subtitle={LIBRARY_SUBTITLE}
         actions={
           <Link

@@ -9,6 +9,7 @@ import { StageSkeleton } from "../components/StageSkeleton";
 import { MessageBox } from "../ui/MessageBox";
 import { StageConsole } from "../ui/StageConsole";
 import { encounterMessage, LOADING_LABEL, MENU_PROMPT } from "../lib/copy";
+import { PageTitle } from "../ui/PageTitle";
 
 export function HomePage() {
   const { id, data, loading, error, retry } = useEncounter();
@@ -43,17 +44,21 @@ export function HomePage() {
   }
 
   return (
-    <StageConsole
-      stage={
-        <div className="home-stage" ref={stageRef} tabIndex={-1}>
-          {stage}
+    <>
+      {/* Home is the app itself, so the tab shows just the app name */}
+      <PageTitle />
+      <StageConsole
+        stage={
+          <div className="home-stage" ref={stageRef} tabIndex={-1}>
+            {stage}
+          </div>
+        }
+      >
+        <div className="home-console">
+          <MessageBox text={message} />
+          <BattleMenu />
         </div>
-      }
-    >
-      <div className="home-console">
-        <MessageBox text={message} />
-        <BattleMenu />
-      </div>
-    </StageConsole>
+      </StageConsole>
+    </>
   );
 }
