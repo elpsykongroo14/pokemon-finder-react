@@ -835,6 +835,8 @@ D32 Ambient motion Stage, ▶ cursor, the 24 s backdrop drift, the 404 scene. Ru
 
 D33 Fifth motion tier, Status Spinner and skeleton: allowed where loading happens, gated, with a static fallback that still communicates.
 
+| D34 | Accessibility checks: vitest-axe vs axe-core + own matcher | axe-core 4.14.0 (exact pin) + ~60-line matcher in src/a11y/axe.ts. vitest-axe works on Vitest 4 but its single 0.1.0 release types the old `Vi` namespace, so the glue is ours either way. color-contrast disabled in jsdom (no layout); checked in a real browser instead. | R10 |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
