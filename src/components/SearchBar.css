@@ -10,6 +10,10 @@
 
   .search-bar-wrapper input {
     flex: 1;
+    /* a flex item never shrinks below its content size by default, and an
+       input's "content size" is its built-in width (~20 characters). at
+       320px that pushed the Search button 18px off screen (WCAG 1.4.10) */
+    min-width: 0;
     background: var(--surface-well);
     border: 1px solid var(--border-hairline);
     border-radius: var(--radius-pill);

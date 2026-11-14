@@ -29,5 +29,9 @@
     background: var(--theme-accent-soft);
     color: var(--theme-soft-ink);
     border-color: var(--theme-accent-deep);
+    /* the ring is drawn in the colour that is GUARANTEED to contrast with
+       this surface (its ink), not in an accent that only contrasts on some
+       of the 18 type tints. */
+    --focus-ring: var(--theme-soft-ink);
   }
 }
