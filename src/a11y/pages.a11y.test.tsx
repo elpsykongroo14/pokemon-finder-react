@@ -1,39 +1,21 @@
 //page-level accessibility gate: every route, in the
-//states a user actually sees, rendered as the REAL app (all providers, the real Layout, real components) and checked by axe.
+//states a user actually sees, rendered as the REAL app (all providers, the
+//real Layout, real components) and checked by axe.
 //only the network is fake (see fakeApi.ts)
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
-import App from "../App";
-import { PreferencesProvider } from "../context/PreferencesContext";
-import { FavoritesProvider } from "../context/FavoritesContext";
-import { TeamProvider } from "../context/TeamContext";
 import { clearPokeCache } from "../lib/api";
 import { CARDS_LOADING_LABEL, LOADING_LABEL } from "../lib/copy";
 import { installFakeApi } from "./fakeApi";
 import { runAxe } from "./axe";
+import { renderApp } from "./renderApp";
 
-//the same provider stack as main.tsx, so the test sees what the user sees
-function renderApp(path: string) {
-  return render(
-    <MemoryRouter initialEntries={[path]}>
-      <PreferencesProvider>
-        <FavoritesProvider>
-          <TeamProvider>
-            <App />
-          </TeamProvider>
-        </FavoritesProvider>
-      </PreferencesProvider>
-    </MemoryRouter>,
-  );
-}
-
-//axe checks what it is in the DOM right now, so a check run while a page is
+//axe checks what is in the DOM right now, so a check run while a page is
 //still loading would only check the skeleton. "settled" = none of the
 //app's loading signals is on screen: the two loading sentences from
-//copy.ts (as text or as a statu's name) and any skeleton shape.
-//waitFor retries until that holds (or fails the test after 1s)
+//copy.ts (as text or as a status's name) and any skeleton shape.
+//waitFor retries until that holds (or fails the test after 1 s)
 const LOADING = new RegExp(`${LOADING_LABEL}|${CARDS_LOADING_LABEL}`);
 
 async function settled() {
@@ -46,8 +28,8 @@ async function settled() {
 
 beforeEach(() => {
   installFakeApi();
-  //api.ts caches responses in module scope; a cache left over from the previous
-  //test would make "laoding" states unreachable
+  //api.ts caches responses in module scope; a cache left over from the
+  //previous test would make "loading" states unreachable
   clearPokeCache();
   localStorage.clear();
   sessionStorage.clear();
