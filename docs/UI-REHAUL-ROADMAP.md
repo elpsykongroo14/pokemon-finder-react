@@ -634,14 +634,14 @@ Type colors: reuse the existing `--type-*` values as **primitives**; derive deep
 
 **Deliverables & tasks**
 
-1. **Accessibility:** automated (axe via a Vitest matcher such as `vitest-axe`, verify package fit) + manual keyboard-only run of every page + screen-reader smoke test + contrast re-check.
-2. **Performance:** Lighthouse mobile vs the R0 baseline; Core Web Vitals "good" thresholds (LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1); bundle-size review with a Vite-compatible analyzer; image/GIF weight review; DevTools performance recording of the Stage and the Library grid.
-3. **Cross-browser:** Chromium, Firefox, WebKit (Safari); check View Transitions and any newer CSS features degrade cleanly.
-4. **Responsive matrix:** 360 / 375 / 768 / 1024 / 1440 / 1920, portrait + landscape phone.
-5. **Visual regression:** adopt Playwright `toHaveScreenshot` for the key pages, with animations disabled, run in CI's container (Decision D8).
-6. **CI:** optional Lighthouse CI budget assertion; keep tests/lint/Stylelint/build as required checks. Pin Prettier as an exact devDependency, add a format:check script, and run it in CI.
-7. **Cleanup:** delete alias tokens and dead CSS; ensure `/styleguide` is not in the production bundle (verify in build output).
-8. **Launch:** update README screenshots, write a DEVLOG chapter, open the `ui/rehaul` → `main` PR, deploy, smoke-test production.
+1. **Freeze & clean:** Prettier pinned + format check in CI; alias tokens and dead StatBar removed; build-output guard (`check-dist`).
+2. **Automated accessibility:** axe-core + own matcher (D34), page-level checks with a fake network.
+3. **Accessibility pass:** real-browser contrast/focus/reflow checks, page titles, Settings dialog trap fix, route-change announcement (D35). F3 (toggle naming) optional.
+4. **The build output and the cache:** bundle as a module graph (`npm run analyze`); route-splitting measured, not assumed (D37); HTTP caching policy for content-hashed assets via `public/_headers` (D38); size budgets in `check-dist`.
+5. **End-to-end smoke tests:** Playwright, Chromium only, 2–3 user journeys against the production build with the network intercepted; runs in CI.
+6. **Release engineering:** build once, deploy that exact artifact; `ui/rehaul` → `main` PR; deploy; production smoke test; rollback plan; DEVLOG chapter.
+
+**Dropped (with reason):** cross-browser and responsive matrices, visual regression (D8), Lighthouse CI, DevTools traces. A solo portfolio app with little traffic gains little from them, and the concepts are covered by Parts 4–6. Optional: one Lighthouse run of the old UI on production before Part 6, for a before/after.
 
 **Checkpoint:** all gates green or explicitly waived in §10 with a reason; production deploy verified.
 
@@ -940,3 +940,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-11-05 | R8 complete: card is a real button; ?view= and ?page= in the URL; Grid, Table (sortable) and Binder (3x3) over the same data; holo tilt and shine via CSS variables and requestAnimationFrame (hovered card only, will-change on hover only); card dialog on ui/Dialog with zoom, tilt and set/rarity chips; sort uses ui/Select; shared animationsAreOff() and styles/holo.css. Measured on 60 cards: no layout work and no React re-render per mouse move. |
 
 | 2026-11-12 | R9 complete: settings model (intent + resolver + tolerant migration), Settings dialog, PageHeader on every page, Pokémon page regrouped, credits footer, pixel-art 404, celebrations as events (shiny sparkle, first favorite, icon pops), one opt-in motion gate with a CI guard and a classified inventory, page-load intro, StyleGuide no longer shipped. Sound dropped (D28). D28–D33 recorded. 807 → 910 tests; +3.30 kB JS gzip, +0.96 kB CSS gzip. |
+
+| 2026-11-15 | R10 rescoped: Parts 4–6 refocused on build output, caching, E2E smoke tests and release engineering; matrices, visual regression and Lighthouse CI dropped. |
