@@ -62,7 +62,7 @@ describe("PokemonActions", () => {
       within(collect).getByRole("button", { name: /favorite/i }),
     ).toBeInTheDocument();
     expect(
-      within(collect).getByRole("button", { name: "+ Add to Team" }),
+      within(collect).getByRole("button", { name: "Team" }),
     ).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe("PokemonActions", () => {
 
     const explore = screen.getByRole("group", { name: "Explore" });
     expect(
-      within(explore).getByRole("link", { name: "⚔️ Compare" }),
+      within(explore).getByRole("link", { name: "Compare" }),
     ).toBeInTheDocument();
     expect(
       within(explore).getByRole("link", { name: "View Cards" }),
@@ -92,7 +92,7 @@ describe("PokemonActions", () => {
     renderActions();
 
     expect(
-      screen.getByRole("button", { name: "+ Add to Team" }),
+      screen.getByRole("button", { name: "Team" }),
     ).toHaveAccessibleDescription(/party is full/i);
   });
 
@@ -114,7 +114,7 @@ describe("PokemonActions", () => {
   it("builds the destinations from the pokemon's name", () => {
     renderActions("pikachu");
 
-    expect(screen.getByRole("link", { name: "⚔️ Compare" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Compare" })).toHaveAttribute(
       "href",
       "/compare?a=pikachu",
     );
@@ -127,7 +127,7 @@ describe("PokemonActions", () => {
   it("encodes names that are not URL-safe", () => {
     renderActions("mr mime");
 
-    expect(screen.getByRole("link", { name: "⚔️ Compare" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Compare" })).toHaveAttribute(
       "href",
       "/compare?a=mr%20mime",
     );
@@ -137,7 +137,7 @@ describe("PokemonActions", () => {
     const user = userEvent.setup();
     renderActions();
 
-    await user.click(screen.getByRole("link", { name: "⚔️ Compare" }));
+    await user.click(screen.getByRole("link", { name: "Compare" }));
 
     expect(screen.getByTestId("where")).toHaveTextContent("/compare?a=pikachu");
   });

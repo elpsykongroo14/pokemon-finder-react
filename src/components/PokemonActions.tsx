@@ -60,7 +60,9 @@ export function PokemonActions({ pokemon }: PokemonActionsProps) {
         </span>
         <div className="pokemon-actions__row">
           <TransitionLink to={`/compare?a=${name}`} variant="secondary">
-            ⚔️ Compare
+            {/* decorative: hidden so the link is named "Compare", not
+                "crossed swords, Compare" */}
+            <span aria-hidden="true">⚔️</span> Compare
           </TransitionLink>
           <TransitionLink to={`/library/${name}`} variant="secondary">
             View Cards

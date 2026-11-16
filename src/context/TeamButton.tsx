@@ -7,7 +7,12 @@ import { type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useTeamAction, type TeamAction } from "../hooks/useTeamAction";
 import { MAX_TEAM } from "../lib/teamReducer";
-import { TEAM_COMPLETE, TEAM_FULL_HINT, TEAM_FULL_LINK } from "../lib/copy";
+import {
+  TEAM_COMPLETE,
+  TEAM_FULL_HINT,
+  TEAM_FULL_LINK,
+  TEAM_TOGGLE_LABEL,
+} from "../lib/copy";
 import type { PokemonDetails } from "../lib/type";
 import { PopIcon } from "../ui/PopIcon";
 
@@ -41,8 +46,10 @@ export function TeamToggle({ action }: { action: TeamAction }) {
       //described by the hint even when the hint is drawn somewhere else
       aria-describedby={action.partyFull ? action.hintId : undefined}
     >
+      {/* same rule as FavoriteButton: the icon and pressed look show the
+          state, aria-pressed says it, the name stays "Team" */}
       <PopIcon popKey={action.popKey}>{action.onTeam ? "✅" : "+"}</PopIcon>{" "}
-      {action.onTeam ? "On Team" : "Add to Team"}
+      {TEAM_TOGGLE_LABEL}
     </Button>
   );
 }
