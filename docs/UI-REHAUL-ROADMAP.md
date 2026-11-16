@@ -839,6 +839,8 @@ D33 Fifth motion tier, Status Spinner and skeleton: allowed where loading happen
 
 | D35 | Announcing in-app page changes (SPA routing) | Option C: a skip link, first in the shell, takes focus on every PATH change (not query-only changes, not first load; Back/Forward included) and is named after the new page ("Your Team: skip to content"). Name read from document.title via pageNameFromTitle; focus moved one render after the name changes so screen readers read the new name. Based on the 2019 Gatsby × Fable Tech Labs user research. | R10 |
 
+| D36 | Toggle buttons: changing label vs fixed name (finding F3) | Fixed name ("Favorite", "Team", in copy.ts); state only in aria-pressed (heard) + icon and pressed style (seen). Decorative icons are aria-hidden (PopIcon, Compare, Featured). Page-level a11y test now fails on any emoji/arrow/symbol in an operable element's accessible name. | R10 |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |

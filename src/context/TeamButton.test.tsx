@@ -62,7 +62,7 @@ describe("TeamButton", () => {
     render(<TeamButton pokemon={pikachu} />);
     expect(screen.getByText("+")).not.toHaveAttribute("data-pop");
 
-    await user.click(screen.getByRole("button", { name: "+ Add to Team" }));
+    await user.click(screen.getByRole("button", { name: "Team" }));
 
     expect(screen.getByText("+")).toHaveAttribute("data-pop");
   });
@@ -73,12 +73,12 @@ describe("TeamButton", () => {
     const user = userEvent.setup();
     renderButton();
 
-    await user.click(screen.getByRole("button", { name: "+ Add to Team" }));
+    await user.click(screen.getByRole("button", { name: "Team" }));
 
     expect(screen.getByText("+")).not.toHaveAttribute("data-pop");
   });
 
-  it("shows 'Add to Team' and calls addToTeam when not on the team", async () => {
+  it("shows 'Team' and calls addToTeam when not on the team", async () => {
     vi.useRealTimers();
     const addToTeam = vi.fn();
     setTeam({ isOnTeam: () => false, addToTeam });
@@ -86,7 +86,7 @@ describe("TeamButton", () => {
 
     render(<TeamButton pokemon={pikachu} />);
 
-    const button = screen.getByRole("button", { name: "+ Add to Team" });
+    const button = screen.getByRole("button", { name: "Team" });
     expect(button).toHaveAttribute("aria-pressed", "false");
 
     await user.click(button);
@@ -157,7 +157,7 @@ describe("TeamButton", () => {
       setTeam({ team: makeMembers(MAX_TEAM) });
       renderButton();
       expect(
-        screen.getByRole("button", { name: "+ Add to Team" }),
+        screen.getByRole("button", { name: "Team" }),
       ).toHaveAccessibleDescription(/Your party is full/);
     });
 
@@ -175,9 +175,7 @@ describe("TeamButton", () => {
       renderButton();
 
       expect(screen.queryByText(/Your party is full/)).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: "✅ On Team" }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Team" })).toBeInTheDocument();
     });
 
     it("does not also show the raw reduce error since the hint already covers it", () => {
@@ -213,7 +211,7 @@ describe("TeamButton", () => {
       setTeam({ team: makeMembers(memberCount) });
       const user = userEvent.setup();
       const view = renderButton();
-      await user.click(screen.getByRole("button", { name: "+ Add to Team" }));
+      await user.click(screen.getByRole("button", { name: "Team" }));
       return view;
     }
 

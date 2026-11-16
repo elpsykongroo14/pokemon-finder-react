@@ -26,6 +26,35 @@ async function settled() {
   });
 }
 
+//R10 F3: an emoji or arrow inside a button or link becomes part of its
+//accessible name, so a screen reader reads it out ("crossed swords,
+//Compare"). axe does not flag this, so we check it ourselves: no
+//pictograph, arrow, geometric shape or dingbat in the name of anything
+//you can operate. decorative icons belong in an aria-hidden span
+const SYMBOL =
+  /[\p{Extended_Pictographic}\u2190-\u21FF\u25A0-\u25FF\u2700-\u27BF]/u;
+const OPERABLE = [
+  "button",
+  "link",
+  "tab",
+  "option",
+  "radio",
+  "checkbox",
+  "switch",
+  "menuitem",
+] as const;
+
+//the whole page check: axe's rules plus the name rule above
+async function expectAccessiblePage() {
+  expect(await runAxe(document.body)).toHaveNoViolations();
+  const offenders = OPERABLE.flatMap((role) =>
+    screen
+      .queryAllByRole(role, { name: SYMBOL })
+      .map((el) => `${role}: "${el.textContent?.trim()}"`),
+  );
+  expect(offenders).toEqual([]);
+}
+
 beforeEach(() => {
   installFakeApi();
   //api.ts caches responses in module scope; a cache left over from the
@@ -39,32 +68,32 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("accessibility: every page passes axe (WCAG 2.1 A + AA)", () => {
+describe("accessibility: every page passes axe (WCAG 2.1 A + AA) and has clean names", () => {
   it("Home, after the wild encounter has loaded", async () => {
     renderApp("/");
     await screen.findAllByText(/pikachu/i);
     await settled();
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("Pokémon page", async () => {
     renderApp("/pokemon/pikachu");
     await screen.findByRole("heading", { name: /pikachu/i });
     await settled();
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("Compare (Versus) with two Pokémon", async () => {
     renderApp("/compare?a=pikachu&b=raichu");
     await screen.findAllByText(/raichu/i);
     await settled();
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("Team (Party), empty", async () => {
     renderApp("/team");
     await settled();
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("Team (Party), with members", async () => {
@@ -88,14 +117,14 @@ describe("accessibility: every page passes axe (WCAG 2.1 A + AA)", () => {
     renderApp("/team");
     await screen.findAllByText(/raichu/i);
     await settled();
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it.each(["grid", "table", "binder"])("Library, %s view", async (view) => {
     renderApp(`/library/pikachu?view=${view}`);
     await screen.findAllByText(/test set|pikachu/i);
     await settled();
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("Library, card dialog open", async () => {
@@ -104,7 +133,7 @@ describe("accessibility: every page passes axe (WCAG 2.1 A + AA)", () => {
     const cards = await screen.findAllByRole("button", { name: /pikachu/i });
     await user.click(cards[0]);
     await screen.findByRole("dialog");
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("Settings dialog open", async () => {
@@ -113,19 +142,19 @@ describe("accessibility: every page passes axe (WCAG 2.1 A + AA)", () => {
     await screen.findByRole("heading", { name: /pikachu/i });
     await user.click(screen.getByRole("button", { name: "Settings" }));
     await screen.findByRole("dialog");
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("Pokémon page, network error (MessageBox + Retry)", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("offline")));
     renderApp("/pokemon/pikachu");
     await screen.findByRole("alert");
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 
   it("404", async () => {
     renderApp("/this/route/does/not/exist");
     await screen.findByRole("heading", { level: 2 });
-    expect(await runAxe(document.body)).toHaveNoViolations();
+    await expectAccessiblePage();
   });
 });

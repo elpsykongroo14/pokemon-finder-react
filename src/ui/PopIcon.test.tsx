@@ -15,6 +15,14 @@ describe("PopIcon", () => {
     expect(screen.getByText("❤️")).toHaveAttribute("data-pop");
   });
 
+  //F3: the icon decorates; the button's name and aria-pressed carry the
+  //meaning. without this, "✅" became part of the name: "check mark, Team"
+  it("is hidden from assistive technology", () => {
+    render(<PopIcon popKey={0}>❤️</PopIcon>);
+
+    expect(screen.getByText("❤️")).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("swaps in a brand new element each time the counter moves", () => {
     const { rerender } = render(<PopIcon popKey={1}>❤️</PopIcon>);
     const first = screen.getByText("❤️");

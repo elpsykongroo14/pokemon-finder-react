@@ -29,8 +29,23 @@ describe("FavoriteButton", () => {
     render(<FavoriteButton isFavorite={true} onToggle={() => {}} />);
 
     const button = screen.getByRole("button", { name: /favorite/i });
-    expect(button).toHaveTextContent("❤️ In Favorites");
+    expect(button).toHaveTextContent("❤️ Favorite");
     expect(button).toHaveAttribute("aria-pressed", "true");
+  });
+
+  //F3: the name changes and never includes the emoji: the state
+  //is aria-pressed (heard as "pressed") plus the icon and pressed look (seen)
+  it("is named exactly 'Favorite' in both states", () => {
+    const { rerender } = render(
+      <FavoriteButton isFavorite={false} onToggle={() => {}} />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Favorite" }),
+    ).toBeInTheDocument();
+    rerender(<FavoriteButton isFavorite={true} onToggle={() => {}} />);
+    expect(
+      screen.getByRole("button", { name: "Favorite" }),
+    ).toBeInTheDocument();
   });
 
   it("calls onToggle when clicked", async () => {

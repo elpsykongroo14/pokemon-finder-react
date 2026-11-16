@@ -92,7 +92,8 @@ export function LibraryPage() {
             to={{ pathname: "/library", search: searchForNewResults }}
             className="library-back"
           >
-            ← Featured
+            {/* the arrow is decoration; the name is "Featured" */}
+            <span aria-hidden="true">←</span> Featured
           </Link>
         }
       />

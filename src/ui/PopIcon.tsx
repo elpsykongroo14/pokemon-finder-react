@@ -17,6 +17,10 @@ export function PopIcon({ popKey, children }: PopIconProps) {
     <span
       key={popKey}
       className="pop-icon"
+      //decorative: the button's name and aria-pressed carry the meaning
+      //an emoji left visible to assistive tech becomes part of the name
+      //("check mark, Team"), so it is hidden from it
+      aria-hidden="true"
       //no pop on the very first render: a pokemon that is already a favorite
       //when the page opens did not just become one
       data-pop={popKey > 0 ? "" : undefined}

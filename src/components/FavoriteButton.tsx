@@ -5,7 +5,7 @@ import "./FavoriteButton.css";
 import { Button } from "../ui/Button";
 import { PopIcon } from "../ui/PopIcon";
 import type { FavoriteAction } from "../hooks/useFavoriteAction";
-import { FIRST_FAVORITE } from "../lib/copy";
+import { FAVORITE_TOGGLE_LABEL, FIRST_FAVORITE } from "../lib/copy";
 
 interface FavoriteButtonProps {
   isFavorite: boolean;
@@ -21,8 +21,11 @@ export function FavoriteButton({
 }: FavoriteButtonProps) {
   return (
     <Button variant="secondary" onClick={onToggle} pressed={isFavorite}>
+      {/* the heart and the pressed look SHOW the state; aria-pressed SAYS
+          it. the words never change (a toggle that changes both is heard
+          twice: "In Favorites, pressed") */}
       <PopIcon popKey={popKey}>{isFavorite ? "❤️" : "🤍"}</PopIcon>{" "}
-      {isFavorite ? "In Favorites" : "Favorite"}
+      {FAVORITE_TOGGLE_LABEL}
     </Button>
   );
 }

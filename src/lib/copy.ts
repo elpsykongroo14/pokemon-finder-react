@@ -23,6 +23,11 @@ export function cardDialogLabel(name: string): string {
 }
 
 export const RETRY_LABEL = "Retry";
+
+//toggle buttons keep ONE name; their state is aria-pressed
+export const FAVORITE_TOGGLE_LABEL = "Favorite";
+export const TEAM_TOGGLE_LABEL = "Team";
+
 export const MENU_PROMPT = "What will you do?";
 
 //compare page: the empty state invites, the self compare error says what to do
