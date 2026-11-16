@@ -31,3 +31,6 @@ dist-ssr
 
 # private moodboard (game screenshots): never commit
 docs/ui-references/
+
+# bundle map from `npm run analyze` (generated, never committed)
+stats.html
