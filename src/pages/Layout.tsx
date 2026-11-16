@@ -9,6 +9,7 @@ import { Backdrop } from "../components/Backdrop";
 import { SettingsButton } from "../components/SettingsButton";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 import { AppFooter } from "../components/AppFooter";
+import { MAIN_CONTENT_ID, SkipLink } from "../components/SkipLink";
 
 export function Layout() {
   const navigate = useViewTransitionNavigate();
@@ -24,6 +25,8 @@ export function Layout() {
 
   return (
     <div className="app-shell">
+      {/* first in the page, so it is the first Tab stop */}
+      <SkipLink />
       <Backdrop />
       <header className="app-header">
         <h1 className="app-title">
@@ -41,7 +44,8 @@ export function Layout() {
         </div>
       </header>
 
-      <main className="app-main">
+      {/* tabIndex -1: focusable by the skip link, but not a Tab stop */}
+      <main className="app-main" id={MAIN_CONTENT_ID} tabIndex={-1}>
         <Outlet />
         {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and tray around it persist across every navigation; only this slot swaps.*/}
       </main>

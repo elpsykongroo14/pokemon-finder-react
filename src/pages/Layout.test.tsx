@@ -142,6 +142,8 @@ describe("Layout", () => {
     renderLayout("/");
 
     await user.tab();
+    expect(screen.getByRole("link", { name: "Skip to content" })).toHaveFocus();
+    await user.tab();
     expect(screen.getByRole("link", { name: "Home" })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole("link", { name: "Compare" })).toHaveFocus();

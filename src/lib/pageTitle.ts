@@ -9,3 +9,12 @@ export const APP_NAME = "Pokémon Finder";
 export function pageTitle(page?: string): string {
   return page ? `${page} · ${APP_NAME}` : APP_NAME;
 }
+
+//the reverse: turns a document title back into the page's name, for the
+//skip link that announces page changes. Home's title is the bare app name,
+//which as a page name would say nothing, so Home is called "Home"
+export function pageNameFromTitle(title: string): string {
+  const suffix = ` · ${APP_NAME}`;
+  if (title === APP_NAME || title === "") return "Home";
+  return title.endsWith(suffix) ? title.slice(0, -suffix.length) : title;
+}
