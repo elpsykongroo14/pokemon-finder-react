@@ -837,6 +837,8 @@ D33 Fifth motion tier, Status Spinner and skeleton: allowed where loading happen
 
 | D34 | Accessibility checks: vitest-axe vs axe-core + own matcher | axe-core 4.14.0 (exact pin) + ~60-line matcher in src/a11y/axe.ts. vitest-axe works on Vitest 4 but its single 0.1.0 release types the old `Vi` namespace, so the glue is ours either way. color-contrast disabled in jsdom (no layout); checked in a real browser instead. | R10 |
 
+| D35 | Announcing in-app page changes (SPA routing) | Option C: a skip link, first in the shell, takes focus on every PATH change (not query-only changes, not first load; Back/Forward included) and is named after the new page ("Your Team: skip to content"). Name read from document.title via pageNameFromTitle; focus moved one render after the name changes so screen readers read the new name. Based on the 2019 Gatsby × Fable Tech Labs user research. | R10 |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
