@@ -841,6 +841,8 @@ D33 Fifth motion tier, Status Spinner and skeleton: allowed where loading happen
 
 | D36 | Toggle buttons: changing label vs fixed name (finding F3) | Fixed name ("Favorite", "Team", in copy.ts); state only in aria-pressed (heard) + icon and pressed style (seen). Decorative icons are aria-hidden (PopIcon, Compare, Featured). Page-level a11y test now fails on any emoji/arrow/symbol in an operable element's accessible name. | R10 |
 
+| D39 | End-to-end test scope and boundary | Playwright, Chromium only, 4 journeys (search + not-found, team persistence, library view + dialog, outage + retry) against `vite preview` of the production build. Everything outside localhost is intercepted: the shared fake back end (src/testing/fakeBackend.ts) answers known APIs, images get a 1×1 PNG, unknown hosts are blocked and fail the test (fail closed). CI: separate job in parallel with `test`, 1 worker, 1 retry (flaky = visible), no browser cache, report uploaded even on failure. | R10 |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
