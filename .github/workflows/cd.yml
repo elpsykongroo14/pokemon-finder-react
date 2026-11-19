@@ -28,8 +28,9 @@ jobs:
       - name: Build
         env:
           # VITE_TCG_PROXY gets baked into the built JS at this step
-          # (Vite substitutes it at build time, not runtime — must be a repo secret)
-          VITE_TCG_PROXY: ${{ secrets.VITE_TCG_PROXY }}
+          # (Vite substitutes it at build time, not runtime). A repository
+          # variable, not a secret: the URL ends up public in the bundle anyway
+          VITE_TCG_PROXY: ${{ vars.VITE_TCG_PROXY }}
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
