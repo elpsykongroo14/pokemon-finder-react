@@ -47,15 +47,17 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 
   //Playwright starts the server itself and waits until the URL answers.
-  //`build` + `preview` = the production bundle, not the dev server: we test
-  //what we ship. VITE_TCG_PROXY is a fake address the tests intercept
-  //(Vite bakes VITE_* variables in at BUILD time, so it must be set here)
+  //it only SERVES dist/ (`vite preview` = the production bundle, not the dev
+  //server: we test what we ship). building is the caller's job:
+  //  locally: `npm run test:e2e` builds first, then runs these tests
+  //  on CI: the workflow provides dist/ and runs `npx playwright test`
+  //the bundle may contain the real proxy address: the network fixture
+  //intercepts every non-localhost request, so nothing real is ever called
   webServer: {
-    command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
+    command: `npm run preview -- --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
-    env: { VITE_TCG_PROXY: "https://tcg-proxy.e2e.test" },
-    //locally, reuse a server you already started; CI always builds fresh
+    //locally, reuse a server you already started; CI always starts fresh
     reuseExistingServer: !CI,
-    timeout: 120_000,
+    timeout: 60_000,
   },
 });
