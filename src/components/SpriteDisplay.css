@@ -1,0 +1,34 @@
+@layer features {
+  .sprite-stage {
+    width: var(--sprite-size, 180px);
+    height: var(--sprite-size, 180px);
+    border-radius: var(--radius-pill);
+    background: var(--surface-well);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sprite-stage[data-plain="true"] {
+    background: none;
+    border-radius: 0;
+    align-items: flex-end;
+  }
+
+  .sprite-display[data-kind="artwork"] {
+    max-width: calc(var(--sprite-size, 180px) * 0.78);
+    max-height: calc(var(--sprite-size, 180px) * 0.78);
+  }
+
+  .sprite-display[data-kind="pixel"],
+  .sprite-display[data-kind="animated"] {
+    image-rendering: pixelated;
+  }
+
+  .sprite-placeholder {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    text-align: center;
+    padding: 0 var(--space-4);
+  }
+}

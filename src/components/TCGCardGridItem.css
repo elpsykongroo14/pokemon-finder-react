@@ -1,0 +1,78 @@
+@layer features {
+  .tcg-card {
+    /* a <button> arrives with browser styling; reset it so the card keeps its look */
+    display: block;
+    width: 100%;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: var(--surface-chrome);
+    border: 1px solid var(--tier-color, var(--border-hairline));
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease-standard),
+      transform var(--dur-fast) var(--ease-standard);
+  }
+
+  /* --tier-color is set once, for every view, in styles/rarity-tiers.css;
+        this file only READS it, with a quiet fallback for common cards.
+        the shine itself lives in styles/holo.css, shared with the card dialog */
+
+  .tcg-card-img-wrap {
+    aspect-ratio: 5 / 7;
+    background: var(--surface-well);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+  }
+
+  .tcg-card-info {
+    padding: var(--space-2) var(--space-3) var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .tcg-card-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  .tcg-card-set,
+  .tcg-card-rarity {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+  }
+
+  .tcg-card-rarity {
+    color: var(--tier-color, var(--text-secondary));
+  }
+
+  .tcg-card:focus-visible {
+    outline: var(--border-width-line) solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* hover effects only for a real mouse. on a touch screen a tap leaves
+     :hover "stuck" on, so the lift and tilt stay out of it.
+     will-change is set on the ONE hovered card, never on the whole grid */
+  @media (hover: hover) and (pointer: fine) {
+    .tcg-card:hover {
+      border-color: var(--tier-color, var(--border-hairline));
+      transform: perspective(600px) translateY(-2px) rotateX(var(--rx, 0deg))
+        rotateY(var(--ry, 0deg));
+      will-change: transform;
+    }
+  }
+
+  .tcg-card-img-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}

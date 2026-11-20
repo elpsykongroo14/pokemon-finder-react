@@ -1,0 +1,9 @@
+:root {
+  transition:
+    --theme-accent var(--dur-slow) var(--ease-standard),
+    --theme-accent-deep var(--dur-slow) var(--ease-standard),
+    --theme-accent-soft var(--dur-slow) var(--ease-standard),
+    --theme-accent-ink var(--dur-slow) var(--ease-standard),
+    --theme-accent-2 var(--dur-slow) var(--ease-standard),
+    --theme-accent-2-deep var(--dur-slow) var(--ease-standard);
+}

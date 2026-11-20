@@ -9,6 +9,18 @@ export const STAT_ORDER = [
   "special-defense",
 ] as const;
 
+//the highest base stat any pokemon can have in a single stat, so every
+//stat bar in the app is measured against the same ruler
+export const MAX_BASE_STAT = 255;
+
+//how full a bat should be as a number from 0 to 100
+//clamped, so a bad input can never draw a bar outside its track
+//and a max of 0 returns 0 instead of dividing by zero
+export function percentOf(value: number, max: number): number {
+  if (max <= 0) return 0;
+  return Math.min(100, Math.max(0, (value / max) * 100));
+}
+
 export const STAT_LABELS: Record<string, string> = {
   hp: "HP",
   attack: "Attack",

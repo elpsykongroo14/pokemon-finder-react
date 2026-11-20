@@ -1,13 +1,14 @@
-import { StatBar } from "./StatBar";
+import "./StatBarChart.css";
+import { StatMeter } from "../ui/StatMeter";
 import type { PokemonStat } from "../lib/type";
-import { STAT_LABELS, getOrderedStats } from "../lib/stats";
-
-const MAX_STAT = 255;
+import { STAT_LABELS, MAX_BASE_STAT, getOrderedStats } from "../lib/stats";
 
 interface StatBarChartProps {
   stats: PokemonStat[];
 }
 
+//decides which stats to show in what order, and which one stands out
+//drawing a single bar is StatMeter's job.
 export function StatBarChart({ stats }: StatBarChartProps) {
   const orderedStats = getOrderedStats(stats);
 
@@ -15,13 +16,14 @@ export function StatBarChart({ stats }: StatBarChartProps) {
 
   return (
     <div className="stat-bar-chart">
-      {orderedStats.map((stat) => (
-        <StatBar
+      {orderedStats.map((stat, index) => (
+        <StatMeter
           key={stat.stat.name}
           label={STAT_LABELS[stat.stat.name] ?? stat.stat.name}
           value={stat.base_stat}
-          maxValue={MAX_STAT}
-          isHighest={stat.base_stat === highestValue}
+          max={MAX_BASE_STAT}
+          variant={stat.base_stat === highestValue ? "highest" : "default"}
+          index={index}
         />
       ))}
     </div>

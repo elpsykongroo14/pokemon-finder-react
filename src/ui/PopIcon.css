@@ -1,0 +1,21 @@
+/* A quick, springy swell: the icon answers the click. Only when the app's
+   resolved motion answer is "on"; otherwise the icon just changes. */
+@layer features {
+  .pop-icon {
+    display: inline-block;
+  }
+
+  :root[data-motion="on"] .pop-icon[data-pop] {
+    animation: pop-icon var(--dur-base) var(--ease-snap);
+  }
+
+  @keyframes pop-icon {
+    from {
+      transform: scale(0.4);
+    }
+
+    60% {
+      transform: scale(1.35);
+    }
+  }
+}

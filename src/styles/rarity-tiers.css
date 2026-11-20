@@ -1,0 +1,18 @@
+/* src/styles/rarity-tiers.css
+   The ONE place a rarity tier is turned into a color. Any element that
+   carries data-rarity="rare|holo|ultra" gets --tier-color, and each view
+   (grid card, table row, later binder and modal) just READS that variable.
+   "common" sets nothing on purpose: it falls back to the quiet defaults. */
+@layer features {
+  [data-rarity="rare"] {
+    --tier-color: var(--rarity-rare);
+  }
+
+  [data-rarity="holo"] {
+    --tier-color: var(--rarity-holo);
+  }
+
+  [data-rarity="ultra"] {
+    --tier-color: var(--rarity-ultra);
+  }
+}

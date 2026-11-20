@@ -1,7 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { PreferencesProvider } from "../context/PreferencesContext";
 import { StatBarChart } from "./StatBarChart";
 import type { PokemonStat } from "../lib/type";
+
+//StatMeter reads preferences, so the chart needs the provider
+function renderChart(stats: PokemonStat[]) {
+  return render(
+    <PreferencesProvider>
+      <StatBarChart stats={stats} />
+    </PreferencesProvider>,
+  );
+}
 
 function makeStat(name: string, base_stat: number): PokemonStat {
   return { base_stat, effort: 0, stat: { name, url: "" } };
@@ -18,7 +28,7 @@ describe("StatBarChart", () => {
       makeStat("special-attack", 50),
     ];
 
-    render(<StatBarChart stats={stats} />);
+    renderChart(stats);
 
     const labels = screen.getAllByText(
       /^(HP|Attack|Defense|Speed|Sp\. Atk|Sp\. Def)$/,
@@ -33,6 +43,19 @@ describe("StatBarChart", () => {
     ]);
   });
 
+  it("exposes every stat as a meter with its value", () => {
+    renderChart([makeStat("hp", 35), makeStat("attack", 90)]);
+
+    expect(screen.getByRole("meter", { name: "HP" })).toHaveAttribute(
+      "aria-valuenow",
+      "35",
+    );
+    expect(screen.getByRole("meter", { name: "Attack" })).toHaveAttribute(
+      "aria-valuenow",
+      "90",
+    );
+  });
+
   it("marks the single highest stat", () => {
     const stats = [
       makeStat("hp", 35),
@@ -40,10 +63,10 @@ describe("StatBarChart", () => {
       makeStat("defense", 40),
     ];
 
-    const { container } = render(<StatBarChart stats={stats} />);
+    const { container } = renderChart(stats);
 
-    const rows = container.querySelectorAll(".stat-row");
-    const highest = container.querySelectorAll(".stat-row--highest");
+    const rows = container.querySelectorAll(".stat-meter");
+    const highest = container.querySelectorAll('[data-variant="highest"]');
     expect(highest).toHaveLength(1);
     expect(highest[0]).toHaveTextContent("Attack");
     expect(rows).toHaveLength(3);
@@ -56,9 +79,11 @@ describe("StatBarChart", () => {
       makeStat("defense", 40),
     ];
 
-    const { container } = render(<StatBarChart stats={stats} />);
+    const { container } = renderChart(stats);
 
-    expect(container.querySelectorAll(".stat-row--highest")).toHaveLength(2);
+    expect(container.querySelectorAll('[data-variant="highest"]')).toHaveLength(
+      2,
+    );
   });
 });
 

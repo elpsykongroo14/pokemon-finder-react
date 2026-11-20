@@ -1,0 +1,21 @@
+@layer features {
+  .favorite-first {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--text-primary);
+    font-family: var(--font-display);
+  }
+
+  :root[data-motion="on"] .favorite-first {
+    animation: favorite-first-in var(--dur-epic) var(--ease-bounce) backwards;
+  }
+
+  @keyframes favorite-first-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--space-2));
+    }
+  }
+}

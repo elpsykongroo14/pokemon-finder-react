@@ -1,0 +1,165 @@
+/* App shell: header / main / tray.
+
+   Breakpoints (mobile-first, min-width only):
+     768px  tablet   header becomes two rows
+     1024px desktop  header becomes one row
+   CSS cannot read var() inside @media, so these two numbers live
+   here as literals. Decision D15 in the roadmap records why. */
+
+@layer features {
+  .app-shell {
+    --shell-max-width: 80rem;
+    --shell-gutter: var(--space-4);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas:
+      "header"
+      "main"
+      "tray"
+      "footer";
+    min-height: 100svh;
+    max-width: var(--shell-max-width);
+    margin-inline: auto;
+  }
+
+  /* Header */
+  /* Every header child is placed by name. Phone: title and gear share the
+     first row, nav and search get a full row each. */
+  .app-header {
+    grid-area: header;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "title settings"
+      "nav nav"
+      "search search";
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--shell-gutter);
+    background: var(--surface-chrome);
+    border-bottom: var(--border-width-line) solid var(--border-hairline);
+  }
+
+  .app-title {
+    grid-area: title;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .main-nav {
+    grid-area: nav;
+  }
+
+  .app-search {
+    grid-area: search;
+  }
+
+  .app-settings {
+    grid-area: settings;
+    justify-self: end;
+  }
+
+  /* Main and tray */
+  .app-main {
+    grid-area: main;
+    min-width: 0;
+    padding: var(--space-5) var(--shell-gutter);
+    view-transition-name: page;
+  }
+
+  .app-tray {
+    grid-area: tray;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--shell-gutter);
+    background: var(--surface-chrome);
+    border-top: var(--border-width-line) solid var(--border-hairline);
+  }
+
+  /* The favorites strip takes whatever room the party counter leaves.
+     min-width: 0 lets it shrink so its own list can scroll sideways. */
+  .app-tray__favorites {
+    flex: 1;
+    min-width: 0;
+  }
+
+  @media (min-width: 768px) {
+    .app-shell {
+      --shell-gutter: var(--space-5);
+    }
+
+    .app-header {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        "title nav settings"
+        "search search search";
+    }
+
+    .main-nav {
+      justify-self: end;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .app-shell {
+      --shell-gutter: var(--space-6);
+    }
+
+    .app-header {
+      grid-template-columns: auto minmax(0, 1fr) minmax(16rem, 24rem) auto;
+      grid-template-areas: "title nav search settings";
+    }
+
+    .main-nav {
+      justify-self: center;
+    }
+  }
+
+  /* The one orchestrated page-load moment (R9). Like a DS powering on:
+     the top bar drops in, the page rises into place, then the tray slides
+     up from the bottom, each a beat after the last.
+
+     - plays once per page load: Layout mounts once, and route changes swap
+       only the <Outlet />, so navigating never replays it
+     - Transition tier, motion tokens only: motion.css sets them to 0ms when
+       animations are off, which removes the intro with no extra rule
+     - total = 2 x --dur-instant (stagger) + --dur-slow = 580ms, inside the
+       --dur-epic ceiling
+     - animates header/main/tray only, never .app-shell itself: a transform
+       there would become the reference box for the fixed Backdrop and toast */
+  .app-header {
+    animation: shell-drop var(--dur-slow) var(--ease-standard) backwards;
+  }
+
+  .app-main {
+    animation: shell-rise var(--dur-slow) var(--ease-standard) backwards;
+    animation-delay: var(--dur-instant);
+  }
+
+  .app-tray {
+    animation: shell-rise var(--dur-slow) var(--ease-standard) backwards;
+    animation-delay: calc(2 * var(--dur-instant));
+  }
+
+  @keyframes shell-drop {
+    from {
+      opacity: 0;
+      transform: translateY(calc(-1 * var(--space-3)));
+    }
+  }
+
+  @keyframes shell-rise {
+    from {
+      opacity: 0;
+      transform: translateY(var(--space-3));
+    }
+  }
+}

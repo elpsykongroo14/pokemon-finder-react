@@ -1,0 +1,19 @@
+@layer features {
+  .menu-item {
+    height: var(--menu-item-height, 40px);
+    display: flex;
+    align-items: center;
+    padding-inline-start: var(--space-6);
+    background: transparent;
+    border: none;
+    font: inherit;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .menu-item:focus-visible {
+    outline: var(--border-width-line) solid var(--focus-ring);
+    outline-offset: -2px;
+  }
+}

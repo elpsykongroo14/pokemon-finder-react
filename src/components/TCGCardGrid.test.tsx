@@ -3,13 +3,14 @@ import { render, screen } from "@testing-library/react";
 import { TCGCardGrid } from "./TCGCardGrid";
 import userEvent from "@testing-library/user-event";
 import type { TCGCard } from "../lib/type";
+import { CARDS_LOADING_LABEL } from "../lib/copy";
 
 function makeCard(id: string, name: string): TCGCard {
   return { id, name };
 }
 
 describe("TCGCardGrid", () => {
-  it("shows a loading message while status is loading", () => {
+  it("shows a loading status, and no cards, while status is loading ", () => {
     render(
       <TCGCardGrid
         cards={[]}
@@ -20,7 +21,11 @@ describe("TCGCardGrid", () => {
       />,
     );
 
-    expect(screen.getByText("Loading cards...")).toBeInTheDocument();
+    expect(
+      screen.getByRole("status", { name: CARDS_LOADING_LABEL }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("shows the empty message when statu is empty", () => {
@@ -52,7 +57,7 @@ describe("TCGCardGrid", () => {
 
     expect(screen.getByText("Charizard")).toBeInTheDocument();
     expect(screen.getByText("Blastoise")).toBeInTheDocument();
-    expect(screen.getAllByAltText(/Charizard|Blastoise/)).toHaveLength(2);
+    expect(screen.getAllByRole("button")).toHaveLength(2);
   });
 
   it("passes the onSelect callback through to each card so selection still works", async () => {
@@ -70,9 +75,7 @@ describe("TCGCardGrid", () => {
       />,
     );
 
-    const cardEl = screen.getByAltText("Charizard").closest(".tcg-card");
-    if (!cardEl) throw new Error("card element not found");
-    await user.click(cardEl);
+    await user.click(screen.getByRole("button", { name: /Charizard/ }));
 
     expect(handleSelect).toHaveBeenCalledWith(cards[0]);
   });

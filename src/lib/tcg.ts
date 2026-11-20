@@ -6,6 +6,9 @@ import type { TCGCard } from "./type";
 
 export type SortMode = "newest" | "oldest" | "rarity";
 
+//the four visual tiers a card can earn. "common" is the baseline: no effect.
+export type RarityTier = "common" | "rare" | "holo" | "ultra";
+
 //fisher yates shuffle, unchanged from tcglibrary.ts copies before
 //mutating so callers never have their input array altered under them
 export function shuffleArray<T>(arr: T[]): T[] {
@@ -39,6 +42,18 @@ const RARITY_RANK: Record<string, number> = {
   Common: 0,
 };
 
+export function getRarityRank(rarity?: string): number {
+  return RARITY_RANK[rarity ?? ""] ?? 0;
+}
+
+export function getRarityTier(rarity?: string): RarityTier {
+  const rank = getRarityRank(rarity);
+  if (rank >= 6) return "ultra";
+  if (rank >= 3) return "holo";
+  if (rank >= 2) return "rare";
+  return "common";
+}
+
 //returns a new sorted array, never mutates `cards`. This mirrors the derived state lesson from Compare Mode
 //sorting is something we CALCULATE from state on demand, never something we store as its own piece of state.
 //two sources of truth (raw cards + sorted cards) is exactly the class of bug that caused the stale-highlight fix
@@ -54,10 +69,7 @@ export function sortTCGCards(cards: TCGCard[], sortMode: SortMode): TCGCard[] {
       (a.set?.releaseDate ?? "").localeCompare(b.set?.releaseDate ?? ""),
     );
   } else {
-    sorted.sort(
-      (a, b) =>
-        (RARITY_RANK[b.rarity ?? ""] ?? 0) - (RARITY_RANK[a.rarity ?? ""] ?? 0),
-    );
+    sorted.sort((a, b) => getRarityRank(b.rarity) - getRarityRank(a.rarity));
   }
   return sorted;
 }

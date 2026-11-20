@@ -1,0 +1,35 @@
+@layer features {
+  /* hidden until the keyboard reaches it. :focus-visible, not :focus:
+     after a MOUSE click on a nav link the browser still moves focus here,
+     but does not count it as keyboard focus, so mouse users never see the
+     pill while screen readers still read it */
+  .skip-link {
+    position: fixed;
+    top: var(--space-3);
+    left: var(--space-3);
+    z-index: 100;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--accent-select);
+    color: var(--surface-frame);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    box-shadow: var(--shadow-raised);
+  }
+
+  .skip-link:not(:focus-visible) {
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* <main> is a landing spot for the skip link, not a control: no ring
+     (same convention as .pokemon-page and .home-stage) */
+  .app-main:focus {
+    outline: none;
+  }
+}

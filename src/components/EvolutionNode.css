@@ -1,0 +1,69 @@
+@layer features {
+  .evolution-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    min-width: 72px;
+  }
+
+  .evolution-branch-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .evolution-branch-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .evolution-arrow {
+    width: 24px;
+    height: 1px;
+    background: var(--border-hairline);
+    position: relative;
+    flex-shrink: 0;
+    /* the arrow is revealed left to right, deeper levels a beat later.
+       Duration and delay come from motion tokens, which are 0ms when
+       animations are off, so there is no separate reduced-motion rule. */
+    animation: evolution-draw var(--dur-base) var(--ease-standard) both;
+    animation-delay: calc(var(--evo-depth, 0) * var(--dur-base));
+  }
+
+  @keyframes evolution-draw {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+  }
+
+  /* narrow screens: stack the chain top to bottom instead of scrolling sideways */
+  @media (max-width: 480px) {
+    .evolution-branch-row {
+      flex-direction: column;
+    }
+
+    .evolution-arrow {
+      width: 1px;
+      height: 24px;
+      animation-name: evolution-draw-down;
+    }
+
+    .evolution-arrow::after {
+      right: auto;
+      left: 50%;
+      top: auto;
+      bottom: 0;
+      transform: translateX(-50%);
+      border-color: transparent;
+      border-top-color: var(--border-hairline);
+    }
+  }
+
+  @keyframes evolution-draw-down {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+}

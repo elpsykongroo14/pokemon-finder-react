@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TCGCardModal } from "./TCGCardModal";
 import type { TCGCard } from "../lib/type";
@@ -91,6 +91,120 @@ describe("TCGCardModal", () => {
     await user.click(screen.getByRole("button", { name: "Close" }));
 
     expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("TCGCardModal as dialog", () => {
+  it("is a dialog named after the card", () => {
+    render(<TCGCardModal card={makeCard()} onClose={() => {}} />);
+
+    expect(
+      screen.getByRole("dialog", { name: "Charizard card details" }),
+    ).toBeInTheDocument();
+  });
+
+  it("closes on Escape", async () => {
+    const user = userEvent.setup();
+    const handleClose = vi.fn();
+    render(<TCGCardModal card={makeCard()} onClose={handleClose} />);
+    await user.keyboard("{Escape}");
+
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("zooms in and out with the card button, and says which state it is in", async () => {
+    const user = userEvent.setup();
+    render(<TCGCardModal card={makeCard()} onClose={() => {}} />);
+    const zoom = screen.getByRole("button", { name: "Zoom card" });
+
+    expect(zoom).toHaveAttribute("aria-pressed", "false");
+    await user.click(zoom);
+    expect(zoom).toHaveAttribute("aria-pressed", "true");
+    await user.click(zoom);
+    expect(zoom).toHaveAttribute("aria-pressed", "false");
+  });
+});
+
+describe("TCGCardModal chips", () => {
+  it("shows the set and the rarity as chips, the rarity carrying its tier", () => {
+    render(
+      <TCGCardModal
+        card={makeCard({ set: { name: "Base Set" }, rarity: "Rare Holo" })}
+        onClose={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Base Set")).not.toHaveAttribute("data-rarity");
+    expect(screen.getByText("Rare Holo")).toHaveAttribute(
+      "data-rarity",
+      "holo",
+    );
+  });
+
+  it("does not repeat the set and rarity as rows under the chips", () => {
+    render(
+      <TCGCardModal
+        card={makeCard({
+          set: { name: "Base Set" },
+          rarity: "Rare Holo",
+          artist: "Mitsuhiro Arita",
+        })}
+        onClose={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Artist")).toBeInTheDocument();
+    expect(screen.queryByText("Set")).not.toBeInTheDocument();
+    expect(screen.queryByText("Rarity")).not.toBeInTheDocument();
+  });
+
+  it("shows no chip for a fact the card does not have", () => {
+    render(<TCGCardModal card={makeCard()} onClose={() => {}} />);
+
+    expect(document.querySelector(".card-chip")).toBeNull();
+  });
+});
+
+describe("TCGCardModal holo tilt", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function renderTilting(rarity: string) {
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+    render(<TCGCardModal card={makeCard({ rarity })} onClose={() => {}} />);
+    const stage = screen.getByRole("button", { name: "Zoom card" });
+    stage.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 200, height: 100 }) as DOMRect;
+    return stage;
+  }
+
+  it("a holo card tilts toward the mouse", () => {
+    const stage = renderTilting("Rare Holo");
+
+    fireEvent.pointerMove(stage, {
+      clientX: 150,
+      clientY: 25,
+      pointerType: "mouse",
+    });
+
+    expect(stage.style.getPropertyValue("--ry")).toBe("4deg");
+  });
+
+  it("a common card does not tilt", () => {
+    const stage = renderTilting("Common");
+
+    fireEvent.pointerMove(stage, {
+      clientX: 150,
+      clientY: 25,
+      pointerType: "mouse",
+    });
+
+    expect(stage.style.getPropertyValue("--ry")).toBe("");
   });
 });
 

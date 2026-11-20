@@ -1,0 +1,100 @@
+@layer features {
+  .card-modal-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+  }
+
+  /* the image is a real button: click or Enter/Space toggles the zoom.
+     reset the browser's button look so only the card shows */
+  .card-modal-stage {
+    flex-shrink: 0;
+    width: 220px;
+    padding: 0;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    cursor: zoom-in;
+    transition: transform var(--dur-fast) var(--ease-standard);
+  }
+
+  .card-modal-body[data-zoomed="true"] .card-modal-stage {
+    width: min(100%, 420px);
+    margin-inline: auto;
+    cursor: zoom-out;
+  }
+
+  .card-modal-art {
+    display: block;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .card-modal-art img {
+    display: block;
+    width: 100%;
+  }
+
+  /* tilt follows the mouse (--rx / --ry from useHoloPointer); real mouse only.
+     will-change lives on the one hovered image, never at rest */
+  @media (hover: hover) and (pointer: fine) {
+    .card-modal-stage:hover {
+      transform: perspective(800px) rotateX(var(--rx, 0deg))
+        rotateY(var(--ry, 0deg));
+      will-change: transform;
+    }
+  }
+
+  .card-modal-info {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  /* this content sits on the Dialog's light panel; --text-* re-binds there.
+     The explicit color predates the alias removal and is kept as-is. */
+  .card-modal-name {
+    margin-bottom: var(--space-3);
+    color: var(--text-primary);
+  }
+
+  .card-modal-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .card-modal-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    padding: var(--space-1) 0;
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .meta-row:last-child {
+    border-bottom: none;
+  }
+
+  .meta-label {
+    color: var(--text-secondary);
+  }
+
+  .meta-value {
+    color: var(--text-primary);
+    text-align: right;
+  }
+
+  .card-modal-flavor {
+    margin-top: var(--space-3);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+}

@@ -1,0 +1,145 @@
+@layer features {
+  .search-bar-wrapper {
+    position: relative;
+  }
+
+  .search-bar-wrapper form {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .search-bar-wrapper input {
+    flex: 1;
+    /* a flex item never shrinks below its content size by default, and an
+       input's "content size" is its built-in width (~20 characters). at
+       320px that pushed the Search button 18px off screen (WCAG 1.4.10) */
+    min-width: 0;
+    background: var(--surface-well);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-4);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: var(--text-sm);
+  }
+
+  .search-bar-wrapper input::placeholder {
+    color: var(--text-secondary);
+  }
+
+  .search-bar-wrapper input:focus {
+    outline: none;
+    border-color: var(--focus-ring);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 25%, transparent);
+  }
+
+  .search-bar-wrapper button {
+    background: var(--accent-select);
+    color: var(--surface-frame);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: var(--space-2) var(--space-5);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter var(--dur-fast) var(--ease-standard);
+  }
+
+  .search-bar-wrapper button:hover {
+    filter: brightness(1.08);
+  }
+
+  /* Design idea: the dropdown reads like a page of the Pokédex index.
+     The preview strip on top is the "selected entry" (big sprite, name,
+     number); each row below is a number plus a name, and the highlighted
+     row gets the ▶ cursor, so keyboard position is visible without color alone. */
+  .autocomplete-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: var(--surface-chrome);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-1);
+    overflow: hidden;
+  }
+
+  .autocomplete-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-well);
+    border-bottom: 1px solid var(--border-hairline);
+  }
+
+  .autocomplete-preview img {
+    width: 48px;
+    height: 48px;
+    image-rendering: pixelated;
+  }
+
+  .autocomplete-preview-name {
+    color: var(--text-primary);
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+
+  .autocomplete-preview-id {
+    color: var(--text-secondary);
+    margin-left: auto;
+    font-size: var(--text-sm);
+    letter-spacing: 0.08em;
+  }
+
+  .autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    list-style: none;
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+
+  .autocomplete-item__cursor {
+    width: 1ch;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition:
+      opacity var(--dur-fast) var(--ease-standard),
+      transform var(--dur-fast) var(--ease-standard);
+  }
+
+  .autocomplete-item__id {
+    min-width: 4.5ch;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+  }
+
+  .autocomplete-item__name {
+    text-transform: capitalize;
+  }
+
+  .autocomplete-item--active {
+    background: var(--surface-well);
+    color: var(--focus-ring);
+  }
+
+  .autocomplete-item--active .autocomplete-item__cursor {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .autocomplete-item__cursor {
+      transition: none;
+      transform: none;
+    }
+  }
+}

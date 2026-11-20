@@ -175,3 +175,69 @@ then Layout.test.tsx the SearchBar is trusted but not cheap (real fetch via useA
 09-17-2026: follow up reminder
 
 after finishing the testing pass and moving onto builiding the CI/CD parity for the react app discovered tcg-proxy (the live Worker) is missing the TCG_CACHE/TCG_RATE_LIMITER bindings that exist on the orphaned pokemon-finder Worker instead — wrangler.jsonc deploys apparently targeted the wrong Worker name at some point. Needs a follow-up: fix tcg-proxy/'s config so one file, one name, and redeploy with bindings attached to the right Worker
+
+09-21-2026: UI rehaul, R0 baseline & ground rules
+
+Hygiene fixes shipped to main: TypeBadge fallback typo, /Library → /library
+(with its test), stray <Route />, MAX_STAT 225 → 255.
+
+CI now runs on ui/rehaul, includes a build step, and deploys a preview.
+Audited which tests depend on class names (the "class contract", see roadmap 8.3).
+
+10-09-2026: UI rehaul, app shell, navigation & theme engine
+
+Token cutover finished: colors, shadows, durations and fonts moved to the new system; tokens.css retired; aliases remain until R5-R8. Decisions: border-default points at border-hairline for legacy components; sunken uses a new surface-well role; font-mono split into display and body.
+Added the type-reactive Backdrop (diagonal for dual types, tint capped at 22% so text stays above 4.5:1), secondary theme variables, and @property-based fades.
+Route transitions: React Router’s viewTransition option does nothing under BrowserRouter, so navigation goes through useViewTransitionNavigate (main nav and search only).
+Fixed: a new visitor’s animation default now follows the OS reduced-motion setting.
+Known, owned by R5: stat bars not visible, unstyled Compare button and View Cards link, danger red at 4.19:1 on cards.
+
+10-14-2026: UI rehaul Pokemon page
+
+Built the sprite pipeline: resolveSprite returns { url, kind } through a mode-aware fallback chain (animated Gen V → static pixel → artwork), with an animate switch that swaps GIFs for stills when animations are off, and integerScale for crisp pixel art. Spike result: animated sprites present for every Pokémon tested except #650 (the chain, not an ID range, handles the gaps).
+Stage + Console layout with Info/Stats/Evolution tabs; TabPanel keepMounted lets Stats replay its staggered fill each time it opens. StatBarChart now uses StatMeter; dead StatBar needs to be removed. MetaInfo labels are real row headers.
+Compare and View Cards are now real links via TransitionLink, built on the Part 8 view-transition hook; Back/Forward stays instant.
+Page logic is one discriminated union (getPokemonPageState); loading is a skeleton built from the real layout; error and not-found use MessageBox.
+Deferred: shiny sparkle and button response animations; remaining getSpriteUrl callers (SearchBar, team, favorites) because they persist URL.
+
+10-20-2026: UI rehaul, R6 Home, search, favorites & states
+
+Errors became data: getJSON throws a typed HttpError (in its own file, so tests that mock api.ts can't swallow it) and classifyFetchError maps anything thrown to "not-found" or "unreachable". usePokemon now returns that kind, derives loading instead of storing it (fixed a one frame "not found" flash, and a stale finally that switched loading off after an abort), and exposes retry(). Every failure sentence lives in lib/copy.ts; FailureMessage decides alert vs status and whether Retry shows; focus moves to a stable wrapper before Retry removes itself.
+Home: pickEncounterId(random) is pure (the dice are injected). getSessionEncounterId reads before it writes, so StrictMode's double call is harmless, and the stored value is validated as untrusted input. D21 = sessionStorage. useEncounter reuses usePokemon. BattleMenu is a roving-tabindex 2x2 over a pure moveInGrid(index, key, cols, count); Alt/Ctrl/Meta+arrow are left to the browser.
+Search: fetchPokemonIndex keeps the number that was already inside every list url, and fetchAllpokemonNames now reads through it (one request, one cache, old contract intact for the Library). Rows show #id + name, filterEntries also accepts a number, and the cursor and number are aria-hidden so option names are unchanged.
+Favorites: staggerSlot (capped; later arrivals take slot 0) hands position to CSS through --fav-slot; the empty state is a MessageBox invitation. "No favorites yet." changed in the same commit as its three test assertions.
+Guardrails: tests/tokens.test.ts fails on an undefined var(--x) or a raw color in component CSS. preconnect hints for pokeapi.co (crossorigin, because fetch is CORS) and raw.githubusercontent.com (no crossorigin, because <img> isn't).
+Bundle: +3.95 kB JS (+1.37 gzip), +1.73 kB CSS (+0.28 gzip), no new dependencies.
+Deferred: recently viewed strip (needs new persistence, so R12); tray chips load artwork-size images at 32px (R12, needs a saved-data migration); two buttons named "Search" on Home; the Favorite button uses emoji hearts while the copy says ♥; ComparePage still uses status-message (R7).
+
+10-28-2026: UI rehaul, Compare & Team
+
+Data first. Team members persist a TeamMember (a favorite plus optional types), so old saves are valid as they are. parseStoredTeam treats localStorage as untrusted input: valid JSON of the wrong shape ({"members":"oops"}) used to crash isOnTeam, and now loads as an empty team, with the reducer’s invariants (no duplicates, at most 6) enforced at that second entrance. BACKFILL returns the same state object when there is nothing to do; useTeamBackfill fills missing types one member per effect run, sequentially, with AbortController cleanup, on the Team page only.
+
+Compare: ComparePage is now one discriminated union (getComparePageState), drawn through FailureMessage/MessageBox, with the search kept open after a failed or rejected opponent. CompareStatRow is label-first in the HTML (grid places it visually), each value carries “higher/lower/tied” plus an aria-hidden arrow, and two decorative bars share one ruler (MAX_BASE_STAT, percentOf, now also used by StatMeter). Versus halves are re-skinned by data-type on any element, no JS theming.
+
+Team: the party is a lead slot plus five, always MAX_TEAM slots, empty ones spoken (“Empty slot 3”), the whole card a stretched link with a separate 44px remove target. a “leaving” state, animationend plus a 600 ms fallback, focus moves to the list, removal announced. “Team full” is explained up front from team.length (reducer untouched); “Team complete!” is an event decided at click time.
+
+what surprised me: the as PokemonDetails mock that lied about having types; a loop-shaped effect that restarted itself on every success; --theme-accent-ink (text for the accent) was used on the soft tint, giving ~1.9:1 for fighting/poison/ghost/dragon/dark, and axe missed the Stage name entirely, so I fixed it with --theme-soft-ink and a palette-wide contrast test; jsdom has no AnimationEvent and React picks the event name when react-dom loads, so the polyfill needed its own earlier setup file.
+
+11-05-2026: UI rehaul, TCG Library
+
+The card became a real <button> first (focus, Enter and Space for free) and carries data-rarity. getRarityRank is the one door into the rank table, so sorting and the visual tiers cannot disagree; getRarityTier maps ranks to common/rare/holo/ultra, and rarity-tiers.css is the one place a tier becomes --tier-color.
+The view and the binder page live in the URL (?view=, ?page=) and are parsed at the edge: an unknown view falls back to grid, a page past the end is clamped. Toggling the view replaces history, flipping a page pushes, and a new search keeps the view and drops the page (withoutPage). Three views, one data set: TCGCardGrid, TCGCardTable (sortable columns, aria-sort, a nextTableSort cycle asc, desc, none) and TCGCardBinder (3x3 pages from a pure paginate()). LibraryNotice was extracted at the third copy, not before.
+Holo: getHoloPose is pure (pointer in, shine position and tilt out). useHoloPointer writes --mx/--my/--rx/--ry straight onto the one hovered element and coalesces pointer events with requestAnimationFrame, so a mouse move never re-renders React. Common cards run no handlers and have no overlay; touch and reduced motion get the static gloss. animationsAreOff() is one shared function now (view transitions and holo). The shine moved to styles/holo.css when the card dialog became its second user.
+TCGCardModal moved onto ui/Dialog (focus trap, focus return, Escape) with zoom, tilt and set/rarity chips; the old Modal had no other user and was deleted. Sort uses ui/Select.
+Measured on the real page, 60 cards, headless Chromium with a faked network: 0 cards with will-change at rest, 1 while hovering; 200 mouse moves caused 800 style mutations, all on the hovered card, 0 DOM child changes (no React re-render) and 0 layouts; scrolling sat at the 60 Hz floor (median 16.7 ms) with the shine on and with it switched off. Lazy loading: all 60 images carry loading="lazy"; at 390 px wide 20 of 60 load up front. Checkpoint: grid, table and binder show the same 60 names; ?view=binder&page=3 survives a reload; Enter opens the dialog. 375/768/1440 have no horizontal scroll; new colour pairs measure 5.7:1 or better.
+what surprised me: the dialog's text was invisible on its light panel, because the --color-_ aliases are fixed at :root and only the --text-_ tokens re-bind inside .surface-window (no test could see it, a screenshot did); a hook that returned { ref, handlers } was rejected by react-hooks/refs, so the caller now owns the ref; a synchronous rAF stub exposed a stale "scheduled" id, fixed with a separate boolean; at 375 px the title and controls squeezed each other until the header was allowed to wrap; and my own scare that images were not lazy was only a short desktop page that fits inside the browser's preload margin.
+Deferred: filter chips (needs filter state in the URL and a decision about sorting and paging); focus after changing binder pages; a stale ?page= beyond the last page; sort not resetting the page; repeated fallback strings; checking Firefox, Safari, a real touch device and a real DevTools performance recording; before/after screenshots for the PR.
+
+11-12-2026: UI rehaul, Juice, settings & presentation
+
+Settings model first. Preferences now store intent (animations auto/on/off), not the OS answer frozen on the first visit, which had been saved as if it were a choice. resolveAnimations is the one resolver; the provider writes the resolved answer to <html data-motion>, so CSS, lib/motion and components agree. parseStoredPreferences treats localStorage as untrusted, field by field, and migrates the old shape on read (false → off, true → auto). Sound dropped entirely (D28). MessageBox and StatMeter stopped asking the OS themselves.
+Settings dialog: a pixel-art gear in the header opens ui/Dialog with two SegmentedControls (new optional labelVisible and description via aria-describedby). It is a pure view of PreferencesContext, so it can never disagree with the Stage's pixel switch.
+Organization: the Pokémon page groups controls by what they act on (sprite switches on the Stage; Collect; Explore). shiny moved down into Stage and resets per Pokémon with a key. TeamButton split into useTeamAction + TeamToggle + TeamStatus so the party-full hint spans both groups. A shared PageHeader opens every page (Compare's title is no longer hidden); a two-line credits footer is the contentinfo landmark.
+404: an original pixel-art "wild 404" encounter (route sign, tall grass, "!"), drawn from text rows: toRuns run-length-encodes them (~150 rects instead of 1,248) and PixelArt renders layered, crisp SVG.
+Celebrations are events, not states: counters bumped in click handlers and replayed with a key (PopIcon, ShinySparkle with outlined 7x7 stars, first favorite, D31). PokemonActions is keyed per Pokémon, so Team complete no longer reappears when you come back.
+Motion: every loop uses one opt-in gate (:root[data-motion="on"]); motion-gate.test.ts parses every stylesheet and fails the build on a literal duration outside it. Measured in Chromium on every page: 0 moving elements with Animations Off. Inventory classified (D32 restates the ambient rule, D33 adds a Status tier). stylelint now covers every stylesheet; postcss declared (it was a phantom dependency).
+Close-out: one page-load intro (header, main, tray; 580 ms; tokens only; once per load).
+Testing Library calls every <header> a banner while Chromium and the spec don't; vi.mock fakes aren't type-checked, so incomplete fakes broke when a hook read one more field (now typed as the real context value); a "stage-idle isn't gated" claim that a browser measurement disproved; and Prettier isn't a dependency of the project at all.
+Deferred to R10: pin Prettier and add a format check to CI; a Firefox, Safari and real-touch-device pass; profile the width-animated stat bars if they ever stutter.

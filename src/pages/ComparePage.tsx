@@ -1,73 +1,107 @@
+import "./ComparePage.css";
+import "../styles/shared.css";
+import { useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { CompareView } from "../components/CompareView";
+import { FailureMessage } from "../components/FailureMessage";
+import { MessageBox } from "../ui/MessageBox";
 import { usePokemon } from "../hooks/usePokemon";
+import { getComparePageState } from "../lib/comparePageState";
+import {
+  EMPTY_COMPARE,
+  LOADING_LABEL,
+  SELF_COMPARE,
+  COMPARE_HEADING,
+  COMPARE_SUBTITLE,
+  OPPONENT_SEARCH_LABEL,
+} from "../lib/copy";
+import { PageHeader } from "../ui/PageHeader";
 
 export function ComparePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const a = searchParams.get("a") ?? "";
   const b = searchParams.get("b") ?? "";
 
-  const { data: dataA, loading: loadingA, error: errorA } = usePokemon(a);
-  const { data: dataB, loading: loadingB, error: errorB } = usePokemon(b);
+  const first = usePokemon(a);
+  const second = usePokemon(b);
+  const regionRef = useRef<HTMLDivElement>(null);
 
-  //same "derived every render, nothing to keep in sync" pattern
-  const isSelfCompare = Boolean(dataA && dataB && dataA.id === dataB.id);
+  //exactly one situation at a time, worked out before anything is drawn
+  const state = getComparePageState({ a, b, first, second });
 
   function handlePickSecond(query: string) {
     setSearchParams({ a, b: query });
   }
 
-  if (!a) {
-    return (
-      <p className="status-message">
-        Search for a Pokémon first, then hit Compare to bring it here.
-      </p>
-    );
+  //a Retry button removes itself when its message is replaced by loading,
+  //which would drop keyboard focus to the top of the page. so focus moves
+  //to the wrapper (which stays mounted) first. same reasoning as PokemonPage
+  function handleRetry(retry: () => void) {
+    regionRef.current?.focus();
+    retry();
+  }
+
+  //a plain JSX value, not a component declared in here: a function componenet
+  //defined inside another component is brand new type on every render, so
+  //React would unmout and remount the search bar each time (losing what was typed)
+  const opponentSearch = (
+    <SearchBar onSubmit={handlePickSecond} label={OPPONENT_SEARCH_LABEL} />
+  );
+
+  function renderState() {
+    switch (state.status) {
+      case "no-first":
+        return <MessageBox text={EMPTY_COMPARE} />;
+      case "first-loading":
+      case "second-loading":
+        return <MessageBox text={LOADING_LABEL} />;
+      case "first-failed":
+        return (
+          <FailureMessage
+            kind={state.kind}
+            query={state.name}
+            onRetry={() => handleRetry(first.retry)}
+          />
+        );
+      case "pick-second":
+        return (
+          <>
+            <h3>Comparing {state.first.name} with...</h3>
+            {opponentSearch}
+          </>
+        );
+      //a failed or rejected opponent still leaves the way forward open:
+      //an error should say what happened AND what to do next
+      case "second-failed":
+        return (
+          <>
+            <FailureMessage
+              kind={state.kind}
+              query={state.name}
+              onRetry={() => handleRetry(second.retry)}
+            />
+            {opponentSearch}
+          </>
+        );
+      case "same-pokemon":
+        return (
+          <>
+            <MessageBox variant="error" text={SELF_COMPARE} />
+            {opponentSearch}
+          </>
+        );
+      case "ready":
+        return (
+          <CompareView primary={state.primary} secondary={state.secondary} />
+        );
+    }
   }
 
   return (
-    <section className="compare-panel">
-      {loadingA && (
-        <p role="status" className="status-message">
-          Loading...
-        </p>
-      )}
-      {errorA && (
-        <p role="alert" className="status-message status-message--error">
-          {errorA}
-        </p>
-      )}
-
-      {!loadingA && !errorA && dataA && !b && (
-        <>
-          <h3>Comparing {dataA.name} with...</h3>
-          <SearchBar onSubmit={handlePickSecond} />
-        </>
-      )}
-
-      {b && (
-        <>
-          {loadingB && (
-            <p role="status" className="status-message">
-              Loading...
-            </p>
-          )}
-          {errorB && (
-            <p role="alert" className="status-message status-message--error">
-              {errorB}
-            </p>
-          )}
-          {!loadingB && !errorB && dataB && isSelfCompare && (
-            <p role="alert" className="status-message status-message--error">
-              Choose a different Pokémon to compare.
-            </p>
-          )}
-          {!loadingB && !errorB && dataA && dataB && !isSelfCompare && (
-            <CompareView primary={dataA} secondary={dataB} />
-          )}
-        </>
-      )}
-    </section>
+    <div className="compare-page" ref={regionRef} tabIndex={-1}>
+      <PageHeader title={COMPARE_HEADING} subtitle={COMPARE_SUBTITLE} />
+      {renderState()}
+    </div>
   );
 }

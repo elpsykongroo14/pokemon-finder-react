@@ -27,3 +27,16 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+
+# private moodboard (game screenshots): never commit
+docs/ui-references/
+
+# bundle map from `npm run analyze` (generated, never committed)
+stats.html
+
+# Playwright output (reports, traces, screenshots): generated, never committed
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

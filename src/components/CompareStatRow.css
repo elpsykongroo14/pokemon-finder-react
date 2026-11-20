@@ -1,0 +1,91 @@
+@layer features {
+  /* The value and label columns have FIXED widths, so every row's centre
+     line sits at the same x and the bars line up from one row to the next. */
+  .compare-stat-row {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr) 4.5rem minmax(0, 1fr) 3.25rem;
+    grid-template-areas: "lval lbar label rbar rval";
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    border-bottom: var(--border-width-hairline) solid var(--border-hairline);
+  }
+
+  .compare-stat-row:last-child {
+    border-bottom: none;
+  }
+
+  .compare-stat-label {
+    grid-area: label;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .compare-stat-value {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .compare-stat-value[data-side="left"] {
+    grid-area: lval;
+    text-align: right;
+  }
+
+  .compare-stat-value[data-side="right"] {
+    grid-area: rval;
+    text-align: left;
+  }
+
+  .stat-win {
+    color: var(--focus-ring);
+  }
+
+  .stat-lose {
+    color: var(--text-secondary);
+  }
+
+  .compare-stat-mark {
+    margin-inline-start: var(--space-1);
+    font-size: var(--text-xs);
+  }
+
+  /* the tug-of-war: both bars are anchored at the centre (next to the label)
+     and grow outward, on the same ruler, so their lengths compare honestly */
+  .compare-stat-bar {
+    display: flex;
+    height: var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--surface-window-sunken);
+    overflow: hidden;
+  }
+
+  .compare-stat-bar[data-side="left"] {
+    grid-area: lbar;
+    justify-content: flex-end;
+  }
+
+  .compare-stat-bar[data-side="right"] {
+    grid-area: rbar;
+    justify-content: flex-start;
+  }
+
+  .compare-stat-bar__fill {
+    width: var(--stat-bar-percent, 0%);
+    background: var(--text-secondary);
+    animation: compare-stat-grow var(--dur-slow) var(--ease-tick) both;
+  }
+
+  .compare-stat-bar[data-outcome="win"] .compare-stat-bar__fill {
+    background: var(--accent-select);
+  }
+
+  @keyframes compare-stat-grow {
+    from {
+      width: 0;
+    }
+  }
+}

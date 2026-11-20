@@ -16,6 +16,10 @@ vi.mock("../hooks/useAutocomplete", () => ({
 
 const mockedUseAutocomplete = vi.mocked(useAutocomplete);
 
+const PIKACHU = { name: "pikachu", id: 25 };
+const PICHU = { name: "pichu", id: 172 };
+const PIKACHU_AND_PICHU = [PIKACHU, PICHU];
+
 //a small helper to keep every test's setup honest
 function setAutocomplete(
   overrides: Partial<ReturnType<typeof useAutocomplete>> = {},
@@ -38,6 +42,17 @@ beforeEach(() => {
 });
 
 describe("SearchBar", () => {
+  it("leaves its search landmark unnamed by default, and names it when given a label", () => {
+    const { unmount } = render(<SearchBar onSubmit={vi.fn()} />);
+    expect(screen.getByRole("search")).not.toHaveAttribute("aria-label");
+    unmount();
+
+    render(<SearchBar onSubmit={vi.fn()} label="Choose an opponent" />);
+    expect(
+      screen.getByRole("search", { name: "Choose an opponent" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders a search input and submit button", () => {
     render(<SearchBar onSubmit={() => {}} />);
 
@@ -71,7 +86,7 @@ describe("SearchBar", () => {
 
   it("shows matches in a listbox when the hook reports its open", () => {
     setAutocomplete({
-      matches: ["pikachu", "pichu"],
+      matches: PIKACHU_AND_PICHU,
       isOpen: true,
       highlightedIndex: 0,
     });
@@ -84,8 +99,44 @@ describe("SearchBar", () => {
     expect(options[1]).toHaveAttribute("aria-selected", "false");
   });
 
+  it("shows each option's Pokedex number to the eye, but not to a secreen render", () => {
+    setAutocomplete({
+      matches: PIKACHU_AND_PICHU,
+      isOpen: true,
+      highlightedIndex: 0,
+    });
+    render(<SearchBar onSubmit={() => {}} />);
+
+    const first = screen.getByRole("option", { name: "pikachu" });
+    expect(first).toHaveTextContent("#025");
+    expect(screen.getByRole("option", { name: "pichu" })).toHaveTextContent(
+      "#172",
+    );
+  });
+
+  it("keeps the combobox contract: ids, aria-activedescendant, aria-controls", () => {
+    setAutocomplete({
+      matches: PIKACHU_AND_PICHU,
+      isOpen: true,
+      highlightedIndex: 1,
+    });
+    render(<SearchBar onSubmit={() => {}} />);
+
+    const input = screen.getByRole("combobox", { name: /search pokémon/i });
+    const listbox = screen.getByRole("listbox");
+    const options = screen.getAllByRole("option");
+
+    expect(input).toHaveAttribute("aria-expanded", "true");
+    expect(input).toHaveAttribute("aria-controls", listbox.id);
+    expect(options.map((o) => o.id)).toEqual([
+      "autocomplete-option-0",
+      "autocomplete-option-1",
+    ]);
+    expect(input).toHaveAttribute("aria-activedescendant", options[1].id);
+  });
+
   it("hides the listbox when the hook reports its closed", () => {
-    setAutocomplete({ matches: ["pikachu"], isOpen: false });
+    setAutocomplete({ matches: [PIKACHU], isOpen: false });
     render(<SearchBar onSubmit={() => {}} />);
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
@@ -94,7 +145,7 @@ describe("SearchBar", () => {
   it("moves the highlight down on ArrowDown", async () => {
     const user = userEvent.setup();
     setAutocomplete({
-      matches: ["pikachu", "pichu"],
+      matches: PIKACHU_AND_PICHU,
       isOpen: true,
       highlightedIndex: 0,
     });
@@ -109,7 +160,7 @@ describe("SearchBar", () => {
     const user = userEvent.setup();
     const handleSubmit = vi.fn();
     setAutocomplete({
-      matches: ["pikachu", "pichu"],
+      matches: PIKACHU_AND_PICHU,
       isOpen: true,
       highlightedIndex: 1,
     });
@@ -123,7 +174,7 @@ describe("SearchBar", () => {
   it("dismisses the dropdown on Escape", async () => {
     const user = userEvent.setup();
     setAutocomplete({
-      matches: ["pikachu"],
+      matches: [PIKACHU],
       isOpen: true,
       highlightedIndex: 0,
     });
@@ -138,7 +189,7 @@ describe("SearchBar", () => {
     const user = userEvent.setup();
     const handleSubmit = vi.fn();
     setAutocomplete({
-      matches: ["pikachu"],
+      matches: [PIKACHU],
       isOpen: true,
       highlightedIndex: 0,
     });

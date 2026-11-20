@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getOrderedStats } from "./stats";
+import { getOrderedStats, percentOf, MAX_BASE_STAT } from "./stats";
 import type { PokemonStat } from "./type";
 
 function makeStat(name: string, base_stat: number): PokemonStat {
@@ -38,5 +38,27 @@ describe("getOrderedStats", () => {
 
   it("returns an empty array when given no stats", () => {
     expect(getOrderedStats([])).toEqual([]);
+  });
+});
+
+describe("percentOf", () => {
+  it("returns how full the bar is, from 0 to 100", () => {
+    expect(percentOf(50, 200)).toBe(25);
+    expect(percentOf(200, 200)).toBe(100);
+    expect(percentOf(0, 200)).toBe(0);
+  });
+
+  it("never goes below 0 or above 100", () => {
+    expect(percentOf(-10, 200)).toBe(0);
+    expect(percentOf(500, 200)).toBe(100);
+  });
+
+  it("returns 0 instead of NaN or infinity when max is 0 or negative", () => {
+    expect(percentOf(50, 0)).toBe(0);
+    expect(percentOf(50, -5)).toBe(0);
+  });
+
+  it("uses a ruler of 255, the higehst base stat any pokemon can have", () => {
+    expect(MAX_BASE_STAT).toBe(255);
   });
 });

@@ -1,46 +1,66 @@
-@import "./styles/tokens.css";
+/* src/styles/layers.css must load first: it declares the order
+   every other layer in this file (and every future component
+   file) will be judged against. */
+@import "./styles/layers.css";
+@import "./styles/primitives.css" layer(tokens);
+@import "./styles/semantic.css" layer(tokens);
+@import "./styles/type-themes.css" layer(themes);
+@import "./styles/motion.css" layer(tokens);
+@import "./styles/utilities.css";
+@import "./styles/rarity-tiers.css";
+@import "./styles//holo.css";
+@import "./styles/theme-transition.css";
 
 /* Global reset 
    Deliberately small: only browser-default overrides every page
    needs. Anything component-specific belongs in App.css. */
 
-* {
-  box-sizing: border-box;
+@layer reset {
+  * {
+    box-sizing: border-box;
+  }
 }
 
-body {
-  margin: 0;
-  background: var(--color-bg-canvas);
-  color: var(--color-text-primary);
-  font-family: var(--font-mono);
-}
+@layer base {
+  body {
+    margin: 0;
+    background: var(--surface-frame);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+  }
 
-#root {
-  min-height: 100svh;
-}
+  #root {
+    min-height: 100svh;
+  }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: var(--color-text-heading);
-  margin: 0 0 var(--space-2);
-}
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+  }
 
-h1 {
-  font-size: var(--text-2xl);
-  letter-spacing: -0.01em;
-}
+  h1 {
+    font-size: var(--text-2xl);
+    letter-spacing: -0.01em;
+  }
 
-h2 {
-  font-size: var(--text-xl);
-}
+  h2 {
+    font-size: var(--text-xl);
+  }
 
-h3 {
-  font-size: var(--text-lg);
-}
+  h3 {
+    font-size: var(--text-lg);
+  }
 
-p {
-  margin: 0;
+  p {
+    margin: 0;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
 }

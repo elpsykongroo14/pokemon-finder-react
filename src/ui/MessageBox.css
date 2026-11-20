@@ -1,0 +1,29 @@
+@layer features {
+  .message-box {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    line-height: 1.4;
+    color: var(--text-primary);
+  }
+
+  .message-box[data-variant="success"] {
+    color: var(--text-success);
+  }
+
+  .message-box[data-variant="error"] {
+    color: var(--text-danger);
+  }
+
+  .message-box__rest {
+    visibility: hidden;
+  }
+
+  .message-box__actions {
+    margin-top: var(--space-3);
+  }
+
+  /* keep the line break that encounterMessage() puts between its two lines */
+  .message-box__text {
+    white-space: pre-line;
+  }
+}

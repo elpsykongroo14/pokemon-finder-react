@@ -1,3 +1,4 @@
+import "./TypeBadgeList.css";
 import { TypeBadge } from "./TypeBadge";
 import type { PokemonType } from "../lib/type";
 

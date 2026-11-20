@@ -1,0 +1,182 @@
+@layer features {
+  /* phone: six equal cards in 2 columns x 3 rows */
+  .team-slots {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+    max-width: 52rem;
+  }
+
+  .team-slot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 11rem;
+    padding: var(--space-3);
+    border: var(--border-width-line) solid transparent;
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+
+  /* empty: a dashed, sunken socket with an outlined orb in it */
+  .team-slot--empty {
+    background: var(--surface-window-sunken);
+    border-style: dashed;
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+  }
+
+  /* filled: tinted by the pokemon's own type (data-type on the <li>) */
+  .team-slot--filled {
+    /* extra room on top for the LEAD tag and the remove button */
+    padding-top: var(--space-6);
+    background: var(--theme-accent-soft);
+    border-color: var(--theme-accent-deep);
+    color: var(--theme-soft-ink);
+    transition: transform var(--dur-fast) var(--ease-standard);
+  }
+
+  .team-slot--filled:hover {
+    transform: translateY(calc(var(--border-width-line) * -1));
+  }
+
+  /* ENTER: cards pop in one after another, like a party being called out.
+     the stagger step is a motion token, so with reduced motion there is no
+     stagger and no motion: everything is simply there. "backwards" holds the
+     starting look only during the delay, so hover still works afterwards */
+  .team-slot--filled {
+    animation: team-slot-enter var(--dur-base) var(--ease-snap) backwards;
+    animation-delay: calc(var(--slot-index, 0) * var(--dur-instant));
+  }
+
+  /* EXIT: TeamSlots.tsx sets data-leaving, waits for this animation to end
+     (animationend), and only THEN removes the member from the team */
+  .team-slot--filled[data-leaving] {
+    animation: team-slot-exit var(--dur-base) var(--ease-standard) forwards;
+    animation-delay: 0ms;
+    pointer-events: none;
+  }
+
+  @keyframes team-slot-enter {
+    from {
+      opacity: 0;
+      transform: translateY(var(--space-2)) scale(0.96);
+    }
+  }
+
+  @keyframes team-slot-exit {
+    to {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+  }
+
+  .team-slot__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* the whole card is clickable: the link's hit area stretches over the slot.
+     the remove button sits above it (z-index) so it stays separately clickable */
+  .team-slot__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .team-slot__sprite {
+    width: 6rem;
+    height: 6rem;
+    object-fit: contain;
+  }
+
+  .team-slot__name {
+    font-family: var(--font-display);
+    text-transform: capitalize;
+    overflow-wrap: anywhere;
+  }
+
+  /* reserve a row for the badges even before they exist, so cards do not
+     jump when the lazy backfill delivers types a moment later */
+  .team-slot__types {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-1);
+    min-height: 1.5rem;
+  }
+
+  .team-slot__tag {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    padding: 0 var(--space-2);
+    border: var(--border-width-line) solid var(--theme-accent-deep);
+    border-radius: var(--radius-pill);
+    background: var(--surface-window);
+    color: var(--text-primary);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* a small visible circle with a 44px touch target (the ::after) */
+  .remove-team {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: var(--border-width-line) solid var(--border-line);
+    border-radius: var(--radius-pill);
+    background: var(--surface-window);
+    color: var(--text-primary);
+    font-size: var(--text-lg);
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .remove-team::after {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
+  }
+
+  .remove-team:hover {
+    color: var(--text-danger);
+    border-color: var(--text-danger);
+  }
+
+  /* tablet and up: the lead slot becomes a big feature card (2x2 cells) and
+     the other five fill the remaining cells of a 3 x 3 grid */
+  @media (min-width: 768px) {
+    .team-slots {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .team-slot[data-lead] {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .team-slot[data-lead] .team-slot__sprite {
+      width: 10rem;
+      height: 10rem;
+    }
+  }
+}

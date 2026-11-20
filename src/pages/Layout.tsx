@@ -1,12 +1,21 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import "./Layout.css";
+import { Outlet } from "react-router-dom";
 import { SearchBar } from "../components/SearchBar";
 import { FavoritesList } from "../components/FavoritesList";
+import { MainNav } from "../components/MainNav";
+import { BrandMark } from "../components/BrandMark";
+import { PartyCounter } from "../components/PartyCounter";
+import { Backdrop } from "../components/Backdrop";
+import { SettingsButton } from "../components/SettingsButton";
+import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
+import { AppFooter } from "../components/AppFooter";
+import { MAIN_CONTENT_ID, SkipLink } from "../components/SkipLink";
 
 export function Layout() {
-  const navigate = useNavigate();
-  //we use useNavigate() in this file because
+  const navigate = useViewTransitionNavigate();
+  //we use useViewTransitionNavigate() in this file because
   //submitting the search form is an action with a side effect
-  //(validate, then go somehwere), not a plain click on a link
+  //(validate, then go somewhere), not a plain click on a link
 
   function handleSearch(query: string) {
     navigate(`/pokemon/${encodeURIComponent(query)}`);
@@ -15,43 +24,40 @@ export function Layout() {
   }
 
   return (
-    <main className="app">
-      <h1>Pokémon Finder</h1>
-      <nav className="main-nav">
-        <NavLink
-          to="/"
-          end //without end, Navlink to= "/" would report isActive: true on every route
-          //because /pokemon/pikachu technically starts with /
-          //end tells it to only match if the URL is exactly this not just prefixed by it
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          Home
-        </NavLink>
-        <NavLink
-          to="/compare"
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          Compare
-        </NavLink>
-        <NavLink
-          to="/team"
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          Team
-        </NavLink>
-        <NavLink
-          to="/library"
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          Library
-        </NavLink>
-      </nav>
+    <div className="app-shell">
+      {/* first in the page, so it is the first Tab stop */}
+      <SkipLink />
+      <Backdrop />
+      <header className="app-header">
+        <h1 className="app-title">
+          <BrandMark />
+          Pokémon Finder
+        </h1>
+        <MainNav />
 
-      <SearchBar onSubmit={handleSearch} />
-      <FavoritesList />
+        <div className="app-search">
+          <SearchBar onSubmit={handleSearch} />
+        </div>
 
-      <Outlet />
-      {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. Everything above it title, nav, search, favorites, persists across every navigation; only this slot swaps.*/}
-    </main>
+        <div className="app-settings">
+          <SettingsButton />
+        </div>
+      </header>
+
+      {/* tabIndex -1: focusable by the skip link, but not a Tab stop */}
+      <main className="app-main" id={MAIN_CONTENT_ID} tabIndex={-1}>
+        <Outlet />
+        {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and tray around it persist across every navigation; only this slot swaps.*/}
+      </main>
+
+      <aside className="app-tray" aria-label="Favorites and party">
+        <div className="app-tray__favorites">
+          <FavoritesList />
+        </div>
+        <PartyCounter />
+      </aside>
+
+      <AppFooter />
+    </div>
   );
 }

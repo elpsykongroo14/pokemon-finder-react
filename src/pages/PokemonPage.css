@@ -1,0 +1,7 @@
+@layer features {
+  /* focus lands here after Retry so keyboard users keep their place;
+     it is a landing spot, not a control, so no ring */
+  .pokemon-page:focus {
+    outline: none;
+  }
+}

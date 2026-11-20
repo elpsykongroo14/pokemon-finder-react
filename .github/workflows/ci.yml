@@ -1,4 +1,13 @@
-name: CI
+# One pipeline, one build. Every check and every deploy uses the SAME files:
+#
+#   test ───────────────┐
+#   build ──► e2e ──────┼──► deploy-preview     (push to ui/rehaul)
+#     │                 └──► deploy-production  (push to main)
+#     └── uploads dist/ as an artifact; e2e and deploys download it
+#
+# "The thing you tested is the thing you ship": nothing after `build` ever
+# runs `npm run build` again.
+name: Pipeline
 
 on:
   push:
@@ -6,60 +15,171 @@ on:
   pull_request:
     branches: [main, ui/rehaul]
 
+# least privilege: this workflow only needs to READ the repository. any step
+# that is compromised (a bad action version, a malicious dependency) gets a
+# token that cannot push code or change settings
+permissions:
+  contents: read
+
+# a new push to a pull request makes the run for the previous push useless:
+# cancel it. pushes to main/ui/rehaul are never cancelled (they deploy)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # Fast gates that need no build. Runs in parallel with `build`.
   test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
+      - run: npm ci
+      - name: Check formatting
+        run: npm run format:check
       - name: Lint
         run: npm run lint
-
-      - name: Run tests
+      - name: Unit and component tests
         run: npm test
 
-      - name: Build
-        run: npm run build
-
-  # Preview deploy: only when code is pushed (i.e. merged) into ui/rehaul,
-  # and only after the test job above passed.
-  preview:
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/ui/rehaul'
+  # THE build. The only job that runs `npm run build`.
+  build:
     runs-on: ubuntu-latest
-
+    outputs:
+      digest: ${{ steps.digest.outputs.digest }}
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
+      # VITE_TCG_PROXY is CONFIGURATION, not a secret: Vite writes it into
+      # the JavaScript, where anyone can read it in DevTools. so it lives in
+      # a repository VARIABLE (vars.), not a secret. vite.config.ts fails
+      # the build if it is missing or not https.
+      - name: Build (type-check + bundle)
         env:
-          VITE_TCG_PROXY: ${{ secrets.VITE_TCG_PROXY }}
+          VITE_TCG_PROXY: ${{ vars.VITE_TCG_PROXY }}
         run: npm run build
 
+      - name: Check build output (dev-only code, size budgets)
+        run: npm run check:dist
+
+      # a fingerprint of the WHOLE build: hash every file, then hash that
+      # list. same idea as a Git commit id. deploy jobs recompute it and
+      # refuse to deploy if anything changed in between
+      - name: Fingerprint the build
+        id: digest
+        run: |
+          DIGEST=$(find dist -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "build fingerprint: $DIGEST"
+
+      - name: Store the build as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  # The production build in a real browser.
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # dependencies are needed for Playwright and `vite preview`, not to build
+      - run: npm ci
+      - name: Download THE build
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      # not cached on purpose: Playwright's CI guide says restoring a cache
+      # takes about as long as downloading
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      # `playwright test`, NOT `npm run test:e2e` (which would build again)
+      - name: End-to-end tests against the downloaded build
+        run: npx playwright test
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  deploy-preview:
+    needs: [build, test, e2e]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/ui/rehaul'
+    runs-on: ubuntu-latest
+    steps:
+      # only the smoke script: this job deploys a build, it never makes one
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - name: Download THE build
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Verify it is the build that was tested
+        run: |
+          DIGEST=$(find dist -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          test "$DIGEST" = "${{ needs.build.outputs.digest }}" || { echo "::error::build fingerprint changed"; exit 1; }
       - name: Deploy preview to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=pokemon-finder-react --branch=ui-rehaul
+          command: pages deploy dist --project-name=pokemon-finder-react --branch=ui-rehaul --commit-hash=${{ github.sha }}
+      - name: Smoke test the deployment
+        run: node scripts/smoke.mjs "${{ steps.deploy.outputs.deployment-url }}"
+
+  deploy-production:
+    needs: [build, test, e2e]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # two production deploys must never overlap: the second one waits.
+    # (false = queue it, do not cancel the one already running)
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - name: Download THE build
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Verify it is the build that was tested
+        run: |
+          DIGEST=$(find dist -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          test "$DIGEST" = "${{ needs.build.outputs.digest }}" || { echo "::error::build fingerprint changed"; exit 1; }
+      # --branch=main explicitly: this job has no git history to guess from,
+      # and "main" is the Pages project's production branch.
+      # --commit-hash links the deployment to its commit in the dashboard
+      - name: Deploy to production
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=pokemon-finder-react --branch=main --commit-hash=${{ github.sha }}
+      - name: Smoke test the deployment
+        run: node scripts/smoke.mjs "${{ steps.deploy.outputs.deployment-url }}"

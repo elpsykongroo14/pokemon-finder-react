@@ -1,0 +1,43 @@
+/* Two quiet lines of fine print: small, secondary, tight. The credits sit on
+   one line separated by dots and wrap only when the screen is too narrow. */
+@layer features {
+  .app-footer {
+    grid-area: footer;
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--shell-gutter) var(--space-4);
+    font-size: var(--text-xs);
+    line-height: 1.4;
+    color: var(--text-secondary);
+  }
+
+  .app-footer p {
+    margin: 0;
+  }
+
+  .app-footer__credits {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* a middle dot between items. CSS-generated text CAN be read aloud by
+     screen readers, so the second line gives it empty alternative text
+     ("/ ''"); browsers that do not know that syntax keep the first line */
+  .app-footer__credits li + li::before {
+    content: "·";
+    content: "·" / "";
+    padding-inline: var(--space-2);
+  }
+
+  .app-footer a {
+    color: var(--text-primary);
+    text-underline-offset: 2px;
+  }
+
+  .app-footer a:hover {
+    color: var(--accent-select);
+  }
+}
