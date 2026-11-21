@@ -121,6 +121,20 @@ describe("getRarityTier", () => {
     expect(getRarityTier(undefined)).toBe("common");
     expect(getRarityTier("Some Future Rarity")).toBe("common");
   });
+
+  //these three strings are real API values that were missing from the table,
+  //so they fell through to rank 0: a Double Rare ex looked and sorted like a Common
+  it.each([
+    ["Double Rare", "holo"],
+    ["Rare BREAK", "holo"],
+    ["Promo", "rare"],
+  ] as const)("maps %s (once missing from the table) to %s", (rarity, tier) => {
+    expect(getRarityTier(rarity)).toBe(tier);
+  });
+
+  it("sorts a Double Rare above a plain Rare", () => {
+    expect(getRarityRank("Double Rare")).toBeGreaterThan(getRarityRank("Rare"));
+  });
 });
 
 describe("getCardMetaRows", () => {
