@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Compare</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&amp;family=Jersey+10&amp;display=swap">
+<style>
+body{margin:0;background:#fff;color:#000;font-family:"Archivo",ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:#000}a:hover{color:#4a4e57}
+*,*::before,*::after{box-sizing:border-box}
+img{display:block}
+.pf{font-size:16px;line-height:1.5;color:#000;background:#fff}
+.wide{font-stretch:125%}
+.semi{font-stretch:112%}
+.px{font-family:"Jersey 10",ui-monospace,monospace;font-weight:400;letter-spacing:.02em}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.tab{font-variant-numeric:tabular-nums}
+ul,ol{list-style:none;margin:0;padding:0}
+h1,h2,h3,p,dl,dd,figure{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #000;outline-offset:3px;box-shadow:0 0 0 3px #fff}
+.on-dark :focus-visible{outline-color:#fff;box-shadow:0 0 0 3px #000}
+.pixel{image-rendering:pixelated;image-rendering:crisp-edges}
+
+/* ---------- header ---------- */
+.hdr{position:relative;z-index:30;display:flex;flex-wrap:wrap;align-items:center;column-gap:32px;row-gap:12px;min-height:72px;padding:12px 40px;background:#fff;border-bottom:2px solid #000}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-stretch:112%;font-size:20px;letter-spacing:-.01em;color:#000;text-decoration:none;white-space:nowrap}
+.brand:hover{color:#000}
+.brand svg{transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.brand:hover svg{transform:rotate(-180deg)}
+.nav{display:flex;gap:4px}
+.nav a{position:relative;display:inline-flex;align-items:center;height:40px;padding:0 16px;color:#000;text-decoration:none;font-weight:600}
+.nav a::before{content:"";position:absolute;inset:0;transform:skewX(-13deg) scaleX(0);transform-origin:left center;background:#eceef1;transition:transform .18s cubic-bezier(.2,.8,.2,1);z-index:-1}
+.nav a:hover::before{transform:skewX(-13deg) scaleX(1)}
+.nav a.cur{color:#fff}
+.nav a.cur::before{background:#000;transform:skewX(-13deg) scaleX(1)}
+.hdr-end{margin-left:auto;display:flex;align-items:center;gap:14px}
+.search{position:relative;width:min(360px,30vw)}
+.search input{width:100%;height:44px;padding:0 14px 0 44px;border:2px solid transparent;border-radius:4px;background:#eceef1;font:inherit;font-size:16px;color:#000;outline:none;transition:background-color .15s,border-color .15s}
+.search input::placeholder{color:#4a4e57}
+.search input:hover{border-color:#c9cdd4}
+.search input:focus{background:#fff;border-color:#000}
+.search .s-ico{position:absolute;left:14px;top:12px;width:20px;height:20px;pointer-events:none}
+.party{display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:4px;color:#000;text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+.party:hover{background:#eceef1;color:#000}
+.pips{display:flex;gap:4px}
+.pip{width:10px;height:18px;transform:skewX(-13deg);box-shadow:inset 0 0 0 2px #c9cdd4;background:#fff}
+.pip.on{box-shadow:inset 0 0 0 2px #000}
+.pip.pop{animation:pipPop .55s cubic-bezier(.3,1.7,.5,1)}
+@keyframes pipPop{0%{transform:skewX(-13deg) scale(1)}35%{transform:skewX(-13deg) scale(1.7,1.35)}100%{transform:skewX(-13deg) scale(1)}}
+.icon-btn{display:inline-grid;place-items:center;width:44px;height:44px;border:0;border-radius:4px;background:transparent;cursor:pointer;color:#000}
+.icon-btn:hover{background:#eceef1}
+.icon-btn svg{transition:transform .4s cubic-bezier(.3,1.5,.5,1)}
+.icon-btn.gear:hover svg{transform:rotate(60deg)}
+
+/* ---------- slanted buttons ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border:0;background:transparent;font-weight:700;font-stretch:112%;font-size:16px;text-decoration:none;cursor:pointer;white-space:nowrap;isolation:isolate}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(-13deg);transition:background-color .16s,box-shadow .16s,transform .16s}
+.btn>span{display:inline-flex;align-items:center;gap:10px}
+.btn svg{flex:none}
+.btn:active::before{transform:skewX(-13deg) translateY(2px)}
+.btn-light{color:#000}.btn-light::before{background:#fff}
+.btn-light:hover{color:#fff}.btn-light:hover::before{background:#000;box-shadow:inset 0 0 0 2px #fff}
+.btn-ghost{color:#fff}.btn-ghost::before{box-shadow:inset 0 0 0 2px #fff}
+.btn-ghost:hover{color:#000}.btn-ghost:hover::before{background:#fff}
+.btn-dark{color:#fff}.btn-dark::before{background:#000}
+.btn-dark:hover{color:#000}.btn-dark:hover::before{background:#fff;box-shadow:inset 0 0 0 2px #000}
+.btn-line{color:#000}.btn-line::before{background:#fff;box-shadow:inset 0 0 0 2px #000}
+.btn-line:hover{color:#fff}.btn-line:hover::before{background:#000}
+.btn[aria-pressed="true"] .when-off{display:none}
+.btn[aria-pressed="false"] .when-on{display:none}
+.btn.small{min-height:40px;padding:0 16px;font-size:15px}
+.btn:focus-visible{outline:none;box-shadow:none}
+.btn:focus-visible::after,.btn.is-focus::after{content:"";position:absolute;inset:-6px;transform:skewX(-13deg);border:3px solid #000;pointer-events:none}
+.on-dark .btn:focus-visible::after,.on-dark .btn.is-focus::after{border-color:#fff}
+
+/* segmented control (shared by sprite options, library views) */
+.seg{display:inline-flex;position:relative;isolation:isolate}
+.seg::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(-13deg);background:#fff;box-shadow:inset 0 0 0 2px #000}
+.seg button{position:relative;height:40px;padding:0 16px;border:0;background:transparent;cursor:pointer;font-weight:700;font-size:14px;font-stretch:112%;isolation:isolate}
+.seg button::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(-13deg)}
+.seg button:hover::before{background:#eceef1;box-shadow:inset 0 0 0 2px #000}
+.seg button[aria-pressed="true"]{color:#fff}
+.seg button[aria-pressed="true"]::before{background:#000}
+.seg button>span{display:inline-flex;gap:8px;align-items:center}
+
+/* ---------- type chips ---------- */
+.types{display:flex;flex-wrap:wrap;gap:8px}
+.tchip{position:relative;display:inline-flex;align-items:center;height:30px;padding:0 14px;font-weight:700;font-stretch:112%;font-size:14px;isolation:isolate}
+.tchip::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(-13deg);background:var(--c)}
+.tchip>span{display:inline-flex;gap:8px;align-items:center}
+.tchip .x{display:inline-grid;place-items:center;min-width:30px;height:22px;margin-right:-8px;padding:0 6px;background:#000;color:#fff;font-size:13px;font-variant-numeric:tabular-nums;transform:skewX(-13deg)}
+.tchip .x>span{transform:skewX(13deg)}
+.tchip.sm{height:24px;padding:0 10px;font-size:12px}
+.tchip.lg{height:34px;padding:0 18px;font-size:16px}
+
+/* ---------- the encounter field: sky, ground, bands, platform ---------- */
+.field{position:relative;overflow:hidden;isolation:isolate}
+.sky{position:absolute;inset:0;z-index:-3}
+.ground{position:absolute;left:0;right:0;bottom:0;z-index:-2;background:rgba(0,0,0,.16)}
+.ground::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:rgba(0,0,0,.18)}
+.bands{position:absolute;inset:-10% -20%;z-index:-1}
+.band{position:absolute;top:0;bottom:0;transform:skewX(-13deg)}
+.drift .bands{animation:drift 26s linear infinite alternate}
+@keyframes drift{from{transform:translateX(-3%)}to{transform:translateX(3%)}}
+.platform{position:absolute;border-radius:50%;background:rgba(255,255,255,.34);box-shadow:inset 0 0 0 3px rgba(0,0,0,.16)}
+.platform::after{content:"";position:absolute;inset:24% 18%;border-radius:50%;background:rgba(255,255,255,.4)}
+.shadow{position:absolute;border-radius:50%;background:rgba(0,0,0,.22)}
+.sprite-wrap{position:relative;transform-origin:50% 100%}
+
+/* ---------- stat bars ---------- */
+.track{position:relative;display:block;height:14px;background:#eceef1;transform:skewX(-13deg);overflow:hidden}
+.fill{position:absolute;inset:0 auto 0 0;transform-origin:left center}
+
+/* ---------- sections ---------- */
+.sec{border-top:2px solid #000;padding-top:16px}
+.sec-h{font-size:22px;line-height:1.2;font-weight:800;font-stretch:112%;letter-spacing:-.01em;margin:0 0 20px}
+
+/* ---------- footer ---------- */
+.ftr{border-top:2px solid #000;padding:24px 40px 32px;font-size:14px;line-height:1.6;color:#4a4e57;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 40px}
+.ftr a{color:#000}
+
+/* ---------- the encounter: one orchestrated moment per new Pokémon ----------
+   Paired A/B keyframes: switching the class name restarts the sequence. */
+.wipe{position:absolute;top:-10%;bottom:-10%;left:-95%;width:80%;z-index:8;pointer-events:none;transform:skewX(-13deg)}
+.wipe.w1{background:#000}
+.wipe.w2{background:#fff;width:7%}
+.wipe-a{animation:wipeA .64s cubic-bezier(.7,0,.3,1) both}
+.wipe-b{animation:wipeB .64s cubic-bezier(.7,0,.3,1) both}
+.wipe-a.w2{animation-delay:.06s}.wipe-b.w2{animation-delay:.06s}
+@keyframes wipeA{from{left:-95%}to{left:135%}}
+@keyframes wipeB{from{left:-95%}to{left:135%}}
+.drop-a{animation:dropA .5s cubic-bezier(.2,.8,.2,1) .3s both}
+.drop-b{animation:dropB .5s cubic-bezier(.2,.8,.2,1) .3s both}
+@keyframes dropA{0%{opacity:0;transform:translateY(-60px)}62%{opacity:1;transform:translateY(0) scale(1.05,.93)}82%{transform:translateY(-6px) scale(.99,1.02)}100%{opacity:1;transform:none}}
+@keyframes dropB{0%{opacity:0;transform:translateY(-60px)}62%{opacity:1;transform:translateY(0) scale(1.05,.93)}82%{transform:translateY(-6px) scale(.99,1.02)}100%{opacity:1;transform:none}}
+/* silhouette first, then color: how a wild Pokémon appears in Black and White */
+.reveal-a{animation:revealA .9s steps(1,end) both}
+.reveal-b{animation:revealB .9s steps(1,end) both}
+@keyframes revealA{0%,72%{filter:brightness(0)}80%{filter:brightness(0) invert(1)}88%,100%{filter:none}}
+@keyframes revealB{0%,72%{filter:brightness(0)}80%{filter:brightness(0) invert(1)}88%,100%{filter:none}}
+.plate-a{animation:plateA .46s cubic-bezier(.2,.8,.2,1) .26s both}
+.plate-b{animation:plateB .46s cubic-bezier(.2,.8,.2,1) .26s both}
+@keyframes plateA{from{opacity:0;transform:translateX(56px)}to{opacity:1;transform:none}}
+@keyframes plateB{from{opacity:0;transform:translateX(56px)}to{opacity:1;transform:none}}
+.grow-a{animation:growA .6s cubic-bezier(.2,.8,.2,1) both}
+.grow-b{animation:growB .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes growA{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes growB{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.fade-a{animation:fadeA .4s ease .2s both}
+.fade-b{animation:fadeB .4s ease .2s both}
+@keyframes fadeA{from{opacity:0}to{opacity:1}}
+@keyframes fadeB{from{opacity:0}to{opacity:1}}
+.tint{transition:background-color 1ms linear .3s,color 1ms linear .3s}
+
+/* sparkles (shiny on) and heart burst (favorite on) */
+.burst{position:absolute;inset:0;pointer-events:none}
+.burst i{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;opacity:0}
+.burst-a i,.burst-b i{animation:burst .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes burst{0%{opacity:1;transform:translate(0,0) scale(.4)}70%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1)}}
+.st{position:absolute;width:30px;height:30px;opacity:0}
+.spark-a .st,.spark-b .st{animation:sparkle .85s cubic-bezier(.2,.8,.2,1) both}
+@keyframes sparkle{0%{opacity:0;transform:scale(0) rotate(0)}40%{opacity:1;transform:scale(1.15) rotate(45deg)}100%{opacity:0;transform:scale(.2) rotate(90deg)}}
+
+/* inline confirmation next to the action that caused it */
+.note-line{display:inline-flex;align-items:center;gap:10px;min-height:32px;padding:0 14px;font-size:14px;font-weight:600}
+.note-a,.note-b{animation:noteIn .35s cubic-bezier(.2,.8,.2,1) both}
+@keyframes noteIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;transition-delay:0ms!important}
+  .wipe,.burst,.st{display:none}
+  .drift .bands{animation:none}
+}
+
+
+.vs-field{position:relative;height:520px;overflow:hidden;isolation:isolate}
+.half{position:absolute;inset:0;overflow:hidden}
+.half.a{clip-path:polygon(0 0,calc(50% + 60px) 0,calc(50% - 60px) 100%,0 100%)}
+.half.b{clip-path:polygon(calc(50% + 60px) 0,100% 0,100% 100%,calc(50% - 60px) 100%)}
+.half .ground{height:30%}
+.seam{position:absolute;top:-10%;bottom:-10%;left:50%;width:36px;margin-left:-18px;background:#000;transform:skewX(-13deg);z-index:2}
+.vs{position:absolute;left:50%;top:44%;z-index:4;font-size:132px;line-height:1;font-weight:900;font-style:italic;letter-spacing:-.04em;color:#fff;-webkit-text-stroke:6px #000;paint-order:stroke fill;transform:translate(-50%,-50%)}
+.slam-a{animation:slamA .5s cubic-bezier(.3,1.6,.5,1) .65s both}
+.slam-b{animation:slamB .5s cubic-bezier(.3,1.6,.5,1) .65s both}
+@keyframes slamA{from{opacity:0;transform:translate(-50%,-50%) scale(2.6) rotate(-8deg)}to{opacity:1;transform:translate(-50%,-50%)}}
+@keyframes slamB{from{opacity:0;transform:translate(-50%,-50%) scale(2.6) rotate(-8deg)}to{opacity:1;transform:translate(-50%,-50%)}}
+.side-stage{position:absolute;top:0;bottom:0;width:50%;z-index:1}
+.side-stage.a{left:0}
+.side-stage.b{right:0}
+.side-stage .platform{left:50%;bottom:70px;width:360px;height:76px;margin-left:-180px}
+.side-stage .shadow{left:50%;bottom:94px;width:160px;height:22px;margin-left:-80px}
+.side-stage .sprite-pos{position:absolute;left:0;right:0;bottom:102px;display:flex;justify-content:center}
+.in-l-a{animation:inLA .55s cubic-bezier(.2,.8,.2,1) .3s both}
+.in-l-b{animation:inLB .55s cubic-bezier(.2,.8,.2,1) .3s both}
+.in-r-a{animation:inRA .55s cubic-bezier(.2,.8,.2,1) .3s both}
+.in-r-b{animation:inRB .55s cubic-bezier(.2,.8,.2,1) .3s both}
+@keyframes inLA{from{opacity:0;transform:translateX(-180px)}to{opacity:1;transform:none}}
+@keyframes inLB{from{opacity:0;transform:translateX(-180px)}to{opacity:1;transform:none}}
+@keyframes inRA{from{opacity:0;transform:translateX(180px)}to{opacity:1;transform:none}}
+@keyframes inRB{from{opacity:0;transform:translateX(180px)}to{opacity:1;transform:none}}
+.mirror{transform:scaleX(-1)}
+.vband{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:24px;padding:28px 40px;background:#000;color:#fff}
+.side{display:grid;gap:10px;align-content:start}
+.side.b{justify-items:end;text-align:right}
+.side.b .types{justify-content:flex-end}
+.side .dex{font-size:24px;line-height:1}
+.vname{font-size:46px;line-height:1;font-weight:900;font-style:italic;letter-spacing:-.015em}
+.pick{display:flex;align-items:center;gap:10px;font-size:14px;color:#d8dbe0}
+.pick select{height:40px;padding:0 36px 0 12px;border:2px solid #fff;border-radius:4px;background:#000;color:#fff;font:inherit;font-size:15px;font-weight:600;appearance:none;background-image:linear-gradient(45deg,transparent 50%,#fff 50%),linear-gradient(135deg,#fff 50%,transparent 50%);background-position:calc(100% - 18px) 16px,calc(100% - 12px) 16px;background-size:6px 6px;background-repeat:no-repeat;cursor:pointer}
+.pick select:hover{background-color:#1d1f23}
+.swap{position:relative;width:60px;height:60px;border:0;background:transparent;color:#000;cursor:pointer;display:grid;place-items:center;isolation:isolate}
+.swap::before{content:"";position:absolute;inset:0;z-index:-1;transform:skewX(-13deg);background:#fff;transition:background-color .15s}
+.swap:hover{color:#fff}.swap:hover::before{background:#000;box-shadow:inset 0 0 0 2px #fff}
+.swap svg{transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.swap:hover svg{transform:rotate(180deg)}
+.duel{max-width:1120px;margin:0 auto;padding:56px 48px 32px}
+.row{display:grid;grid-template-columns:96px minmax(0,1fr) 112px minmax(0,1fr) 96px;align-items:center;column-gap:16px;height:50px}
+.row .lab{text-align:center;color:#4a4e57;font-size:15px;font-weight:500}
+.row .val{font-size:20px;font-weight:600;font-stretch:112%;color:#4a4e57;display:flex;align-items:center;gap:8px}
+.row .val.r{justify-content:flex-end}
+.row .val.win{font-weight:800;color:#000}
+.diff{display:inline-block;padding:1px 8px;background:#000;color:#fff;font-size:12px;font-weight:700;transform:skewX(-13deg)}
+.track.l{transform:skewX(13deg)}
+.track.l .fill{left:auto;right:0;transform-origin:right center}
+.row.total{height:66px;margin-top:8px;border-top:2px solid #000}
+.row.total .val{font-size:28px}
+.row.total .lab{color:#000;font-weight:700}
+.verdict{max-width:1120px;margin:0 auto;padding:4px 48px 96px}
+.verdict p{display:inline-flex;align-items:center;gap:14px;font-size:20px;font-weight:700;font-stretch:112%}
+.verdict img{width:72px;height:72px;margin:-12px 0}
+@media (max-width: 1000px){
+  .hdr{padding:12px 20px}
+  .hdr-end{margin-left:0;width:100%}
+  .search{flex:1;width:auto}
+  .vs-field{height:380px}
+  .vs{font-size:76px}
+  .side-stage .sprite-pos{transform:scale(.6);transform-origin:50% 100%}
+  .side-stage .platform{width:220px;margin-left:-110px;height:52px}
+  .vband{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:24px 20px}
+  .swap{grid-column:1 / -1;justify-self:center;order:3}
+  .vname{font-size:30px}
+  .duel{padding:40px 16px 24px}
+  .row{grid-template-columns:52px minmax(0,1fr) 64px minmax(0,1fr) 52px;column-gap:8px}
+  .verdict{padding:4px 16px 64px}
+}
+</style>
+</helmet>
+<div class="pf">
+<header class="hdr">
+<a class="brand" href="Main.dc.html"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13.5" fill="#fff" stroke="#000" stroke-width="3"></circle><path d="M18.1 1.9 A13.5 13.5 0 0 0 11.9 28.1 Z" fill="#000"></path></svg><span>Pokémon Finder</span></a>
+<nav class="nav" aria-label="Main"><a href="Home.dc.html">Home</a><a href="Compare.dc.html" class="cur" aria-current="page">Compare</a><a href="Team.dc.html">Team</a><a href="Library.dc.html">Library</a></nav>
+<div class="hdr-end">
+<form class="search" role="search" onSubmit="{{noSubmit}}"><label class="vh" for="q">Search Pokémon</label><svg class="s-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg><input id="q" type="search" placeholder="Search by name or number" autocomplete="off"></form>
+<a class="party" href="Team.dc.html" aria-label="Your team, {{partyCount}} of 6"><span aria-hidden="true">Party</span><span class="pips" aria-hidden="true"><sc-for list="{{partyPips}}" as="pp" hint-placeholder-count="6"><span class="pip {{pp.cls}}" style="background: {{pp.c}}"></span></sc-for></span></a>
+<button class="icon-btn gear" type="button" aria-label="Settings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+</div>
+</header>
+<main>
+<h1 class="vh">Compare Pokémon</h1>
+<section class="vs-field" aria-label="{{a.name}} versus {{b.name}}">
+<div class="half a" aria-hidden="true">
+<div class="sky tint" style="background: {{a.c1}}"></div>
+<div class="ground"></div>
+<div class="band tint" style="left: 10%; width: 13%; background: {{a.band}}; opacity: {{a.bandOp}}"></div>
+<div class="band tint" style="left: 26%; width: 3%; background: {{a.band}}; opacity: {{a.bandOp}}"></div>
+</div>
+<div class="half b" aria-hidden="true">
+<div class="sky tint" style="background: {{b.c1}}"></div>
+<div class="ground"></div>
+<div class="band tint" style="left: 74%; width: 13%; background: {{b.band}}; opacity: {{b.bandOp}}"></div>
+<div class="band tint" style="left: 68%; width: 3%; background: {{b.band}}; opacity: {{b.bandOp}}"></div>
+</div>
+<div class="seam" aria-hidden="true"></div>
+<div class="side-stage a">
+<div class="platform" aria-hidden="true"></div>
+<div class="shadow" aria-hidden="true"></div>
+<div class="sprite-pos"><div class="in-l-{{ph}}"><img class="pixel mirror reveal-{{ph}}" src="{{a.src}}" alt="{{a.name}}" style="width: {{a.w}}px; height: {{a.hgt}}px"></div></div>
+</div>
+<div class="side-stage b">
+<div class="platform" aria-hidden="true"></div>
+<div class="shadow" aria-hidden="true"></div>
+<div class="sprite-pos"><div class="in-r-{{ph}}"><img class="pixel reveal-{{ph}}" src="{{b.src}}" alt="{{b.name}}" style="width: {{b.w}}px; height: {{b.hgt}}px"></div></div>
+</div>
+<p class="vs wide slam-{{ph}}" aria-hidden="true">VS</p>
+<div class="wipe w1 wipe-{{ph}}" aria-hidden="true"></div>
+<div class="wipe w2 wipe-{{ph}}" aria-hidden="true"></div>
+</section>
+<div class="vband on-dark">
+<div class="side a">
+<p class="dex px tint" style="color: {{a.soft1}}">No. {{a.dex}}</p>
+<h2 class="vname wide">{{a.name}}</h2>
+<ul class="types" aria-label="{{a.name}} types"><sc-for list="{{a.types}}" as="t" hint-placeholder-count="2"><li class="tchip" style="--c: {{t.c}}; color: {{t.ink}}"><span>{{t.label}}</span></li></sc-for></ul>
+<label class="pick"><span>First</span><select value="{{aId}}" onChange="{{pickA}}"><option value="635">Hydreigon</option><option value="637">Volcarona</option><option value="609">Chandelure</option><option value="497">Serperior</option><option value="503">Samurott</option><option value="571">Zoroark</option><option value="448">Lucario</option><option value="25">Pikachu</option></select></label>
+</div>
+<button class="swap" type="button" aria-label="Swap sides" onClick="{{swap}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" aria-hidden="true"><path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"></path></svg></button>
+<div class="side b">
+<p class="dex px tint" style="color: {{b.soft1}}">No. {{b.dex}}</p>
+<h2 class="vname wide">{{b.name}}</h2>
+<ul class="types" aria-label="{{b.name}} types"><sc-for list="{{b.types}}" as="t" hint-placeholder-count="2"><li class="tchip" style="--c: {{t.c}}; color: {{t.ink}}"><span>{{t.label}}</span></li></sc-for></ul>
+<label class="pick"><span>Second</span><select value="{{bId}}" onChange="{{pickB}}"><option value="635">Hydreigon</option><option value="637">Volcarona</option><option value="609">Chandelure</option><option value="497">Serperior</option><option value="503">Samurott</option><option value="571">Zoroark</option><option value="448">Lucario</option><option value="25">Pikachu</option></select></label>
+</div>
+</div>
+<section class="duel" aria-labelledby="h-duel">
+<div class="sec"><h2 class="sec-h" id="h-duel">Base stats</h2></div>
+<div role="table" aria-label="Base stats, {{a.name}} against {{b.name}}">
+<div role="rowgroup">
+<div class="vh" role="row"><span role="columnheader">{{a.name}}</span><span role="columnheader">Stat</span><span role="columnheader">{{b.name}}</span></div>
+</div>
+<div role="rowgroup">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<div class="row" role="row">
+<span class="val {{r.aCls}}" role="cell"><span class="tab">{{r.av}}</span><span class="vh">{{r.aWord}}</span><sc-if value="{{r.aWin}}" hint-placeholder-val="{{false}}"><span class="diff" aria-hidden="true">+{{r.d}}</span></sc-if></span>
+<span class="track l" aria-hidden="true"><span class="fill grow-{{ph}}" style="width: {{r.ap}}%; background: {{r.ac}}; animation-delay: {{r.delay}}ms"></span></span>
+<span class="lab" role="rowheader">{{r.label}}</span>
+<span class="track" aria-hidden="true"><span class="fill grow-{{ph}}" style="width: {{r.bp}}%; background: {{r.bc}}; animation-delay: {{r.delay}}ms"></span></span>
+<span class="val r {{r.bCls}}" role="cell"><sc-if value="{{r.bWin}}" hint-placeholder-val="{{false}}"><span class="diff" aria-hidden="true">+{{r.d}}</span></sc-if><span class="tab">{{r.bv}}</span><span class="vh">{{r.bWord}}</span></span>
+</div>
+</sc-for>
+<div class="row total" role="row">
+<span class="val {{tot.aCls}}" role="cell"><span class="tab">{{tot.av}}</span><span class="vh">{{tot.aWord}}</span></span>
+<span aria-hidden="true"></span>
+<span class="lab" role="rowheader">Total</span>
+<span aria-hidden="true"></span>
+<span class="val r {{tot.bCls}}" role="cell"><span class="tab">{{tot.bv}}</span><span class="vh">{{tot.bWord}}</span></span>
+</div>
+</div>
+</div>
+</section>
+<div class="verdict" aria-live="polite"><p><sc-if value="{{winP}}" hint-placeholder-val="{{true}}"><img class="pixel" src="{{winP}}" alt=""></sc-if>{{verdict}}</p></div>
+</main>
+<footer class="ftr">
+<p>Unofficial fan project. Not affiliated with Nintendo, Game Freak, Creatures or The Pokémon Company.</p>
+<p>Data from <a href="https://pokeapi.co">PokéAPI</a> and the <a href="https://pokemontcg.io">Pokémon TCG API</a>. Made by <a href="https://github.com/elpsykongroo14">elpsykongroo14</a>.</p>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1440, "height": 1600}}'>
+class Component extends DCLogic {
+
+  D() { if (!this._d) { this._d = {"T": {"normal": {"c": "#a8a878", "deep": "#54543c", "soft": "#d8d8c2", "ink": "#10151a"}, "fire": {"c": "#ff6b35", "deep": "#80361a", "soft": "#ffbca4", "ink": "#10151a"}, "water": {"c": "#4a90d9", "deep": "#25486c", "soft": "#aecdee", "ink": "#10151a"}, "electric": {"c": "#f9c523", "deep": "#7c6212", "soft": "#fce59c", "ink": "#10151a"}, "grass": {"c": "#5db85d", "deep": "#2e5c2e", "soft": "#b6dfb6", "ink": "#10151a"}, "ice": {"c": "#96d9d6", "deep": "#4b6c6b", "soft": "#d0eeed", "ink": "#10151a"}, "fighting": {"c": "#c03028", "deep": "#601814", "soft": "#e3a29e", "ink": "#f7faf9"}, "poison": {"c": "#a040a0", "deep": "#502050", "soft": "#d4a9d4", "ink": "#f7faf9"}, "ground": {"c": "#e0c068", "deep": "#706034", "soft": "#f1e3bb", "ink": "#10151a"}, "flying": {"c": "#a890f0", "deep": "#544878", "soft": "#d8cdf8", "ink": "#10151a"}, "psychic": {"c": "#f85888", "deep": "#7c2c44", "soft": "#fcb4c9", "ink": "#10151a"}, "bug": {"c": "#a8b820", "deep": "#545c10", "soft": "#d8df9b", "ink": "#10151a"}, "rock": {"c": "#b8a038", "deep": "#5c501c", "soft": "#dfd4a5", "ink": "#10151a"}, "ghost": {"c": "#705898", "deep": "#382c4c", "soft": "#bfb4d1", "ink": "#f7faf9"}, "dragon": {"c": "#7038f8", "deep": "#381c7c", "soft": "#bfa5fc", "ink": "#f7faf9"}, "dark": {"c": "#705848", "deep": "#382c24", "soft": "#bfb4ad", "ink": "#f7faf9"}, "steel": {"c": "#b8b8d0", "deep": "#5c5c68", "soft": "#dfdfea", "ink": "#10151a"}, "fairy": {"c": "#ee99ac", "deep": "#774c56", "soft": "#f7d1da", "ink": "#10151a"}}, "MON": [{"id": 635, "name": "Hydreigon", "types": ["dark", "dragon"], "stats": [92, 105, 90, 125, 90, 98], "h": "1.8 m", "w": "160.0 kg", "abilities": ["Levitate"], "hidden": null, "sw": 90, "sh": 108, "scale": 3, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/635.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/635.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/635.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/635.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/635.png", "evo": [{"id": 633, "name": "Deino", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/633.png"}, {"id": 634, "name": "Zweilous", "cond": "Level 50", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/634.png"}, {"id": 635, "name": "Hydreigon", "cond": "Level 64", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/635.png"}], "weak": [{"t": "fairy", "x": "×4"}, {"t": "fighting", "x": "×2"}, {"t": "bug", "x": "×2"}, {"t": "ice", "x": "×2"}, {"t": "dragon", "x": "×2"}], "resist": [{"t": "fire", "x": "×½"}, {"t": "water", "x": "×½"}, {"t": "grass", "x": "×½"}, {"t": "electric", "x": "×½"}, {"t": "ghost", "x": "×½"}, {"t": "dark", "x": "×½"}], "immune": [{"t": "psychic", "x": "×0"}]}, {"id": 637, "name": "Volcarona", "types": ["bug", "fire"], "stats": [85, 60, 65, 135, 105, 100], "h": "1.6 m", "w": "46.0 kg", "abilities": ["Flame Body"], "hidden": "Swarm", "sw": 92, "sh": 83, "scale": 3, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/637.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/637.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/637.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/637.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/637.png", "evo": [{"id": 636, "name": "Larvesta", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/636.png"}, {"id": 637, "name": "Volcarona", "cond": "Level 59", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/637.png"}], "weak": [{"t": "rock", "x": "×4"}, {"t": "flying", "x": "×2"}, {"t": "water", "x": "×2"}], "resist": [{"t": "grass", "x": "×¼"}, {"t": "fighting", "x": "×½"}, {"t": "bug", "x": "×½"}, {"t": "steel", "x": "×½"}, {"t": "ice", "x": "×½"}, {"t": "fairy", "x": "×½"}], "immune": []}, {"id": 609, "name": "Chandelure", "types": ["ghost", "fire"], "stats": [60, 55, 90, 145, 90, 80], "h": "1.0 m", "w": "34.3 kg", "abilities": ["Flash Fire", "Flame Body"], "hidden": "Infiltrate", "sw": 92, "sh": 90, "scale": 3, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/609.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/609.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/609.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/609.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/609.png", "evo": [{"id": 607, "name": "Litwick", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/607.png"}, {"id": 608, "name": "Lampent", "cond": "Level 41", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/608.png"}, {"id": 609, "name": "Chandelure", "cond": "Dusk Stone", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/609.png"}], "weak": [{"t": "ground", "x": "×2"}, {"t": "rock", "x": "×2"}, {"t": "ghost", "x": "×2"}, {"t": "dark", "x": "×2"}, {"t": "water", "x": "×2"}], "resist": [{"t": "bug", "x": "×¼"}, {"t": "grass", "x": "×½"}, {"t": "ice", "x": "×½"}, {"t": "steel", "x": "×½"}, {"t": "fairy", "x": "×½"}, {"t": "fire", "x": "×½"}, {"t": "poison", "x": "×½"}], "immune": [{"t": "normal", "x": "×0"}, {"t": "fighting", "x": "×0"}]}, {"id": 497, "name": "Serperior", "types": ["grass"], "stats": [75, 75, 95, 75, 95, 113], "h": "3.3 m", "w": "63.0 kg", "abilities": ["Overgrow"], "hidden": "Contrary", "sw": 88, "sh": 74, "scale": 3, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/497.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/497.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/497.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/497.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/497.png", "evo": [{"id": 495, "name": "Snivy", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/495.png"}, {"id": 496, "name": "Servine", "cond": "Level 17", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/496.png"}, {"id": 497, "name": "Serperior", "cond": "Level 36", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/497.png"}], "weak": [{"t": "fire", "x": "×2"}, {"t": "ice", "x": "×2"}, {"t": "poison", "x": "×2"}, {"t": "flying", "x": "×2"}, {"t": "bug", "x": "×2"}], "resist": [{"t": "water", "x": "×½"}, {"t": "electric", "x": "×½"}, {"t": "grass", "x": "×½"}, {"t": "ground", "x": "×½"}], "immune": []}, {"id": 503, "name": "Samurott", "types": ["water"], "stats": [95, 100, 85, 108, 70, 70], "h": "1.5 m", "w": "94.6 kg", "abilities": ["Torrent"], "hidden": "Shell Armor", "sw": 95, "sh": 80, "scale": 3, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/503.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/503.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/503.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/503.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/503.png", "evo": [{"id": 501, "name": "Oshawott", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/501.png"}, {"id": 502, "name": "Dewott", "cond": "Level 17", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/502.png"}, {"id": 503, "name": "Samurott", "cond": "Level 36", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/503.png"}], "weak": [{"t": "grass", "x": "×2"}, {"t": "electric", "x": "×2"}], "resist": [{"t": "fire", "x": "×½"}, {"t": "water", "x": "×½"}, {"t": "ice", "x": "×½"}, {"t": "steel", "x": "×½"}], "immune": []}, {"id": 571, "name": "Zoroark", "types": ["dark"], "stats": [60, 105, 60, 120, 60, 105], "h": "1.6 m", "w": "81.1 kg", "abilities": ["Illusion"], "hidden": null, "sw": 73, "sh": 64, "scale": 4, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/571.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/571.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/571.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/571.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/571.png", "evo": [{"id": 570, "name": "Zorua", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/570.png"}, {"id": 571, "name": "Zoroark", "cond": "Level 30", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/571.png"}], "weak": [{"t": "fighting", "x": "×2"}, {"t": "bug", "x": "×2"}, {"t": "fairy", "x": "×2"}], "resist": [{"t": "ghost", "x": "×½"}, {"t": "dark", "x": "×½"}], "immune": [{"t": "psychic", "x": "×0"}]}, {"id": 448, "name": "Lucario", "types": ["fighting", "steel"], "stats": [70, 110, 70, 115, 70, 90], "h": "1.2 m", "w": "54.0 kg", "abilities": ["Steadfast", "Inner Focus"], "hidden": "Justified", "sw": 47, "sh": 63, "scale": 4, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/448.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/448.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/448.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/448.png", "evo": [{"id": 447, "name": "Riolu", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/447.png"}, {"id": 448, "name": "Lucario", "cond": "High friendship by day", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/448.png"}], "weak": [{"t": "fire", "x": "×2"}, {"t": "fighting", "x": "×2"}, {"t": "ground", "x": "×2"}], "resist": [{"t": "bug", "x": "×¼"}, {"t": "rock", "x": "×¼"}, {"t": "normal", "x": "×½"}, {"t": "steel", "x": "×½"}, {"t": "grass", "x": "×½"}, {"t": "ice", "x": "×½"}, {"t": "dragon", "x": "×½"}, {"t": "dark", "x": "×½"}], "immune": [{"t": "poison", "x": "×0"}]}, {"id": 25, "name": "Pikachu", "types": ["electric"], "stats": [35, 55, 40, 50, 50, 90], "h": "0.4 m", "w": "6.0 kg", "abilities": ["Static"], "hidden": "Lightning Rod", "sw": 50, "sh": 46, "scale": 4, "a": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif", "s": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/25.gif", "art": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png", "sart": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/25.png", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/25.png", "evo": [{"id": 172, "name": "Pichu", "cond": null, "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/172.png"}, {"id": 25, "name": "Pikachu", "cond": "High friendship", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/25.png"}, {"id": 26, "name": "Raichu", "cond": "Thunder Stone", "p": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/26.png"}], "weak": [{"t": "ground", "x": "×2"}], "resist": [{"t": "electric", "x": "×½"}, {"t": "flying", "x": "×½"}, {"t": "steel", "x": "×½"}], "immune": []}]}; } return this._d; }
+  S(defaults) { return Object.assign({}, defaults, this.state || {}); }
+  flip(p) { return p === 'a' ? 'b' : 'a'; }
+  mon(id) { return this.D().MON.find((m) => m.id === id) || this.D().MON[0]; }
+  chip(t, x) { const c = this.D().T[t]; return { label: t.charAt(0).toUpperCase() + t.slice(1), c: c.c, ink: c.ink, deep: c.deep, soft: c.soft, x: x || '' }; }
+  dex(id) { return String(id).padStart(3, '0'); }
+  view(m, opts) {
+    const o = opts || {};
+    const T = this.D().T;
+    const t1 = T[m.types[0]];
+    const t2 = m.types[1] ? T[m.types[1]] : null;
+    const total = m.stats.reduce((a, b) => a + b, 0);
+    const order = [['HP', 0], ['Attack', 1], ['Defense', 2], ['Speed', 5], ['Sp. Atk', 3], ['Sp. Def', 4]];
+    const art = o.mode === 'artwork';
+    const sc = o.scale || m.scale;
+    const best = Math.max.apply(null, m.stats);
+    return {
+      id: m.id, name: m.name, upper: m.name.toUpperCase(), dex: this.dex(m.id),
+      c1: t1.c, deep1: t1.deep, soft1: t1.soft, ink1: t1.ink,
+      band: t2 ? t2.c : t1.soft, bandOp: t2 ? 1 : 0.5,
+      types: m.types.map((t) => this.chip(t)),
+      total: total, totalPct: Math.round(total / 720 * 1000) / 10,
+      stats: order.map((r, i) => ({ label: r[0], v: m.stats[r[1]], pct: Math.round(m.stats[r[1]] / 255 * 1000) / 10, c: t1.c, d: 380 + i * 50, top: m.stats[r[1]] === best })),
+      src: art ? (o.shiny ? m.sart : m.art) : (o.shiny ? m.s : m.a),
+      w: art ? (o.artSize || 340) : m.sw * sc, hgt: art ? (o.artSize || 340) : m.sh * sc,
+      pixelCls: art ? '' : 'pixel', p: m.p,
+      h: m.h, wt: m.w, abilities: m.abilities.join(', '), hidden: m.hidden || 'None',
+      evo: m.evo.map((e) => ({ name: e.name, cond: e.cond, p: e.p, cur: e.id === m.id, cls: e.id === m.id ? 'cur' : '', plat: e.id === m.id ? t1.c : '#eceef1' })),
+      weak: m.weak.map((w) => this.chip(w.t, w.x)), resist: m.resist.map((w) => this.chip(w.t, w.x)), immune: m.immune.map((w) => this.chip(w.t, w.x)),
+      hasImmune: m.immune.length > 0,
+    };
+  }
+  party(ids, popIdx) {
+    const T = this.D().T;
+    return [0, 1, 2, 3, 4, 5].map((i) => {
+      const id = ids[i];
+      if (!id) return { cls: '', c: '#fff' };
+      return { cls: 'on' + (i === popIdx ? ' pop' : ''), c: T[this.mon(id).types[0]].c };
+    });
+  }
+
+
+  defaults() { return { a: 503, b: 637, ph: 'a' }; }
+  renderVals() {
+    const s = this.S(this.defaults());
+    const A = this.mon(s.a), B = this.mon(s.b);
+    const a = this.view(A, {}), b = this.view(B, {});
+    const LOSE = '#c9cdd4';
+    const word = (x, y) => (x > y ? 'higher' : x < y ? 'lower' : 'tied');
+    const rows = a.stats.map((sa, i) => {
+      const sb = b.stats[i];
+      return {
+        label: sa.label, av: sa.v, bv: sb.v, ap: sa.pct, bp: sb.pct, d: Math.abs(sa.v - sb.v), delay: 380 + i * 50,
+        ac: sa.v >= sb.v ? a.c1 : LOSE, bc: sb.v >= sa.v ? b.c1 : LOSE,
+        aWin: sa.v > sb.v, bWin: sb.v > sa.v, aCls: sa.v >= sb.v ? 'win' : '', bCls: sb.v >= sa.v ? 'win' : '',
+        aWord: word(sa.v, sb.v), bWord: word(sb.v, sa.v),
+      };
+    });
+    const tot = { av: a.total, bv: b.total, aCls: a.total >= b.total ? 'win' : '', bCls: b.total >= a.total ? 'win' : '', aWord: word(a.total, b.total), bWord: word(b.total, a.total) };
+    const diff = Math.abs(a.total - b.total);
+    const winner = a.total > b.total ? A : (b.total > a.total ? B : null);
+    const verdict = winner ? (winner.name + ' has the higher base stat total, by ' + diff + '.') : (A.name + ' and ' + B.name + ' have the same base stat total.');
+    const set = (key, other) => (e) => {
+      const id = Number(e.target.value);
+      if (id === s[key]) return;
+      const next = { ph: this.flip(s.ph) };
+      if (id === s[other]) { next[other] = s[key]; }
+      next[key] = id;
+      this.setState(next);
+    };
+    return {
+      a: a, b: b, ph: s.ph, aId: String(s.a), bId: String(s.b), rows: rows, tot: tot, verdict: verdict, winP: winner ? winner.p : null,
+      pickA: set('a', 'b'), pickB: set('b', 'a'),
+      swap: () => this.setState({ a: s.b, b: s.a, ph: this.flip(s.ph) }),
+      partyPips: this.party([635, 637, 503, 448], -1), partyCount: 4,
+      noSubmit: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+    };
+  }
+
+}
+</script>
+</body>
+</html>
