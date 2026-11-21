@@ -152,3 +152,22 @@ export function animationsHint(
 
 //celebrations: rare, and only right after the person caused them
 export const FIRST_FAVORITE = "First favorite! It's waiting in your tray.";
+
+//type matchups: the badge inside a type chip ("×½") and what a screen
+//reader says instead. the chart only ever produces these six values;
+//anything else falls back to plain numbers rather than throwing
+const MULTIPLIER_GLYPH: Record<number, string> = { 0.5: "½", 0.25: "¼" };
+const MULTIPLIER_WORDS: Record<number, string> = {
+  1: "normal damage",
+  0.5: "half damage",
+  0.25: "quarter damage",
+  0: "no damage",
+};
+
+export function multiplierText(multiplier: number): string {
+  return `×${MULTIPLIER_GLYPH[multiplier] ?? multiplier}`;
+}
+
+export function multiplierSpoken(multiplier: number): string {
+  return MULTIPLIER_WORDS[multiplier] ?? `${multiplier} times damage`;
+}
