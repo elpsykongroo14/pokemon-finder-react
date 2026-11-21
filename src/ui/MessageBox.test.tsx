@@ -92,4 +92,23 @@ describe("MessageBox", () => {
     const { container } = renderBox("Loading…");
     expect(typedText(container)).toBe("Loading…");
   });
+
+  //the blinking triangle in the corner of a battle dialog: "done talking,
+  //your move". it must not show while the line is still typing
+  it("shows the continue caret only once the text has finished typing", () => {
+    const { container } = renderBox("Hi");
+    expect(container.querySelector(".message-box__caret")).toBeNull();
+
+    act(() => {
+      vi.advanceTimersByTime(TYPEWRITER_TICK_MS * 2);
+    });
+    const caret = container.querySelector(".message-box__caret");
+    expect(caret).toBeInTheDocument();
+    expect(caret).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("never shows the caret on an error", () => {
+    const { container } = renderBox("Pokémon not found", "error");
+    expect(container.querySelector(".message-box__caret")).toBeNull();
+  });
 });

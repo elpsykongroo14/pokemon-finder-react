@@ -5,7 +5,6 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { Panel } from "./Panel";
 import { IconButton } from "./IconButton";
 import "./Dialog.css";
 
@@ -82,12 +81,10 @@ export function Dialog({
         tabIndex={-1}
         onKeyDown={trapFocus}
       >
-        <Panel>
-          <div className="dialog__close">
-            <IconButton icon="x" aria-label="Close" onClick={onClose} />
-          </div>
-          {children}
-        </Panel>
+        <div className="dialog__close">
+          <IconButton icon="×" aria-label="Close" onClick={onClose} />
+        </div>
+        {children}
       </div>
     </div>,
     document.body,

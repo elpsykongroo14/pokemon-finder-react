@@ -1,0 +1,18 @@
+/* Section heading (spec 5.6): the rule sits ABOVE the heading and belongs
+   to it, so a section starts with a line wherever it lands in the grid.
+   Margins are set here, not by the parent, so every section on every
+   page has the same 16 px over the words and 20 px under them */
+@layer features {
+  .section-heading {
+    margin: 0 0 calc(var(--space-4) + var(--space-1));
+    padding-top: var(--space-4);
+    border-top: var(--border-width-line) solid var(--border-line);
+    font-family: var(--font-body);
+    font-size: var(--text-heading);
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+    line-height: var(--leading-heading);
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+}

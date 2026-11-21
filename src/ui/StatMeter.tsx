@@ -49,6 +49,10 @@ export function StatMeter({
       <span className="stat-meter__label" id={labelId}>
         {label}
       </span>
+      {/* label, value, bar: the DOM order is the reading order on screen
+          (spec 5.5 puts the number before the bar), so a screen reader
+          and a sighted person meet the same three things in the same order */}
+      <span className="stat-meter__value">{shown}</span>
       <div
         className="stat-meter__track"
         role="meter" //specifically, not role="progressbar"
@@ -65,7 +69,6 @@ export function StatMeter({
           style={{ "--stat-meter-percent": `${percent}%` } as CSSProperties}
         />
       </div>
-      <span className="stat-meter__value">{shown}</span>
     </div>
   );
 }

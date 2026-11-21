@@ -89,3 +89,15 @@ describe("StatBarChart", () => {
 
 //this file protects the canonical ordering against out of order API input, and protects the highest stat comparison against both the "one winner" and "tied winners" cases
 //while composing the real, already trusted StatBar instead of a mock, which is what let us assert on genuine rendered DOM order rather than prop call arguments
+
+describe("StatBarChart scale", () => {
+  //each meter already reports its own range (aria-valuemin / max), so the
+  //printed scale is for eyes only and stays out of the accessibility tree
+  it("prints the 0 to 255 scale under the bars, hidden from screen readers", () => {
+    const { container } = renderChart([makeStat("hp", 45)]);
+    const scale = container.querySelector(".stat-bar-chart__scale");
+    expect(scale).toHaveAttribute("aria-hidden", "true");
+    expect(scale).toHaveTextContent("0");
+    expect(scale).toHaveTextContent("255");
+  });
+});
