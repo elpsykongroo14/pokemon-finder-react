@@ -20,7 +20,7 @@ export function FavoriteButton({
   popKey = 0,
 }: FavoriteButtonProps) {
   return (
-    <Button variant="secondary" onClick={onToggle} pressed={isFavorite}>
+    <Button variant="line" onClick={onToggle} pressed={isFavorite}>
       {/* the heart and the pressed look SHOW the state; aria-pressed SAYS
           it. the words never change (a toggle that changes both is heard
           twice: "In Favorites, pressed") */}

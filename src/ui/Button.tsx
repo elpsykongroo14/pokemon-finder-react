@@ -2,7 +2,12 @@ import { type ButtonHTMLAttributes, type ReactNode } from "react";
 import "./Button.css";
 import { Spinner } from "./Spinner";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+//four looks, named after the surface they sit on (spec 5.2):
+//  dark  Ink plate, on white      line   white plate + Ink ring, on white
+//  light white plate, on black    ghost  white ring only, on black
+//each one inverts on hover, so the four are really two pairs
+export type ButtonVariant = "dark" | "line" | "light" | "ghost";
+export type ButtonSize = "md" | "sm";
 
 interface ButtonProps
   //ButtonHTMLAttributes<HTMLButtonElement> is a type React ships that describes every prop a real <button> DOM element accepts
@@ -11,13 +16,15 @@ interface ButtonProps
   // and we only need to declare the props that are new variant, pressed, loading. children we declare explicitly and make required
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className"> {
   variant?: ButtonVariant;
+  size?: ButtonSize;
   pressed?: boolean;
   loading?: boolean;
   children: ReactNode;
 }
 
 export function Button({
-  variant = "primary",
+  variant = "dark",
+  size = "md",
   pressed,
   loading = false,
   disabled,
@@ -33,6 +40,7 @@ export function Button({
       type={type}
       className="btn"
       data-variant={variant}
+      data-size={size}
       disabled={disabled || loading} //a loading button shouldn't be clickable
       aria-pressed={isToggle ? pressed : undefined}
       aria-busy={loading || undefined}

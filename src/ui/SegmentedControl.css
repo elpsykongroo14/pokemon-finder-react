@@ -1,63 +1,109 @@
+/* Segmented control (spec 5.3): one slanted white plate with an Ink ring,
+   the options inside it. Hover lays a Mist plate under an option, the
+   chosen one gets an Ink plate with white text.
+
+   The markup stays radio inputs (one choice out of several, arrow keys
+   move between them for free). The input is visually hidden, so every
+   visual state is read off it with "input:checked + label text" */
 @layer features {
   .segmented {
     display: inline-block;
+    min-width: 0;
     margin: 0;
     padding: 0;
     border: 0;
-    min-width: 0;
   }
 
   .segmented__legend {
     padding: 0;
     margin-bottom: var(--space-2);
-    font-family: var(--font-display);
-    font-size: var(--text-base);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
     color: var(--text-primary);
   }
 
   .segmented__options {
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
     flex-wrap: wrap;
-    gap: var(--space-1);
   }
 
-  /* Semantic tokens follow the surface: inside .surface-window they
-     re-bind to their on-light values. (The old --color-* aliases were
-     resolved once on :root and ignored that re-binding; retired in.) */
+  .segmented__options::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    background: var(--surface-paper);
+    box-shadow: inset 0 0 0 var(--border-width-line) var(--surface-ink);
+  }
+
+  .segmented__option {
+    display: inline-flex;
+  }
+
   .segmented__label {
-    display: inline-block;
-    padding: var(--space-1) var(--space-3);
-    border: var(--border-width-line) solid var(--border-hairline);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: var(--control-sm);
+    padding: 0 var(--space-4);
+    color: var(--surface-ink);
+    font-size: var(--text-chip);
+    font-weight: var(--weight-bold);
+    font-stretch: var(--width-heading);
+    white-space: nowrap;
     cursor: pointer;
-    transition:
-      color var(--dur-fast) var(--ease-standard),
-      border-color var(--dur-fast) var(--ease-standard),
-      background-color var(--dur-fast) var(--ease-standard);
+    transition: color var(--dur-fast) var(--ease-standard);
   }
 
-  .segmented__option:hover .segmented__label {
-    color: var(--text-primary);
+  .segmented__label::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    transition: background-color var(--dur-fast) var(--ease-standard);
   }
 
-  /* Selected = gold, the same "this one" signal as the nav cursor and the
-     primary button, with the same dark ink on top. */
+  .segmented__option:hover .segmented__label::before {
+    background: var(--surface-well);
+    box-shadow: inset 0 0 0 var(--border-width-line) var(--surface-ink);
+  }
+
   .segmented__option input:checked + .segmented__label {
-    color: var(--surface-frame);
-    border-color: var(--accent-select);
-    background: var(--accent-select);
+    color: var(--surface-paper);
   }
 
-  .segmented__option input:focus-visible + .segmented__label {
-    outline: var(--border-width-line) solid var(--focus-ring);
-    outline-offset: 2px;
+  .segmented__option input:checked + .segmented__label::before {
+    background: var(--surface-ink);
+    box-shadow: none;
+  }
+
+  /* the ring for the option that has keyboard focus, slanted like the
+     button ring. --focus-ring, so it flips on a black plate */
+  .segmented__option input:focus-visible + .segmented__label::after {
+    content: "";
+    position: absolute;
+    inset: calc(-2 * var(--border-width-thick));
+    transform: skewX(var(--slant));
+    border: var(--border-width-thick) solid var(--focus-ring);
+    pointer-events: none;
   }
 
   .segmented__description {
     margin: var(--space-2) 0 0;
-    font-size: var(--text-sm);
+    font-size: var(--text-md);
     color: var(--text-secondary);
+  }
+
+  /* phones: 44 px, the touch-target height (spec 5.3) */
+  @media (max-width: 1000px) {
+    .segmented__label {
+      height: var(--control-md);
+    }
   }
 }

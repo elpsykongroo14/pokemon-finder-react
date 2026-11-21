@@ -44,4 +44,25 @@ describe("Button", () => {
     await userEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
   });
+
+  //the four looks are named after what they sit on: dark and line live on
+  //white, light and ghost on a black plate
+  it("draws the dark variant unless told otherwise", () => {
+    render(<Button>Save</Button>);
+    expect(screen.getByRole("button", { name: "Save" })).toHaveAttribute(
+      "data-variant",
+      "dark",
+    );
+  });
+
+  it("passes its variant and size to CSS", () => {
+    render(
+      <Button variant="line" size="sm">
+        Details
+      </Button>,
+    );
+    const button = screen.getByRole("button", { name: "Details" });
+    expect(button).toHaveAttribute("data-variant", "line");
+    expect(button).toHaveAttribute("data-size", "sm");
+  });
 });

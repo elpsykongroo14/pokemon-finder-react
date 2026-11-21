@@ -19,7 +19,7 @@ export function NotFoundPage() {
       <PageHeader title={NOT_FOUND_HEADING} subtitle={NOT_FOUND_SUBTITLE} />
       <LostRouteScene />
       <MessageBox text={NOT_FOUND_ENCOUNTER} />
-      <TransitionLink to="/" variant="primary">
+      <TransitionLink to="/" variant="dark">
         {NOT_FOUND_LINK}
       </TransitionLink>
     </section>

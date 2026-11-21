@@ -39,7 +39,7 @@ function TeamCompleteBanner() {
 export function TeamToggle({ action }: { action: TeamAction }) {
   return (
     <Button
-      variant="secondary"
+      variant="line"
       onClick={action.toggle}
       pressed={action.onTeam}
       //an id reference works anywhere in the document, so the button stays

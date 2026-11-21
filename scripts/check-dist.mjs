@@ -28,7 +28,9 @@ const TEXT_FILE = /\.(html|js|css|map|json|txt)$/;
 // R10B (D60): CSS raised 11 -> 11.5 at B&W-1. The new design tokens sit next
 // to the retired slate/teal/gold ones until B&W-8 deletes those; ratchet back
 // down then.
-const BUDGET_KB = { js: 93, css: 11.5 };
+// R10B (D61): CSS raised 11.5 -> 12 at B&W-2. The new primitives ship while
+// the retired shell/stage/menu CSS still does (it leaves in B&W-3 to B&W-5).
+const BUDGET_KB = { js: 93, css: 12 };
 
 if (!existsSync(DIST)) {
   console.error(`check-dist: no ${DIST}/ folder. Run "npm run build" first.`);

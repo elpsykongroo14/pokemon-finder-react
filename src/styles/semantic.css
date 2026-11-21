@@ -24,6 +24,7 @@
   --surface-window-raised: var(--paper);
   --surface-window-sunken: var(--mist);
   --surface-ink: var(--ink); /* black plates */
+  --surface-paper: var(--paper); /* white plates: never flips, unlike frame */
   --surface-overlay: var(--black-a55); /* dialog scrim */
   --surface-overlay-deep: var(--black-a92); /* card dialog scrim */
 
@@ -44,7 +45,6 @@
   --text-secondary: var(--graphite);
   --text-danger: var(--red-800);
   --text-success: var(--green-800);
-  --text-warning: var(--gold-600); /* last user: StatMeter tiers (B&W-2) */
 
   /* Borders & accents */
   --border-line: var(--ink); /* rules, rings */
@@ -52,6 +52,9 @@
   --accent-select: var(--ink); /* current page, selected option */
   --focus-ring: var(--ink);
   --focus-halo: var(--paper); /* fills the gap between element and ring */
+
+  /* Disabled controls: faded, still readable as "there but not now" */
+  --opacity-disabled: 0.35;
 
   /* Rarity tiers. "common" has no token on purpose: no effect.
      B&W-7 turns these into the four tier marks */
@@ -76,6 +79,10 @@
     var(--foil-blue-a50),
     var(--foil-pink-a50)
   );
+
+  /* Stat rows: label, value, bar. One definition, so the scale line under
+     the chart (and Compare's rows later) line up with the meters */
+  --stat-columns: 76px 44px minmax(0, 1fr);
 
   /* z-index roles, mapped to the raw steps in primitives.css */
   --z-dropdown: var(--z-10);

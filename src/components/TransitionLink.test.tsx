@@ -12,7 +12,7 @@ function Probe() {
 function renderLink() {
   return render(
     <MemoryRouter initialEntries={["/"]}>
-      <TransitionLink to="/compare?a=pikachu" variant="secondary">
+      <TransitionLink to="/compare?a=pikachu" variant="line">
         Compare
       </TransitionLink>
       <Probe />
@@ -84,6 +84,6 @@ describe("TransitionLink", () => {
 
     const link = screen.getByRole("link", { name: "Compare" });
     expect(link).toHaveClass("btn");
-    expect(link).toHaveAttribute("data-variant", "secondary");
+    expect(link).toHaveAttribute("data-variant", "line");
   });
 });

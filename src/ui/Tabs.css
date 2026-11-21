@@ -1,43 +1,73 @@
+/* Tabs, drawn like the segmented control (Mobile prototype): a slanted
+   strip with an Ink ring, and the selected tab sits on an Ink plate.
+   The plate IS the existing sliding indicator: TabList already measures
+   the selected tab (--indicator-x, --indicator-w), so the indicator just
+   grew from a 4 px underline to a full-height plate behind the text.
+   Order inside transform matters: scale the 1 px plate to the tab's
+   width FIRST, then skew it, or the skew's lean gets stretched too */
 @layer features {
   .tab-list {
     position: relative;
+    isolation: isolate;
     display: flex;
-    gap: var(--space-1);
-    border-bottom: var(--border-width-line) solid var(--border-line);
+  }
+
+  .tab-list::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    transform: skewX(var(--slant));
+    box-shadow: inset 0 0 0 var(--border-width-line) var(--border-line);
   }
 
   .tab {
-    background: transparent;
+    flex: 1;
+    height: var(--control-md);
+    padding: 0 var(--space-4);
     border: none;
+    background: transparent;
     font: inherit;
-    font-family: var(--font-display);
-    color: var(--text-secondary);
-    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-chip);
+    font-weight: var(--weight-bold);
+    font-stretch: var(--width-heading);
+    color: var(--text-primary);
     cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-standard);
   }
 
   .tab[aria-selected="true"] {
-    color: var(--text-primary);
+    color: var(--surface-paper);
   }
 
+  /* inside the strip the outer ring would sit on the neighbours: draw it
+     inside the tab instead */
   .tab:focus-visible {
-    outline: var(--border-width-line) solid var(--focus-ring);
-    outline-offset: -2px;
+    outline-offset: calc(-2 * var(--border-width-thick));
+    box-shadow: none;
+  }
+
+  /* the focused tab is usually the selected one (roving tabindex), and
+     an Ink ring on the Ink plate would vanish */
+  .tab[aria-selected="true"]:focus-visible {
+    outline-color: var(--surface-paper);
   }
 
   .tab-indicator {
     position: absolute;
+    top: 0;
+    bottom: 0;
     left: 0;
-    bottom: -2px;
+    z-index: -1;
     width: 1px;
-    height: 4px;
-    background: var(--accent-select);
-    transform-origin: left;
-    transform: translateX(var(--indicator-x, 0px)) scaleX(var(--indicator-w, 0));
+    background: var(--surface-ink);
+    transform-origin: left center;
+    transform: translateX(var(--indicator-x, 0px)) skewX(var(--slant))
+      scaleX(var(--indicator-w, 0));
   }
 
   .tab-list[data-ready] .tab-indicator {
-    transition: transform var(--dur-base) var(--ease-standard);
+    transition: transform var(--dur-base) var(--ease-settle);
   }
 
   .tab-panel {

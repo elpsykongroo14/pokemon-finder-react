@@ -72,11 +72,11 @@ export function BattleMenu() {
           return (
             <li key={item.label}>
               {item.kind === "link" ? (
-                <TransitionLink to={item.to} variant="secondary" {...shared}>
+                <TransitionLink to={item.to} variant="line" {...shared}>
                   {content}
                 </TransitionLink>
               ) : (
-                <Button variant="secondary" onClick={focusSearch} {...shared}>
+                <Button variant="line" onClick={focusSearch} {...shared}>
                   {content}
                 </Button>
               )}

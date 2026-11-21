@@ -26,6 +26,15 @@ export function StatBarChart({ stats }: StatBarChartProps) {
           index={index}
         />
       ))}
+      {/* the scale: "0" and "255" at the two ends of the track column.
+          aria-hidden because every meter already tells a screen reader
+          its own min and max */}
+      <div className="stat-bar-chart__scale" aria-hidden="true">
+        <span className="stat-bar-chart__range">
+          <span>0</span>
+          <span>{MAX_BASE_STAT}</span>
+        </span>
+      </div>
     </div>
   );
 }
