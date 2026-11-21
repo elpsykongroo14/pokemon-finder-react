@@ -25,7 +25,10 @@ const TEXT_FILE = /\.(html|js|css|map|json|txt)$/;
 // decision that shows up in code review, not an accident nobody noticed.
 // TOTALS per type, not per file: splitting one file into two must not be a
 // way to dodge the budget.
-const BUDGET_KB = { js: 93, css: 11 };
+// R10B (D60): CSS raised 11 -> 11.5 at B&W-1. The new design tokens sit next
+// to the retired slate/teal/gold ones until B&W-8 deletes those; ratchet back
+// down then.
+const BUDGET_KB = { js: 93, css: 11.5 };
 
 if (!existsSync(DIST)) {
   console.error(`check-dist: no ${DIST}/ folder. Run "npm run build" first.`);
