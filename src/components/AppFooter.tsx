@@ -9,7 +9,7 @@ const CREDITS = [
   { what: "Cards", label: "Pokémon TCG API", href: "https://pokemontcg.io" },
   {
     what: "Fonts",
-    label: "Jersey 10 & Nunito",
+    label: "Jersey 10 & Archivo",
     href: "https://fontsource.org",
   },
 ] as const;
