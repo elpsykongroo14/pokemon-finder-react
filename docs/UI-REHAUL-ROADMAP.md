@@ -30,21 +30,22 @@
 
 Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessions), not calendar time.
 
-| ✓   | Phase   | Name                                   | Size | Depends on             | Visible payoff                                 |
-| --- | ------- | -------------------------------------- | ---- | ---------------------- | ---------------------------------------------- |
-| ✓   | **R0**  | Baseline & ground rules                | S    | Phase 9 checkpoint     | None (safety net)                              |
-| ✓   | **R1**  | Design language                        | M    | R0                     | Style guide page                               |
-| ✓   | **R2**  | Foundation refactor (no visual change) | M    | R1                     | None (enables everything)                      |
-| ✓   | **R3**  | Primitives kit                         | L    | R2                     | Buttons, panels, bars look like the game       |
-| ✓   | **R4**  | App shell, navigation & theme engine   | L    | R3                     | **First "wow": whole app re-skinned**          |
-| ✓   | **R5**  | The Pokémon page                       | L    | R4                     | **Animated sprite stage, type-reactive world** |
-| ✓   | **R6**  | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
-| ✓   | **R7**  | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
-| ✓   | **R8**  | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
-| ✓   | **R9**  | Juice, settings & presentation         | M    | R5–R8                  | Celebrations, polish                           |
-| ☐   | **R10** | Quality gates & launch                 | M    | R9                     | Confidence + merge to `main`                   |
-| ☐   | **R11** | Port to the vanilla version            | L    | R10                    | Both apps match                                |
-| ☐   | **R12** | Backlog (game-depth features)          | —    | —                      | Only after R11                                 |
+| ✓   | Phase    | Name                                   | Size | Depends on             | Visible payoff                                 |
+| --- | -------- | -------------------------------------- | ---- | ---------------------- | ---------------------------------------------- |
+| ✓   | **R0**   | Baseline & ground rules                | S    | Phase 9 checkpoint     | None (safety net)                              |
+| ✓   | **R1**   | Design language                        | M    | R0                     | Style guide page                               |
+| ✓   | **R2**   | Foundation refactor (no visual change) | M    | R1                     | None (enables everything)                      |
+| ✓   | **R3**   | Primitives kit                         | L    | R2                     | Buttons, panels, bars look like the game       |
+| ✓   | **R4**   | App shell, navigation & theme engine   | L    | R3                     | **First "wow": whole app re-skinned**          |
+| ✓   | **R5**   | The Pokémon page                       | L    | R4                     | **Animated sprite stage, type-reactive world** |
+| ✓   | **R6**   | Home, search, favorites & states       | M    | R5                     | Landing "encounter", live autocomplete         |
+| ✓   | **R7**   | Compare & Team                         | M–L  | R5                     | Versus screen, party screen                    |
+| ✓   | **R8**   | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
+| ✓   | **R9**   | Juice, settings & presentation         | M    | R5–R8                  | Celebrations, polish                           |
+| ✓   | **R10**  | Quality gates & launch                 | M    | R9                     | Confidence + merge to `main`                   |
+| ☐   | **R10B** | Black & White redesign                 | L    | R10                    | **Black & white UI, color only from Pokémon**  |
+| ☐   | **R11**  | Port to the vanilla version            | L    | R10B                   | Both apps match                                |
+| ☐   | **R12**  | Backlog (game-depth features)          | —    | —                      | Only after R11                                 |
 
 **Order rationale:** the first _visible_ transformation lands at R4–R5, deliberately early. The foundation phases (R0–R3) are unglamorous but they are what stops the redesign from becoming another rushed, vibecoded pass, which is exactly the thing we're fixing.
 
@@ -649,6 +650,39 @@ Type colors: reuse the existing `--type-*` values as **primitives**; derive deep
 
 ---
 
+### R10B: Black & White redesign
+
+**Size L · Depends on:** R10 · **Source of truth:** `docs/redesign/SPEC.md` (screens in `docs/redesign/screens/`, prototype CSS in `docs/redesign/reference/`)
+
+**Goal:** re-skin the shipped app in the approved "Black & White" design: the interface is only black and white, and all color comes from the Pokémon (or card) on screen through the existing type-theme engine. It sits before R11 so the vanilla port copies the final design, not one that is about to change.
+
+**Why it is not a new system:** cascade layers, the three token tiers, `useTypeTheme` → `data-type`/`data-type2` → `--theme-*`, and the `src/ui/` primitives all stay. Most of the work is rebinding semantic tokens and rewriting component CSS; the logic changes are listed per slice and get tests first.
+
+**Slices** (one PR each into `ui/rehaul`, branch `ui/bw-N-<name>`; each ends with test, lint and build green plus keyboard, reduced-motion and 375 / 768 / 1440 checks):
+
+| Slice                | Scope                                                                                                                                                                                                           | Main files                                                                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| B&W-1 Foundation     | Archivo (D40), white base and `.on-dark` (D41), field variables and the single-type rule, focus ring, `RARITY_RANK` fix                                                                                         | `primitives.css`, `semantic.css`, `type-themes.css`, `index.css`, `main.tsx`, `index.html`, `lib/tcg.ts`                                   |
+| B&W-2 Primitives     | Button (light / ghost / dark / line), SegmentedControl, Toggle, TypeBadge + multiplier, StatMeter on `scaleX`, SectionHeading, MessageBox battle variant, Dialog (+ sheet), Select, Input, Tabs; style guide    | `src/ui/*`                                                                                                                                 |
+| B&W-3 Shell          | Header, nav plate (D46), search and autocomplete (D51), party pips with type colors and party pop (D45, D50), settings, footer, phone top bar and bottom nav; tray and Backdrop removed                         | `Layout`, `MainNav`, `BrandMark`, `SearchBar`, `PartyCounter`, `SettingsButton`, `AppFooter`                                               |
+| B&W-4 Pokémon page   | `EncounterField` (persistent field, keyed encounter layer, D43), plate, actions, inline confirmation, heart burst, favorites rail (D48), readout vs phone tabs (D57), evolution conditions (D47), type matchups | `PokemonCard`, `Stage`, `PokemonActions`, `FavoritesList`, `MetaInfo`, `Evolution*`, new `EncounterField`, `TypeMatchups`, `useMediaQuery` |
+| B&W-5 Home & Compare | Battle dialog, command plate, reroll; split field, VS slam, identity band (D52), stat duel, verdict                                                                                                             | `HomePage`, `BattleMenu`, `useEncounter`, `CompareView`, `CompareStat*`, `ComparePage`                                                     |
+| B&W-6 Team           | Title band, party cards with mini fields and stat total (D49), empty slots, slot leave                                                                                                                          | `TeamPage`, `TeamSlots`, `useTeamBackfill`                                                                                                 |
+| B&W-7 Library        | Card data fields, hero and deal, toolbar and legend, tiers, tilt / glare / foil, timeline grid, table, binder spreads (D54, D55), dialog flip and keys (D53), phone sheet, cards teaser                         | `lib/type.ts`, `lib/tcg.ts`, `lib/holo.ts`, `LibraryPage`, `TCGCard*`, `useHoloPointer`, `useBinderPage`                                   |
+| B&W-8 Pass           | Loading / error / 404 states, contrast table, axe, e2e updates, budgets, delete unused slate / teal / gold primitives and `.surface-window`                                                                     | across the app                                                                                                                             |
+
+**Class contract for R10B** (D58, regenerated from the tests on 2026-11-21; it replaces the list in §8.3 for this phase): `.stat-meter`, `.stat-win`, `.stat-lose`, `.compare-stat-row`, `.compare-stat-bar`, `.tcg-card`, `.team-slot`, `.team-slot--empty`, `.team-slot--filled`, `[data-leaving]`, `[data-filled]`, `.team-complete`, `.team-complete__pip`, `.active`, `.cursor`, `.shiny-sparkle`, `.sprite-stage`, `.type-badge`, `.card-chip`, `.skeleton`, `.spinner`, `.backdrop`, `.message-box__typed`, `.page-header__subtitle`, `.btn`, `.visually-hidden`, `.pixel-art__layer--front/back`, `.stage-console__stage/__console`, `.panel`, page roots (`.home-stage`, `.pokemon-page`, `.compare-page`). A class whose component the redesign removes (`.backdrop`, the nav `.cursor`, `.stage-console__*`, `.panel`) leaves together with its test, replaced by tests of the new part in the same commit, so the test count still rises.
+
+**Motion:** the one self-starting sequence is the encounter; the only ambient motion is the stripe drift and the dialog caret (D42). Choreography with literal timings lives under `:root[data-motion="on"]` (D59), so with motion off it does not exist and can never leave content hidden. Every keyframe is listed in `docs/MOTION-INVENTORY.md`.
+
+**Baseline at start (2026-11-21):** 123 test files, 923 tests; JS 89.71 kB gzip, CSS 10.38 kB gzip (check-dist).
+
+**Checkpoint:** every screen matches `docs/redesign/screens/` at 1440 and 390; tests ≥ 923 and green; lint and build green; budgets met or raised by a recorded decision; zero moving elements with Animations Off; contrast table for every new pair; e2e green.
+
+**Learning focus:** rebinding a token system wholesale, choreographing CSS motion against React's render model (keys, persistent elements), pure helpers for data-driven copy, 3D transforms with accessible fallbacks.
+
+---
+
 ### R11: Port to the vanilla version
 
 **Size L · Depends on:** R10
@@ -843,6 +877,48 @@ D33 Fifth motion tier, Status Spinner and skeleton: allowed where loading happen
 
 | D39 | End-to-end test scope and boundary | Playwright, Chromium only, 4 journeys (search + not-found, team persistence, library view + dialog, outage + retry) against `vite preview` of the production build. Everything outside localhost is intercepted: the shared fake back end (src/testing/fakeBackend.ts) answers known APIs, images get a 1×1 PNG, unknown hosts are blocked and fail the test (fail closed). CI: separate job in parallel with `test`, 1 worker, 1 retry (flaky = visible), no browser cache, report uploaded even on failure. | R10 |
 
+| D40 | Body and display font (supersedes D4) | Archivo variable (weight 100–900, width 62–125 %) for everything, via `@fontsource-variable/archivo` (`standard.css` + `standard-italic.css`); Nunito removed; Jersey 10 kept for game text only (battle dialog, dex numbers) as `--font-game`. `--font-display` now means Archivo, so headings no longer render in Jersey. | R10B |
+
+| D41 | Base surface (supersedes D13 and D14) | White base: five neutrals (Ink #000, Paper #fff, Mist #ECEEF1, Line #C9CDD4, Graphite #4A4E57) rebound onto the existing semantic roles; a scoped `.on-dark` override for black plates (same pattern as `.surface-window`). All color comes from the type theme. Hard offset shadow only on the autocomplete panel; soft shadows only on trading cards (physical objects). Slate, teal and gold primitives are deleted once unreferenced (B&W-8). D2 still holds: this changes the base, it does not add a light/dark axis. | R10B |
+
+| D42 | Self-starting and ambient motion (supersedes D32) | Exactly one sequence plays on its own: the encounter, once per new Pokémon. Ambient: the field's stripe drift (26 s, field only) and the dialog caret. Retired: the global Backdrop drift, `stage-idle`, the R9 page-load intro and the R4 theme fade. Animated Gen V sprites still move (they are the sprite, gated as before). | R10B |
+
+| D43 | Restarting the encounter | The field element stays mounted from loading to loaded and transitions its sky color with a 300 ms delay; only an inner encounter layer (slabs, sprite, plate) carries `key={pokemon.name}`. A keyed field would be born with the new color and skip the swap under the slab; the theme fade is removed for the same reason (it would restart the delayed transition every frame). | R10B |
+
+| D44 | Toggle names (confirms D36) | Accessible names stay "Favorite" and "Team" with `aria-pressed`; only the visible text swaps ("Favorite"/"Favorited", "Add to team"/"On your team"). "Team" not being literally inside "Add to team" is a recorded WCAG 2.5.3 exception: speech tools match the word. | R10B |
+
+| D45 | Party counter name | "Party, {n} of 6" instead of the spec's "Your team, {n} of 6", so the name contains the visible word "Party" (WCAG 2.5.3). | R10B |
+
+| D46 | Header navigation (supersedes D16) | Real NavLinks with a slanted Ink plate on the current page and a Mist wipe on hover; no ▶ cursor. On phones the same nav element becomes the bottom bar through CSS (one landmark named "Main", never two). The Cursor primitive stays for other uses. | R10B |
+
+| D47 | Evolution conditions (pulled forward from R12) | Model the minimum of `evolution_details` (trigger, `min_level`, `item`) and format it with a pure, tested function: "Level 50", "Dusk Stone", "Trade", "Friendship"; unknown triggers show no label. | R10B |
+
+| D48 | Favorite type colors (amends D10) | `FavoritePokemon` gains optional `types`, saved when a Pokémon is favorited; old favorites get a neutral underline. No backfill. | R10B |
+
+| D49 | Team stat total (amends D10) | `TeamMember` gains optional `statTotal`, saved on add and filled by the existing Team-page backfill (it already fetches the details). | R10B |
+
+| D50 | Header pips without types | Members without stored types get an Ink pip; the backfill stays on the Team page only (D10). | R10B |
+
+| D51 | Autocomplete rows (amends D22) | Each row shows a sprite built from the dex id (an image request only, lazy), the name and "No. 635". No type chips: they would need a request per row. | R10B |
+
+| D52 | Compare pickers | The prototype's `<select>`s list eight hard-coded Pokémon; the app keeps restyled SearchBar comboboxes labelled "First" and "Second" in the identity band, plus a Swap button (`?a=b&b=a`). | R10B |
+
+| D53 | Card dialog | No zoom. The card flips in on open and on Previous / Next; ← → move through the current sort order; Esc closes; focus returns to the opening card. | R10B |
+
+| D54 | Binder URL with spreads | `?page=` keeps meaning a page number; a spread shows an odd page and the next one, and an even number shows the spread that contains it, so old links still work. | R10B |
+
+| D55 | Phone Library views | All three views stay on phones; the binder shows one page at a time at ≤ 1000 px, so `?view=binder` never lies. | R10B |
+
+| D56 | Dex number format | "No. 025" everywhere (was "#025"); tests updated with the change. | R10B |
+
+| D57 | Pokémon page details | Desktop (> 1000 px) shows the readout grid with no tabs; phones keep the Tabs primitive (Stats, Profile, Evolution, Matchups). Switched by a tested `useMediaQuery` hook, not CSS, so the ARIA tab roles never describe something that isn't there. | R10B |
+
+| D58 | Class contract | Regenerated from the tests (the list in §8.3 had gone stale); see the R10B section. | R10B |
+
+| D59 | Choreography and the motion gate | Hover and press use `--dur-*` tokens. Choreographed sequences with literal timings (encounter, deal, VS slam, flip, page turn) sit under `:root[data-motion="on"]`, which the motion-gate test already accepts. | R10B |
+
+| D60 | CSS budget during R10B | Raised 11 → 11.5 kB gzip at B&W-1 (measured 11.02). Cause: new tokens (+0.72 kB gzip on their own) living next to the retired ones; the Archivo @font-face CSS is 0.48 kB. Each slice re-measures; B&W-8 lowers the budget again after deleting the slate / teal / gold primitives. | R10B |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
@@ -944,3 +1020,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-11-12 | R9 complete: settings model (intent + resolver + tolerant migration), Settings dialog, PageHeader on every page, Pokémon page regrouped, credits footer, pixel-art 404, celebrations as events (shiny sparkle, first favorite, icon pops), one opt-in motion gate with a CI guard and a classified inventory, page-load intro, StyleGuide no longer shipped. Sound dropped (D28). D28–D33 recorded. 807 → 910 tests; +3.30 kB JS gzip, +0.96 kB CSS gzip. |
 
 | 2026-11-15 | R10 rescoped: Parts 4–6 refocused on build output, caching, E2E smoke tests and release engineering; matrices, visual regression and Lighthouse CI dropped. |
+
+| 2026-11-21 | R10 complete. R10B "Black & White redesign" added between R10 and R11 (spec in docs/redesign/), with slices B&W-1 to B&W-8, a regenerated class contract and D40–D59. R11 now depends on R10B. |
