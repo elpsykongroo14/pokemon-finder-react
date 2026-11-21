@@ -1,62 +1,83 @@
+/* Stat row (spec 5.5): label, value, then a slanted Mist track filled in
+   the Pokémon's own color, measured against 255. The track leans itself
+   (it holds no text, the one exception to "skew the ::before").
+
+   Motion: the fill is drawn at its final width from the first frame.
+   The grow-in (scaleX from 0) only exists under data-motion="on" (D59),
+   so with motion off there is no starting state that could leave a bar
+   empty. scaleX instead of animating width: the browser can run it on
+   the compositor, no layout per frame */
 @layer features {
   .stat-meter {
     display: grid;
-    grid-template-columns: 72px 1fr 40px;
+    grid-template-columns: var(--stat-columns);
     align-items: center;
-    gap: var(--space-3);
+    column-gap: var(--space-4);
+    min-height: 42px;
   }
 
   .stat-meter__label {
-    font-size: var(--text-xs);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
     color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
+  }
+
+  .stat-meter__value {
+    font-size: var(--text-stat);
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+    color: var(--text-primary);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
 
   .stat-meter__track {
-    height: 6px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-window-sunken);
+    position: relative;
+    height: 14px;
+    background: var(--surface-well);
+    transform: skewX(var(--slant));
     overflow: hidden;
   }
 
   .stat-meter__fill {
     height: 100%;
-    border-radius: inherit;
-    background: var(--accent-select);
     width: var(--stat-meter-percent, 0%);
-    transition: width var(--dur-slow) var(--ease-tick);
-    /* on mount: grow from empty, each row a beat after the one above.
-       Both times come from motion tokens, which are 0ms when animations
-       are off, so reduced motion needs no extra rule here. */
-    animation: stat-meter-fill var(--dur-slow) var(--ease-tick) both;
-    animation-delay: calc(var(--stat-index, 0) * var(--dur-instant));
+    background: var(--theme-accent);
+    transform-origin: left center;
+    /* a value change (Compare swapping a side) slides to the new width */
+    transition: width var(--dur-slow) var(--ease-settle);
   }
 
-  @keyframes stat-meter-fill {
-    from {
-      width: 0;
-    }
+  /* the highest stat: its label steps up to Ink and bold. The fill does
+     not change color, the bar's length already says "biggest" */
+  .stat-meter[data-variant="highest"] .stat-meter__label {
+    color: var(--text-primary);
+    font-weight: var(--weight-bold);
   }
 
-  .stat-meter[data-variant="highest"] .stat-meter__fill {
-    background: var(--text-success);
-  }
-
+  /* tiered bars (no Pokémon color to borrow): three greys, darkest for
+     the strongest. The number beside the bar carries the value, so
+     the shade is a second signal, never the only one */
   .stat-meter[data-tier="high"] .stat-meter__fill {
-    background: var(--text-success);
+    background: var(--text-primary);
   }
   .stat-meter[data-tier="mid"] .stat-meter__fill {
-    background: var(--text-warning);
+    background: var(--text-secondary);
   }
   .stat-meter[data-tier="low"] .stat-meter__fill {
-    background: var(--text-danger);
+    background: var(--border-hairline);
   }
 
-  .stat-meter__value {
-    font-size: var(--text-sm);
-    color: var(--text-primary);
-    text-align: right;
-    font-variant-numeric: tabular-nums;
+  /* 600 ms each, 50 ms apart down the list (spec 5.5). The encounter's
+     380 ms head start belongs to the encounter, B&W-4 adds it there */
+  :root[data-motion="on"] .stat-meter__fill {
+    animation: stat-meter-grow 600ms var(--ease-settle) both;
+    animation-delay: calc(var(--stat-index, 0) * 50ms);
+  }
+
+  @keyframes stat-meter-grow {
+    from {
+      transform: scaleX(0);
+    }
   }
 }

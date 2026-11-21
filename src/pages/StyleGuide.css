@@ -1,6 +1,8 @@
 /* src/pages/StyleGuide.css
-   Dev-only layout for the token preview page. Every color here is a
-   var() from tokens written in Parts 1-4 — nothing new is invented. */
+   Dev-only layout for the primitives preview page. Every color is a
+   token. This file is unlayered (it beats every layer), so it styles
+   only its own classes and never a primitive's: the page must show the
+   primitives exactly as the app draws them */
 
 .styleguide {
   padding: var(--space-6);
@@ -38,28 +40,13 @@
 .swatch {
   width: 96px;
   height: 64px;
-  border-radius: var(--radius-sm);
   border: var(--border-width-hairline) solid var(--border-hairline);
-  display: flex;
-  align-items: flex-end;
-  padding: var(--space-1);
-  font-size: var(--text-xs);
-  color: var(--text-primary);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .type-grid {
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
-}
-
-.type-badge {
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  text-transform: capitalize;
 }
 
 .type-picker {
@@ -112,35 +99,6 @@
   padding: var(--space-2) var(--space-4);
   font-weight: 700;
   cursor: pointer;
-}
-
-.elevation-row {
-  display: flex;
-  gap: var(--space-5);
-}
-
-.elevation-box {
-  padding: var(--space-5);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-raised);
-  cursor: pointer;
-  transition:
-    box-shadow var(--dur-instant) var(--ease-standard),
-    transform var(--dur-instant) var(--ease-standard);
-}
-
-.elevation-box:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translateY(3px);
-}
-
-.elevation-box--frame {
-  background: var(--surface-chrome);
-  color: var(--text-primary);
-}
-
-.elevation-box--window {
-  background: var(--surface-window);
 }
 
 .motion-demo {
@@ -198,4 +156,29 @@
   height: 40px;
   display: flex;
   align-items: center;
+}
+
+.type-sample {
+  margin: 0 0 var(--space-4);
+}
+
+.type-sample--display {
+  font-size: var(--text-display);
+  font-weight: var(--weight-black);
+  font-style: italic;
+  font-stretch: var(--width-display);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+}
+
+.type-sample--game {
+  font-family: var(--font-game);
+  font-size: var(--text-2xl);
+  line-height: 1.1;
+}
+
+/* a black plate to show the on-black buttons on */
+.styleguide__plate {
+  padding: var(--space-5);
+  background: var(--surface-ink);
 }

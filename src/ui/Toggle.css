@@ -1,45 +1,54 @@
+/* A switch, drawn by the calm-utility rule (square corners, no slant).
+   B&W-1 left it black thumb on black track; now: off is a Mist track
+   with an Ink thumb, on is an Ink track with a white thumb on the right.
+   Position AND fill change, so "on" never rests on color alone.
+   (Its two callers, Pixel/Artwork and Shiny, become segmented controls
+   in B&W-4, spec 5.3; this primitive is then unused and B&W-8 decides
+   whether it stays) */
 @layer features {
   .toggle {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    font-weight: var(--weight-semibold);
     cursor: pointer;
   }
 
   .toggle__input {
     appearance: none;
     position: relative;
-    width: 40px;
-    height: 22px;
+    flex: none;
+    width: var(--control-md);
+    height: var(--space-5);
+    margin: 0;
     border: var(--border-width-line) solid var(--border-line);
-    border-radius: var(--radius-pill);
-    background: var(--surface-window-sunken);
+    border-radius: var(--radius-square);
+    background: var(--surface-well);
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-standard);
+    transition: background-color var(--dur-fast) var(--ease-standard);
   }
 
   .toggle__input::before {
     content: "";
     position: absolute;
-    top: 1px;
-    left: 1px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+    top: var(--border-width-line);
+    left: var(--border-width-line);
+    width: var(--space-4);
+    height: var(--space-4);
+    border-radius: var(--border-width-line);
     background: var(--text-primary);
-    transition: transform var(--dur-fast) var(--ease-standard);
+    transition: transform var(--dur-fast) var(--ease-settle);
   }
 
   .toggle__input:checked {
-    background: var(--accent-select);
+    background: var(--text-primary);
   }
 
   .toggle__input:checked::before {
-    transform: translateX(18px);
-  }
-
-  .toggle__input:focus-visible {
-    outline: var(--border-width-line) solid var(--focus-ring);
-    outline-offset: 2px;
+    background: var(--surface-paper);
+    /* track 44 - 2 x 2 border - 16 thumb - 2 x 2 inset = 20 */
+    transform: translateX(
+      calc(var(--control-md) - var(--space-4) - 4 * var(--border-width-line))
+    );
   }
 }

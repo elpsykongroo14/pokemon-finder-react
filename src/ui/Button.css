@@ -1,76 +1,139 @@
+/* Slanted buttons (spec 4.3, 5.2). The element never leans: its ::before
+   is the skewed plate, so the label, the icon and the hit area stay
+   upright. isolation keeps the plate's z-index: -1 inside the button
+   instead of sliding under the page.
+
+   Each variant sets three local properties, and hover swaps them. The
+   shared rules below only ever read the locals, so a fifth variant
+   would be four lines, not a new set of selectors. */
 @layer features {
   .btn {
+    --btn-plate: transparent;
+    --btn-ring: transparent;
+    --btn-ink: var(--text-primary);
+
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
-    font-family: var(--font-display);
+    gap: var(--space-3);
+    min-height: var(--control-lg);
+    padding: 0 calc(var(--space-5) - var(--space-1)); /* 20: the slant eats the rest */
+    border: 0;
+    background: transparent;
+    color: var(--btn-ink);
+    font-family: var(--font-body);
     font-size: var(--text-base);
-    padding: var(--space-2) var(--space-4);
-    border: var(--border-width-line) solid var(--border-line);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    box-shadow: var(--shadow-raised);
-    transition:
-      transform var(--dur-instant) var(--ease-standard),
-      box-shadow var(--dur-instant) var(--ease-standard);
-  }
-
-  /* the same look on a link: a.btn is an anchor drawn like a button */
-  a.btn {
+    font-weight: var(--weight-bold);
+    font-stretch: var(--width-heading);
+    white-space: nowrap;
     text-decoration: none;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-standard);
   }
 
-  .btn[data-variant="primary"] {
-    background: var(--accent-select);
-    color: var(--surface-frame);
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    background: var(--btn-plate);
+    box-shadow: inset 0 0 0 var(--border-width-line) var(--btn-ring);
+    transition:
+      background-color var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-fast) var(--ease-standard),
+      transform var(--dur-instant) var(--ease-standard);
   }
 
-  .btn[data-variant="secondary"] {
-    background: var(--surface-chrome);
-    color: var(--text-primary);
+  .btn[data-size="sm"] {
+    min-height: var(--control-sm);
+    padding: 0 var(--space-4);
+    font-size: var(--text-md);
+  }
+
+  /* --- the four looks, and what hover turns them into --- */
+  .btn[data-variant="dark"] {
+    --btn-plate: var(--surface-ink);
+    --btn-ink: var(--surface-paper);
+  }
+
+  .btn[data-variant="line"],
+  .btn[data-variant="dark"]:hover:not(:disabled) {
+    --btn-plate: var(--surface-paper);
+    --btn-ring: var(--surface-ink);
+    --btn-ink: var(--surface-ink);
+  }
+
+  .btn[data-variant="line"]:hover:not(:disabled) {
+    --btn-plate: var(--surface-ink);
+    --btn-ring: transparent;
+    --btn-ink: var(--surface-paper);
+  }
+
+  .btn[data-variant="light"] {
+    --btn-plate: var(--surface-paper);
+    --btn-ink: var(--surface-ink);
+  }
+
+  .btn[data-variant="light"]:hover:not(:disabled) {
+    --btn-plate: var(--surface-ink);
+    --btn-ring: var(--surface-paper);
+    --btn-ink: var(--surface-paper);
   }
 
   .btn[data-variant="ghost"] {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-    color: var(--text-primary);
+    --btn-ring: var(--surface-paper);
+    --btn-ink: var(--surface-paper);
   }
 
-  .btn[data-variant="danger"] {
-    background: var(--text-danger);
-    color: var(--surface-frame);
+  .btn[data-variant="ghost"]:hover:not(:disabled) {
+    --btn-plate: var(--surface-paper);
+    --btn-ink: var(--surface-ink);
   }
 
-  .btn[aria-pressed="true"] {
-    box-shadow: var(--shadow-pressed);
-    transform: translateY(2px);
-    border-color: var(--accent-select);
+  /* A toggle that is on wears its hover look at rest, so "on" is visible
+     without a pointer. B&W-4 adds the label swap (Favorite / Favorited);
+     the inverted plate stays as the second signal, color is never the
+     only one */
+  .btn[data-variant="line"][aria-pressed="true"] {
+    --btn-plate: var(--surface-ink);
+    --btn-ring: transparent;
+    --btn-ink: var(--surface-paper);
   }
 
-  .btn:active:not(:disabled) {
-    box-shadow: var(--shadow-pressed);
-    transform: translateY(2px);
+  .btn[data-variant="dark"][aria-pressed="true"] {
+    --btn-plate: var(--surface-paper);
+    --btn-ring: var(--surface-ink);
+    --btn-ink: var(--surface-ink);
   }
 
+  /* pressed: the plate sinks, the label stays put */
+  .btn:active:not(:disabled)::before {
+    transform: skewX(var(--slant)) translateY(var(--border-width-line));
+  }
+
+  /* The ring follows the slant: a skewed ::after, 6 px out. The base
+     layer's rectangular outline is switched off here (a later layer
+     wins without a specificity fight). --focus-ring flips to white
+     inside .on-dark, so light and ghost buttons need nothing extra */
   .btn:focus-visible {
-    outline: var(--border-width-line) solid var(--focus-ring);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .btn:focus-visible::after {
+    content: "";
+    position: absolute;
+    inset: calc(-2 * var(--border-width-thick));
+    transform: skewX(var(--slant));
+    border: var(--border-width-thick) solid var(--focus-ring);
+    pointer-events: none;
   }
 
   .btn:disabled {
-    opacity: 0.5;
+    opacity: var(--opacity-disabled);
     cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  .btn[aria-busy="true"] {
-    width: 1em;
-    height: 1em;
-    border: 2px solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: btn-spin var(--dur-slow) linear infinite;
   }
 }
