@@ -59,12 +59,12 @@ export function PokemonActions({ pokemon }: PokemonActionsProps) {
           {ACTIONS_EXPLORE_LABEL}
         </span>
         <div className="pokemon-actions__row">
-          <TransitionLink to={`/compare?a=${name}`} variant="secondary">
+          <TransitionLink to={`/compare?a=${name}`} variant="line">
             {/* decorative: hidden so the link is named "Compare", not
                 "crossed swords, Compare" */}
             <span aria-hidden="true">⚔️</span> Compare
           </TransitionLink>
-          <TransitionLink to={`/library/${name}`} variant="secondary">
+          <TransitionLink to={`/library/${name}`} variant="line">
             View Cards
           </TransitionLink>
         </div>

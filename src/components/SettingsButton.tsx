@@ -13,7 +13,6 @@ export function SettingsButton() {
   return (
     <>
       <IconButton
-        variant="ghost"
         icon={<Icon name="settings" />}
         aria-label={SETTINGS_LABEL}
         onClick={() => setOpen(true)}

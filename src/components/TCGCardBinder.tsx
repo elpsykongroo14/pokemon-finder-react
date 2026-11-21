@@ -73,7 +73,7 @@ export function TCGCardBinder({
 
       <nav className="binder__nav" aria-label={BINDER_PAGES_LABEL}>
         <Button
-          variant="secondary"
+          variant="line"
           disabled={spread.page <= 1}
           onClick={() => onPageChange(spread.page - 1)}
         >
@@ -83,7 +83,7 @@ export function TCGCardBinder({
           Page {spread.page} of {spread.pageCount}
         </p>
         <Button
-          variant="secondary"
+          variant="line"
           disabled={spread.page >= spread.pageCount}
           onClick={() => onPageChange(spread.page + 1)}
         >

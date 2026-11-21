@@ -20,7 +20,7 @@ export function FailureMessage({ kind, query, onRetry }: FailureMessageProps) {
   if (kind === "unreachable") {
     return (
       <MessageBox variant="error" text={text}>
-        <Button variant="secondary" onClick={onRetry}>
+        <Button variant="line" onClick={onRetry}>
           {RETRY_LABEL}
         </Button>
       </MessageBox>
