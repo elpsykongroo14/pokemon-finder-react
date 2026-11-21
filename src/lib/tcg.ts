@@ -36,8 +36,11 @@ const RARITY_RANK: Record<string, number> = {
   "Rare Holo V": 4,
   "Rare Holo GX": 4,
   "Rare Holo EX": 4,
+  "Double Rare": 4, //the modern "ex" cards: tier holo
+  "Rare BREAK": 4, //tier holo
   "Rare Holo": 3,
   Rare: 2,
+  Promo: 2, //tier rare
   Uncommon: 1,
   Common: 0,
 };
