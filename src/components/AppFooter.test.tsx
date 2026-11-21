@@ -19,7 +19,7 @@ describe("AppFooter", () => {
   it.each([
     ["PokéAPI", "https://pokeapi.co"],
     ["Pokémon TCG API", "https://pokemontcg.io"],
-    ["Jersey 10 & Nunito", "https://fontsource.org"],
+    ["Jersey 10 & Archivo", "https://fontsource.org"],
     ["elpsykongroo14", "https://github.com/elpsykongroo14"],
   ])("credits %s with a link to its source", (name, href) => {
     render(<AppFooter />);
