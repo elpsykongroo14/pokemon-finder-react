@@ -1,59 +1,81 @@
 /* src/styles/semantic.css
    Tier 2: roles. Every component reads a variable from THIS file
-   (or motion.css), never a primitive directly. This is the layer's type-theme engine rebinds to reskin the whole page.
+   (or motion.css), never a primitive directly.
 
-   Default values below assume a component sits on the dark
-   "frame" surface. Anything placed inside a light "window" panel
-   (.surface-window) gets a scoped override in the second block
-   several colors flip to darker ink variants there, because a
-   value that reads fine on near black fails contrast on
-   near white. That failure was measured, not guessed: see the R1
-   contrast notes in the design brief. */
+   Black & White (D41): the page is Paper, text and rules are Ink,
+   and the only color on screen comes from the Pokémon through the
+   type theme (type-themes.css). The roles below are the same ones
+   the dark slate design used; only what they point at changed, which
+   is why one file can re-skin the whole app.
+
+   Two scopes override the defaults:
+   .on-dark        a black plate (name plates, the command plate, the
+                   card dialog): text and focus ring flip to white
+   .surface-window the old light panel. On a white page it now equals
+                   the defaults; it stays until the last component
+                   that sets it is restyled (B&W-8 removes it) */
 
 :root {
   /* Surfaces */
-  --surface-frame: var(--slate-900);
-  --surface-chrome: var(--slate-800);
-  --surface-window: var(--slate-100);
-  --surface-well: var(--slate-700);
-  --surface-window-raised: var(--slate-050);
-  --surface-window-sunken: var(--slate-800);
-  --surface-overlay: rgba(0, 0, 0, 0.55);
-  --drop-raised: 0 3px 0 var(--slate-900);
-  --shadow-sunken: inset 0 2px 0 0 var(--slate-900);
+  --surface-frame: var(--paper); /* the page */
+  --surface-chrome: var(--paper); /* the header */
+  --surface-window: var(--paper);
+  --surface-well: var(--mist); /* inputs, tracks, hover fills */
+  --surface-window-raised: var(--paper);
+  --surface-window-sunken: var(--mist);
+  --surface-ink: var(--ink); /* black plates */
+  --surface-overlay: var(--black-a55); /* dialog scrim */
+  --surface-overlay-deep: var(--black-a92); /* card dialog scrim */
 
-  /* Text (on the dark frame/chrome) */
-  --text-primary: var(--slate-100);
-  --text-secondary: var(--slate-300);
-  --text-danger: var(--red-500);
-  --text-success: var(--green-500);
-  --text-warning: var(--gold-600);
+  /* Elevation (D41): flat by default. The hard shadow belongs to the
+     autocomplete panel only; the soft shadow to trading cards only.
+     "0 0 0 0 transparent" instead of "none": it stays valid inside a
+     comma-separated box-shadow list, "none" would void the whole list */
+  --shadow-raised: 0 0 0 0 transparent;
+  --shadow-pressed: 0 0 0 0 transparent;
+  --drop-raised: 0 0 0 0 transparent;
+  --shadow-sunken: 0 0 0 0 transparent;
+  --bevel-highlight: 0 0 0 0 transparent;
+  --shadow-hard: 6px 6px 0 var(--ink);
+  --shadow-card: 0 8px 18px var(--black-a20);
 
-  /* Borders & accents (on the dark frame/chrome) */
-  --border-line: var(--teal-500);
-  --border-hairline: var(--slate-600);
-  --accent-select: var(--gold-400);
-  --focus-ring: var(--teal-500);
+  /* Text */
+  --text-primary: var(--ink);
+  --text-secondary: var(--graphite);
+  --text-danger: var(--red-800);
+  --text-success: var(--green-800);
+  --text-warning: var(--gold-600); /* last user: StatMeter tiers (B&W-2) */
 
-  /* Rarity tiers. "common" has no token on purpose: no effect. */
-  --rarity-rare: var(--slate-300);
-  --rarity-holo: var(--teal-500);
-  --rarity-ultra: var(--gold-400);
+  /* Borders & accents */
+  --border-line: var(--ink); /* rules, rings */
+  --border-hairline: var(--line);
+  --accent-select: var(--ink); /* current page, selected option */
+  --focus-ring: var(--ink);
+  --focus-halo: var(--paper); /* fills the gap between element and ring */
 
-  /* Holo effect: the shine laid over cards of rare tiers and up */
-  --gloss-highlight: rgba(255, 255, 255, 0.55);
-  --holo-foil: linear-gradient(
-    115deg,
-    var(--teal-500),
-    var(--gold-400),
-    var(--type-psychic),
-    var(--teal-500)
+  /* Rarity tiers. "common" has no token on purpose: no effect.
+     B&W-7 turns these into the four tier marks */
+  --rarity-rare: var(--line);
+  --rarity-holo: var(--ink);
+  --rarity-ultra: var(--ink);
+  --rarity-ultra-fill: linear-gradient(
+    100deg,
+    var(--foil-pink),
+    var(--foil-yellow) 30%,
+    var(--foil-mint) 60%,
+    var(--foil-blue)
   );
 
-  /* Elevation */
-  --shadow-raised: 0 3px 0 0 var(--slate-900);
-  --shadow-pressed: 0 0 0 0 transparent;
-  --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  /* Holo effect on trading cards: glare + foil band */
+  --gloss-highlight: var(--white-a55);
+  --holo-foil: linear-gradient(
+    115deg,
+    var(--foil-pink-a50),
+    var(--foil-yellow-a50),
+    var(--foil-mint-a50),
+    var(--foil-blue-a50),
+    var(--foil-pink-a50)
+  );
 
   /* z-index roles, mapped to the raw steps in primitives.css */
   --z-dropdown: var(--z-10);
@@ -63,19 +85,34 @@
   --z-toast: var(--z-50);
 }
 
-/* Any subtree marked .surface-window sits on the light panel
-   color, so several roles need their on-light variant instead. */
+/* A black plate. Same pattern as .surface-window: the subtree
+   re-binds the roles it reads, so a component placed inside never
+   needs to know it is on black */
+.on-dark {
+  --text-primary: var(--paper);
+  --text-secondary: var(--on-dark-200);
+  --text-tertiary: var(--on-dark-400);
+  --text-danger: var(--red-500);
+  --text-success: var(--green-500);
+  --border-line: var(--paper);
+  --border-hairline: var(--graphite);
+  --accent-select: var(--paper);
+  --focus-ring: var(--paper);
+  --focus-halo: var(--ink);
+
+  color: var(--text-primary);
+}
+
+/* The old light window. On white it is the default, so every role
+   points where :root does; kept so nothing that still sets the
+   class falls back to the slate values */
 .surface-window {
-  --text-primary: var(--slate-800);
-  --text-secondary: var(--slate-400);
+  --text-primary: var(--ink);
+  --text-secondary: var(--graphite);
   --text-danger: var(--red-800);
   --text-success: var(--green-800);
-  --text-warning: var(--gold-600);
-  --border-line: var(--teal-700);
-  --focus-ring: var(--teal-700);
-  --shadow-raised: 0 3px 0 0 var(--slate-400);
-  --bevel-highlight: inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
-  --surface-window-sunken: var(--slate-300);
-  --drop-raised: 0 3px 0 var(--slate-400);
-  --shadow-sunken: inset 0 2px 0 0 var(--slate-400);
+  --border-line: var(--ink);
+  --focus-ring: var(--ink);
+  --focus-halo: var(--paper);
+  --surface-window-sunken: var(--mist);
 }

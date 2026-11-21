@@ -1,72 +1,77 @@
 /* Tier 1.5: derives --type-x-deep / -soft / -ink from each
    --type-x primitive, then exposes them under generic
    --theme-* role names via a [data-type] attribute selector.
-   R4 sets data-type on a container to reskin that subtree;
-   nothing here is wired to a component yet (R1 scope). */
+   useTypeTheme sets data-type / data-type2 on <html>; any other
+   element can wear them too (Compare halves, team cards), which
+   re-skins just that subtree.
+
+   The last section turns the theme into the encounter field
+   (sky, ground, stripes, dex color), spec 4.1. */
 
 :root {
   --type-normal-deep: #54543c;
   --type-normal-soft: #d8d8c2;
-  --type-normal-ink: var(--slate-900);
+  --type-normal-ink: var(--ink);
   --type-fire-deep: #80361a;
   --type-fire-soft: #ffbca4;
-  --type-fire-ink: var(--slate-900);
+  --type-fire-ink: var(--ink);
   --type-water-deep: #25486c;
   --type-water-soft: #aecdee;
-  --type-water-ink: var(--slate-900);
+  --type-water-ink: var(--ink);
   --type-electric-deep: #7c6212;
   --type-electric-soft: #fce59c;
-  --type-electric-ink: var(--slate-900);
+  --type-electric-ink: var(--ink);
   --type-grass-deep: #2e5c2e;
   --type-grass-soft: #b6dfb6;
-  --type-grass-ink: var(--slate-900);
+  --type-grass-ink: var(--ink);
   --type-ice-deep: #4b6c6b;
   --type-ice-soft: #d0eeed;
-  --type-ice-ink: var(--slate-900);
+  --type-ice-ink: var(--ink);
   --type-fighting-deep: #601814;
   --type-fighting-soft: #e3a29e;
-  --type-fighting-ink: var(--slate-050);
+  --type-fighting-ink: var(--paper);
   --type-poison-deep: #502050;
   --type-poison-soft: #d4a9d4;
-  --type-poison-ink: var(--slate-050);
+  --type-poison-ink: var(--paper);
   --type-ground-deep: #706034;
   --type-ground-soft: #f1e3bb;
-  --type-ground-ink: var(--slate-900);
+  --type-ground-ink: var(--ink);
   --type-flying-deep: #544878;
   --type-flying-soft: #d8cdf8;
-  --type-flying-ink: var(--slate-900);
+  --type-flying-ink: var(--ink);
   --type-psychic-deep: #7c2c44;
   --type-psychic-soft: #fcb4c9;
-  --type-psychic-ink: var(--slate-900);
+  --type-psychic-ink: var(--ink);
   --type-bug-deep: #545c10;
   --type-bug-soft: #d8df9b;
-  --type-bug-ink: var(--slate-900);
+  --type-bug-ink: var(--ink);
   --type-rock-deep: #5c501c;
   --type-rock-soft: #dfd4a5;
-  --type-rock-ink: var(--slate-900);
+  --type-rock-ink: var(--ink);
   --type-ghost-deep: #382c4c;
   --type-ghost-soft: #bfb4d1;
-  --type-ghost-ink: var(--slate-050);
+  --type-ghost-ink: var(--paper);
   --type-dragon-deep: #381c7c;
   --type-dragon-soft: #bfa5fc;
-  --type-dragon-ink: var(--slate-050);
+  --type-dragon-ink: var(--paper);
   --type-dark-deep: #382c24;
   --type-dark-soft: #bfb4ad;
-  --type-dark-ink: var(--slate-050);
+  --type-dark-ink: var(--paper);
   --type-steel-deep: #5c5c68;
   --type-steel-soft: #dfdfea;
-  --type-steel-ink: var(--slate-900);
+  --type-steel-ink: var(--ink);
   --type-fairy-deep: #774c56;
   --type-fairy-soft: #f7d1da;
-  --type-fairy-ink: var(--slate-900);
+  --type-fairy-ink: var(--ink);
 
-  /* Default theme accent: used on pages with no single Pokémon
-     in focus (Home, Compare, Library). */
-  --theme-accent: var(--teal-500);
-  --theme-accent-deep: var(--teal-700);
-  --theme-accent-soft: var(--slate-100);
-  --theme-accent-ink: var(--slate-900);
-  --theme-soft-ink: var(--slate-900);
+  /* Default theme: no Pokémon in focus (empty Compare, loading,
+     errors, 404, the Library without a name). The field turns
+     Graphite, the one neutral dark enough to read as "a sky" */
+  --theme-accent: var(--graphite);
+  --theme-accent-deep: var(--ink);
+  --theme-accent-soft: var(--mist);
+  --theme-accent-ink: var(--paper);
+  --theme-soft-ink: var(--ink);
   --theme-accent-2: var(--theme-accent);
   --theme-accent-2-deep: var(--theme-accent-deep);
 }
@@ -285,4 +290,44 @@
 [data-type2="dark"] {
   --theme-accent-2: var(--type-dark);
   --theme-accent-2-deep: var(--type-dark-deep);
+}
+
+/* ---- The encounter field (spec 4.1) --------------------------------
+   Declared on every element that carries a theme, not only on :root.
+   Why: a custom property that holds var(--theme-accent) is resolved
+   on the element that declares it, and children inherit the RESULT.
+   Declared on :root alone, a Compare half with data-type="fire"
+   would still inherit the page's sky. Re-declaring it under
+   [data-type] makes each themed subtree resolve its own. */
+:root,
+[data-type] {
+  --field-sky: var(--theme-accent);
+  --field-ground: var(--black-a16); /* laid over the sky */
+  --field-horizon: var(--black-a18);
+  --field-stripe: var(--theme-accent-2);
+  --field-stripe-opacity: 1;
+  --field-dex: var(--theme-accent-soft); /* "No. 635" on the black plate */
+  --field-platform: var(--white-a34);
+  --field-platform-ring: var(--black-a16);
+  --field-platform-inner: var(--white-a40);
+  --field-platform-shadow: var(--black-a22);
+}
+
+/* No Pokémon in focus: Graphite sky (the default theme above),
+   faint Mist stripes */
+:root:not([data-type]) {
+  --field-stripe: var(--mist);
+  --field-stripe-opacity: 0.35;
+}
+
+/* One type only. --theme-accent-2 already falls back to the primary
+   color, but that would paint full-strength stripes in the sky's own
+   color, invisible. Single types get the soft tint at half strength.
+   Written for any themed element (not :root only) for the same
+   reason as the field block above */
+[data-type]:not([data-type2]) {
+  --theme-accent-2: var(--theme-accent);
+  --theme-accent-2-deep: var(--theme-accent-deep);
+  --field-stripe: var(--theme-accent-soft);
+  --field-stripe-opacity: 0.5;
 }

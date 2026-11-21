@@ -27,17 +27,24 @@
     background: var(--surface-frame);
     color: var(--text-primary);
     font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
   }
 
   #root {
     min-height: 100svh;
   }
 
+  /* the section-heading voice (spec 4.2). The big italic display
+     style is opt-in per component (names, page titles), because
+     most headings in the app are section headings */
   h1,
   h2,
   h3 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+    line-height: var(--leading-heading);
     color: var(--text-primary);
     margin: 0 0 var(--space-2);
   }
@@ -59,8 +66,15 @@
     margin: 0;
   }
 
+  /* spec 4.5: an Ink ring 3px out, with a Paper halo filling the gap,
+     so the ring reads on white, on black and on any type color.
+     .on-dark swaps the two colors through the tokens. Components
+     that draw rings with box-shadow (slanted buttons) replace this
+     with a ring on their own ::after; they live in later layers,
+     so they win without fighting specificity */
   :focus-visible {
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 2px;
+    outline: var(--border-width-thick) solid var(--focus-ring);
+    outline-offset: var(--border-width-thick);
+    box-shadow: 0 0 0 var(--border-width-thick) var(--focus-halo);
   }
 }

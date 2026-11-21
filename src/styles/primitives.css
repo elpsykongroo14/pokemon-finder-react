@@ -4,7 +4,44 @@
    from this file directly, see semantic.css for that layer. */
 
 :root {
-  /*Neutrals: the slate ramp (D13 chrome)*/
+  /*Neutrals: Black & White (D41)
+     Five values. Everything else on screen is a type color. */
+  --ink: #000000; /* text, plates, primary buttons, rules */
+  --paper: #ffffff; /* the page */
+  --mist: #eceef1; /* inputs, stat tracks, hover fills, empty slots */
+  --line: #c9cdd4; /* hairlines, inactive pips, the losing side */
+  --graphite: #4a4e57; /* secondary text, 8.6:1 on paper */
+
+  /* text on black plates */
+  --on-dark-200: #d8dbe0; /* secondary */
+  --on-dark-400: #a3a8b3; /* tertiary */
+
+  /* translucent black and white: the field (ground, horizon,
+     platform), the card dialog scrim, the one soft shadow (cards) */
+  --black-a16: rgba(0, 0, 0, 0.16);
+  --black-a18: rgba(0, 0, 0, 0.18);
+  --black-a20: rgba(0, 0, 0, 0.2);
+  --black-a22: rgba(0, 0, 0, 0.22);
+  --black-a55: rgba(0, 0, 0, 0.55);
+  --black-a92: rgba(0, 0, 0, 0.92);
+  --white-a12: rgba(255, 255, 255, 0.12);
+  --white-a20: rgba(255, 255, 255, 0.2);
+  --white-a34: rgba(255, 255, 255, 0.34);
+  --white-a40: rgba(255, 255, 255, 0.4);
+  --white-a55: rgba(255, 255, 255, 0.55);
+
+  /* foil: the one rainbow in the app, only on trading cards */
+  --foil-pink: #ffd6e8;
+  --foil-yellow: #fff3b0;
+  --foil-mint: #c6f7e9;
+  --foil-blue: #cdd8ff;
+  --foil-pink-a50: rgba(255, 214, 232, 0.5);
+  --foil-yellow-a50: rgba(255, 243, 176, 0.5);
+  --foil-mint-a50: rgba(198, 247, 233, 0.5);
+  --foil-blue-a50: rgba(205, 216, 255, 0.5);
+
+  /*Retired neutrals and accents (D13), kept until nothing
+     references them; B&W-8 deletes them*/
   --slate-900: #10151a;
   --slate-800: #171e24;
   --slate-700: #202a31;
@@ -15,7 +52,6 @@
   --slate-100: #eef3f2;
   --slate-050: #f7faf9;
 
-  /*Accent ramps*/
   --teal-700: #1f8f80;
   --teal-600: #2bb9a5;
   --teal-500: #3fd6c0;
@@ -25,13 +61,13 @@
   --gold-400: #f2b545;
 
   /*Functional (not brand, not chrome)*/
-  --green-500: #3fd68a; /* success, "high" stat tier */
-  --green-800: #22754b; /* on-light text ink, added after the contrast check */
+  --green-500: #3fd68a; /* success on dark */
+  --green-800: #22754b; /* success on light, added after the contrast check */
 
-  --red-500: #e2483c; /* danger, "low" stat tier */
-  --red-800: #b43930; /* on-light text ink, added after the contrast check */
+  --red-500: #e2483c; /* danger on dark */
+  --red-800: #b43930; /* danger on light, added after the contrast check */
 
-  /*Pokémon type palette 
+  /*Pokémon type palette
      Unchanged from the current tokens.css. Kept verbatim as
      primitives; type-themes.css derives everything
      else (deep/soft/ink) from these single source values. */
@@ -54,14 +90,37 @@
   --type-steel: #b8b8d0;
   --type-fairy: #ee99ac;
 
-  /*Typography*/
-  --font-display: "Jersey 10", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Nunito Variable", ui-sans-serif, system-ui, sans-serif;
+  /*Typography (D40)
+     Archivo for everything people read; Jersey 10 only for game
+     text (the battle dialog and dex numbers) */
+  --font-display: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-game: "Jersey 10", ui-monospace, monospace;
 
-  --text-xs: 0.75rem;
+  /* Archivo's width axis, as font-stretch values */
+  --width-display: 125%; /* names and page titles */
+  --width-era: 118%; /* Library era headings */
+  --width-heading: 112%; /* section headings, buttons, chips */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 800;
+  --weight-black: 900;
+
+  --tracking-display: -0.02em;
+  --leading-display: 0.94;
+  --leading-heading: 1.2;
+  --leading-body: 1.5;
+
+  --text-xs: 0.75rem; /* 12 */
+  --text-meta: 0.8125rem; /* 13: labels and meta */
   --text-sm: 0.85rem;
-  --text-base: 1rem;
+  --text-md: 0.9375rem; /* 15: small buttons */
+  --text-base: 1rem; /* 16: body, buttons */
   --text-lg: 1.15rem;
+  --text-heading: 1.375rem; /* 22: section heading */
   --text-xl: 1.5rem;
   --text-2xl: 2rem;
   --text-display: 3rem;
@@ -75,17 +134,28 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 64px;
+  --space-gutter: 40px; /* page gutter, desktop */
+  --space-gutter-phone: 20px; /* page gutter, phone */
 
-  /*Radius*/
+  /*Shape: three rules (spec 4.3)*/
+  --slant: -13deg; /* plates, chips, buttons, bars, pips */
+  --radius-square: 4px; /* calm utilities: inputs, selects, settings */
   --radius-sm: 6px;
   --radius-md: 10px;
+  --radius-dialog: 14px; /* battle dialog, settings sheet, binder */
   --radius-lg: 16px;
   --radius-pill: 999px;
+  --radius-card: 4.6% / 3.3%; /* a trading card's real corner */
 
-  /*Border widths (T2: thin, crisp lines)*/
+  /*Readable widths*/
+  --measure-page: 1240px;
+  --measure-library: 1360px;
+
+  /*Border widths*/
   --border-width-hairline: 1px;
   --border-width-line: 2px;
-  --border-width-thick: 3px; /* reserved for the R3 Window frame */
+  --border-width-thick: 3px;
+  --border-width-heavy: 4px; /* the battle dialog frame */
 
   /*Raw z-index steps
      Roles (dropdown, modal, toast...) get assigned to these

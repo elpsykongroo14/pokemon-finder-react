@@ -1,6 +1,6 @@
 @layer features {
   .message-box {
-    font-family: var(--font-display);
+    font-family: var(--font-game);
     font-size: var(--text-base);
     line-height: 1.4;
     color: var(--text-primary);
