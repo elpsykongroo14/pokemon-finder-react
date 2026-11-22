@@ -22,13 +22,16 @@ export interface FavoritePokemon {
   name: string;
   id: number;
   sprite: string | null;
-}
-
-//what we persist for a team member: everything a favorite has, plus the extra detail a party card shows
-//`types` is OPTIONAL on purpose, teams saved before this field existed will not have it
-export interface TeamMember extends FavoritePokemon {
+  //D48: saved when a Pokémon is favorited, for the rail's type-colored
+  //underline. optional: favorites saved before this field have none, and
+  //get a neutral underline (no backfill)
   types?: string[];
 }
+
+//what we persist for a team member: today the same summary as a favorite
+//(types moved up into FavoritePokemon with D48). its own name, because the
+//two are free to grow apart: B&W-6 adds statTotal here (D49)
+export type TeamMember = FavoritePokemon;
 
 //---pokeAPI's universal building blocks:
 //almost every pokeAPI object references other resources this way instead of embeding them.
@@ -75,17 +78,31 @@ export interface PokemonSpecies {
   flavor_text_entries: FlavorTextEntry[];
 }
 
-//evolution_details is deliberately omitted: buildEvolutionTree() in main.js only ever reads .species.name and .evoles_to,
-//walking the tree structurally. it never inspects why an evolution happens
-//so that data (which is the largest, messiest part of this endpoint) isnt modeled
+//WHY a Pokémon evolves (D47). the real object has around twenty fields
+//(time of day, held item, known move, location...); only the three that
+//name the common cases are modeled, the "type only what you use" rule.
+//optional and nullable, because the API sends null for anything unused
+export interface EvolutionDetail {
+  trigger: NamedAPIResource;
+  min_level?: number | null;
+  item?: NamedAPIResource | null;
+  min_happiness?: number | null;
+}
+
+//evolution_details is optional: the root of a chain has an empty list, and
+//older fixtures (and tests) leave it out
 export interface ChainLink {
   species: NamedAPIResource;
   evolves_to: ChainLink[];
+  evolution_details?: EvolutionDetail[];
 }
 
 export interface EvolutionNode {
   name: string;
   children: EvolutionNode[];
+  //how THIS stage is reached from the one before ("Level 50", "Dusk
+  //Stone"); absent for the first stage and for triggers we cannot name
+  condition?: string;
 }
 
 export interface EvolutionChain {
@@ -122,4 +139,21 @@ export interface TCGCard {
     name?: string;
     releaseDate?: string;
   };
+}
+
+//---what a click on the Pokémon page just did. the toggles return these, so
+//the page can confirm the action in words (the inline confirmation, spec
+//6.2) without working the answer out a second time
+
+export interface FavoriteOutcome {
+  added: boolean;
+  //the list was empty before this add
+  first: boolean;
+}
+
+export interface TeamOutcome {
+  //rejected: the party was full, nothing changed
+  kind: "joined" | "left" | "rejected";
+  //the party size after the click
+  size: number;
 }

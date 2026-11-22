@@ -115,3 +115,35 @@ export function computeDefensiveChart(
 
   return multipliers;
 }
+
+export interface Matchup {
+  type: string;
+  multiplier: number;
+}
+
+export interface GroupedMatchups {
+  weak: Matchup[];
+  resists: Matchup[];
+  immune: Matchup[];
+}
+
+// the "Type matchups" section: the same defensive chart, sorted into the
+// three lists people actually read. Neutral (1x) matchups say nothing, so
+// they are left out. Within a list the biggest effect comes first (4x
+// before 2x, a quarter before a half); equal ones keep the chart's order,
+// because Array.prototype.sort is stable.
+export function groupMatchups(pokemonTypes: string[]): GroupedMatchups {
+  const all = Object.entries(computeDefensiveChart(pokemonTypes)).map(
+    ([type, multiplier]) => ({ type, multiplier }),
+  );
+
+  return {
+    weak: all
+      .filter((m) => m.multiplier > 1)
+      .sort((a, b) => b.multiplier - a.multiplier),
+    resists: all
+      .filter((m) => m.multiplier > 0 && m.multiplier < 1)
+      .sort((a, b) => a.multiplier - b.multiplier),
+    immune: all.filter((m) => m.multiplier === 0),
+  };
+}

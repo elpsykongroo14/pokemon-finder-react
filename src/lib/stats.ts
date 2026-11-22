@@ -13,6 +13,16 @@ export const STAT_ORDER = [
 //stat bar in the app is measured against the same ruler
 export const MAX_BASE_STAT = 255;
 
+//the same idea for the base stat total on the name plate: the highest
+//total of an ordinary form (Arceus, 720). special forms above it (Eternamax)
+//would only make every other bar look short
+export const MAX_STAT_TOTAL = 720;
+
+//"Base stat total": the six base stats added up
+export function statTotal(stats: readonly PokemonStat[]): number {
+  return stats.reduce((sum, s) => sum + s.base_stat, 0);
+}
+
 //how full a bat should be as a number from 0 to 100
 //clamped, so a bad input can never draw a bar outside its track
 //and a max of 0 returns 0 instead of dividing by zero
