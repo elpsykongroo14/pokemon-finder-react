@@ -4,9 +4,10 @@
 export const POKEDEX_SIZE = 1025;
 
 //pure formatting helper, no DOM, no React
-//dex numbers show as #006, #025, #150. padStart only ever adds zeros
-//it never cuts, so #1025 stays #1025
+//dex numbers show as No. 006, No. 025, No. 150, the way the games print
+//them (D56, was #025). padStart only ever adds zeros, it never cuts, so
+//No. 1025 stays No. 1025
 export function formatDexNumber(id: number): string {
-  if (!Number.isInteger(id) || id < 1) return "#???";
-  return `#${String(id).padStart(3, "0")}`;
+  if (!Number.isInteger(id) || id < 1) return "No. ???";
+  return `No. ${String(id).padStart(3, "0")}`;
 }
