@@ -17,13 +17,17 @@ export function PartyCounter() {
   const slots = Array.from({ length: MAX_TEAM }, (_, i) => team[i]);
 
   return (
-    <Link to="/team" className="party-counter">
-      {/* name: "Party" + ", 4 of 6". The word stays in the DOM on phones
-          too (CSS hides it visually there), so the name never changes */}
+    <Link
+      to="/team"
+      className="party-counter"
+      //one aria-label, "Party, 4 of 6" (D45), rather than the visible word
+      //plus a visually hidden count: browsers add a space before a hidden
+      //span that is positioned absolutely ("Party , 4 of 6"), so the name
+      //is written out whole. it still starts with the visible word
+      aria-label={`${PARTY_WORD}${partyCountText(team.length, MAX_TEAM)}`}
+    >
+      {/* the word stays in the DOM on phones too; CSS hides it there */}
       <span className="party-counter__word">{PARTY_WORD}</span>
-      <span className="visually-hidden">
-        {partyCountText(team.length, MAX_TEAM)}
-      </span>
       <span className="party-counter__pips" aria-hidden="true">
         {slots.map((member, i) => (
           <span

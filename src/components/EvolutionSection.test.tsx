@@ -4,6 +4,7 @@ import { EvolutionSection } from "./EvolutionSection";
 import { useEvolutionChain } from "../hooks/useEvolutionChain";
 import type { PokemonDetails } from "../lib/type";
 import { PreferencesProvider } from "../context/PreferencesContext";
+import { MemoryRouter } from "react-router-dom";
 
 vi.mock("../hooks/useEvolutionChain", () => ({
   useEvolutionChain: vi.fn(),
@@ -23,12 +24,15 @@ function setEvolutionChain(
   });
 }
 
-//EvolutionSection reads the sprite preference, so it needs the provider
+//EvolutionSection reads the sprite preference, so it needs the provider;
+//its stages are links (B&W-4), so they need a router
 function renderSection() {
   return render(
-    <PreferencesProvider>
-      <EvolutionSection pokemon={makePokemon()} />
-    </PreferencesProvider>,
+    <MemoryRouter>
+      <PreferencesProvider>
+        <EvolutionSection pokemon={makePokemon()} />
+      </PreferencesProvider>
+    </MemoryRouter>,
   );
 }
 
@@ -102,6 +106,22 @@ describe("EvolutionSection", () => {
 
     expect(screen.getByText("bulbasaur")).toBeInTheDocument();
     expect(screen.getByText("ivysaur")).toBeInTheDocument();
+  });
+
+  //the page's own Pokémon is the current stage: marked, not a link
+  it("marks the page's Pokémon as the current stage", () => {
+    setEvolutionChain({
+      tree: {
+        name: "bulbasaur",
+        children: [{ name: "ivysaur", children: [] }],
+      },
+    });
+    renderSection();
+
+    expect(
+      screen.queryByRole("link", { name: "bulbasaur" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "ivysaur" })).toBeInTheDocument();
   });
 });
 

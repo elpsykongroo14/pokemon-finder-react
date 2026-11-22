@@ -1,11 +1,14 @@
 //FavoriteButton is intentionally dumb,
 //it doesnt know how favorites work
 //it just renders a boolean and fires a callback
-import "./FavoriteButton.css";
 import { Button } from "../ui/Button";
 import { PopIcon } from "../ui/PopIcon";
-import type { FavoriteAction } from "../hooks/useFavoriteAction";
-import { FAVORITE_TOGGLE_LABEL, FIRST_FAVORITE } from "../lib/copy";
+import { Icon } from "./Icon";
+import {
+  FAVORITE_OFF_TEXT,
+  FAVORITE_ON_TEXT,
+  FAVORITE_TOGGLE_LABEL,
+} from "../lib/copy";
 
 interface FavoriteButtonProps {
   isFavorite: boolean;
@@ -20,30 +23,20 @@ export function FavoriteButton({
   popKey = 0,
 }: FavoriteButtonProps) {
   return (
-    <Button variant="line" onClick={onToggle} pressed={isFavorite}>
-      {/* the heart and the pressed look SHOW the state; aria-pressed SAYS
-          it. the words never change (a toggle that changes both is heard
-          twice: "In Favorites, pressed") */}
-      <PopIcon popKey={popKey}>{isFavorite ? "❤️" : "🤍"}</PopIcon>{" "}
-      {FAVORITE_TOGGLE_LABEL}
+    <Button
+      //on the black name plate: a white plate (spec 7.2)
+      variant="light"
+      onClick={onToggle}
+      pressed={isFavorite}
+      //D44: the NAME never changes, aria-pressed says the state. the visible
+      //words swap ("Favorite" / "Favorited") for people who see them, and
+      //"Favorite" is inside both, so speech control still matches
+      aria-label={FAVORITE_TOGGLE_LABEL}
+    >
+      <PopIcon popKey={popKey}>
+        <Icon name={isFavorite ? "heart" : "heart-outline"} size={18} />
+      </PopIcon>
+      {isFavorite ? FAVORITE_ON_TEXT : FAVORITE_OFF_TEXT}
     </Button>
-  );
-}
-
-//what the favorite has to say. a fragment, like TeamStatus, so the
-//page decides where it goes
-export function FavoriteStatus({ action }: { action: FavoriteAction }) {
-  return (
-    <>
-      {action.celebratingFirst && (
-        //a decorative copy of the words: the live region below announces them
-        <p className="favorite-first" aria-hidden="true">
-          <PopIcon popKey={1}>❤️</PopIcon> {FIRST_FAVORITE}
-        </p>
-      )}
-      <span className="visually-hidden" role="status">
-        {action.announcement}
-      </span>
-    </>
   );
 }

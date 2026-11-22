@@ -1,0 +1,46 @@
+/* Eight pieces fly out from the Favorite button and fade, 700 ms
+   (spec 6.2). Rendered only when animations are on (JS gate), and the
+   animation only exists under data-motion="on". The pieces rest at
+   opacity 0: without the animation, there is nothing to see. */
+@layer features {
+  .heart-burst {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .heart-burst__piece {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--space-3);
+    height: var(--space-3);
+    margin: calc(var(--space-3) / -2) 0 0 calc(var(--space-3) / -2);
+    background: var(--theme-accent);
+    opacity: 0;
+  }
+
+  .heart-burst__piece[data-round] {
+    border-radius: var(--radius-pill);
+  }
+
+  :root[data-motion="on"] .heart-burst__piece {
+    animation: heart-burst 700ms var(--ease-settle) both;
+  }
+
+  @keyframes heart-burst {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(0.4);
+    }
+
+    70% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) scale(1);
+    }
+  }
+}

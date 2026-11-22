@@ -1,8 +1,11 @@
 import { useParams } from "react-router-dom";
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { usePokemon } from "../hooks/usePokemon";
-import { PokemonCard } from "../components/PokemonCard";
+import { EncounterField } from "../components/EncounterField";
+import { PokemonEncounter } from "../components/PokemonEncounter";
+import { PokemonReadout } from "../components/PokemonReadout";
 import { PokemonSkeleton } from "../components/PokemonSkeleton";
+import { FavoritesList } from "../components/FavoritesList";
 import { MessageBox } from "../ui/MessageBox";
 import { useTypeTheme } from "../hooks/useTypeTheme";
 import { getPokemonPageState } from "../lib/pokemonPageState";
@@ -16,6 +19,9 @@ export function PokemonPage() {
   //useParams here just reads result
   const { data, loading, error, retry } = usePokemon(name ?? "");
   const regionRef = useRef<HTMLDivElement>(null);
+  //the name plate's heading id: the plate renders the heading, the field
+  //is named after it (aria-labelledby), so the page owns the id both use
+  const headingId = useId();
 
   useTypeTheme(error ? undefined : data?.types.map((t) => t.type.name));
   //usePokemon does not clear data when name changes
@@ -28,6 +34,7 @@ export function PokemonPage() {
   //instead of four seperate '{condition && ...}' blocks that could overlap.
   //we first work out WHICH single situation we are in, then render only that
   const state = getPokemonPageState({ name, loading, error, data });
+  const pokemon = state.status === "ready" ? state.pokemon : undefined;
 
   //pressing Retry makes the button disappear (the skeleton replaces the message),
   //and a focused element that vanishes drops keyboard focus to the top of the page.
@@ -38,31 +45,59 @@ export function PokemonPage() {
     retry();
   }
 
-  function renderState() {
+  //what stands in the field. one situation at a time
+  function renderField() {
     switch (state.status) {
       case "no-name":
-        return <MessageBox text="No Pokémon specified" />;
+        return (
+          <div className="encounter-field__message">
+            <MessageBox text="No Pokémon specified" />
+          </div>
+        );
       case "loading":
         return <PokemonSkeleton />;
       case "failed":
         return (
-          <FailureMessage
-            kind={state.kind}
-            query={state.name}
-            onRetry={handleRetry}
-          />
+          <div className="encounter-field__message">
+            <FailureMessage
+              kind={state.kind}
+              query={state.name}
+              onRetry={handleRetry}
+            />
+          </div>
         );
       case "ready":
-        return <PokemonCard pokemon={state.pokemon} />;
+        //key: a new Pokémon is a NEW encounter layer, so the encounter
+        //plays again (spec 6.1). the field around it is NOT keyed (D43)
+        return (
+          <PokemonEncounter
+            key={state.pokemon.name}
+            pokemon={state.pokemon}
+            headingId={headingId}
+          />
+        );
     }
   }
 
   return (
-    <div className="pokemon-page" ref={regionRef} tabIndex={-1}>
+    //page--bleed: this page runs edge to edge (the field and the rail),
+    //instead of sitting inside the shell's 1240 px column
+    <div className="pokemon-page page--bleed" ref={regionRef} tabIndex={-1}>
       {/* the name from the URL, so the tab is right even while loading
           or when the search failed ("Missingno · Pokémon Finder") */}
       <PageTitle page={name && name.charAt(0).toUpperCase() + name.slice(1)} />
-      {renderState()}
+
+      {/* the field stays mounted through loading, ready and failed, so its
+          sky can change color under the encounter's slab (D43) */}
+      <EncounterField labelledBy={pokemon ? headingId : undefined}>
+        {renderField()}
+      </EncounterField>
+
+      <FavoritesList current={pokemon?.name} />
+
+      {/* keyed like the encounter: a new Pokémon's bars grow again, and on
+          phones its tabs start on Stats */}
+      {pokemon && <PokemonReadout key={pokemon.name} pokemon={pokemon} />}
     </div>
   );
 }

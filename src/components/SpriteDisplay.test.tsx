@@ -103,6 +103,36 @@ describe("SpriteDisplay modes", () => {
     expect(img).toHaveStyle({ width: "288px" });
   });
 
+  it("says nothing to a screen reader when decorative", () => {
+    const { container } = render(
+      <SpriteDisplay sprites={sprites} name="mew" shiny={false} decorative />,
+    );
+
+    expect(container.querySelector("img")).toHaveAttribute("alt", "");
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  //a small sprite in a big box would grow 6x; the stage caps it at 4x
+  it("never scales a pixel sprite past maxScale", () => {
+    render(
+      <SpriteDisplay
+        sprites={sprites}
+        name="mew"
+        shiny={false}
+        mode="pixel"
+        size={330}
+        maxScale={4}
+      />,
+    );
+    const img = screen.getByRole("img", { name: "mew" });
+    Object.defineProperty(img, "naturalWidth", { value: 50 });
+    Object.defineProperty(img, "naturalHeight", { value: 46 });
+
+    fireEvent.load(img);
+
+    expect(img).toHaveStyle({ width: "200px" });
+  });
+
   it("lets the browser defer the download only when asked to", () => {
     const { rerender } = render(
       <SpriteDisplay sprites={sprites} name="mew" shiny={false} />,

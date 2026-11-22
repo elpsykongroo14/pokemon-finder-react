@@ -5,6 +5,9 @@ import {
   multiplierText,
   multiplierSpoken,
   partyCountText,
+  favoriteNote,
+  teamNote,
+  FIRST_FAVORITE,
 } from "./copy";
 
 describe("EncounterMessage", () => {
@@ -68,5 +71,51 @@ describe("partyCountText", () => {
   it("counts the party out of the maximum", () => {
     expect(partyCountText(4, 6)).toBe(", 4 of 6");
     expect(partyCountText(0, 6)).toBe(", 0 of 6");
+  });
+});
+
+//the inline confirmation under the Pokémon page actions (spec 6.2): one
+//sentence about what the last click did
+describe("favoriteNote", () => {
+  it("confirms a save", () => {
+    expect(favoriteNote({ added: true, first: false })).toBe(
+      "Saved to your favorites.",
+    );
+  });
+
+  it("confirms a removal", () => {
+    expect(favoriteNote({ added: false, first: false })).toBe(
+      "Removed from favorites.",
+    );
+  });
+
+  it("celebrates the very first favorite instead", () => {
+    expect(favoriteNote({ added: true, first: true })).toBe(FIRST_FAVORITE);
+  });
+});
+
+describe("teamNote", () => {
+  it("says who joined and how full the party is now", () => {
+    expect(teamNote("hydreigon", { kind: "joined", size: 5 })).toBe(
+      "Hydreigon joined your party. 5 of 6 slots filled.",
+    );
+  });
+
+  it("says who left", () => {
+    expect(teamNote("hydreigon", { kind: "left", size: 4 })).toBe(
+      "Hydreigon left your party. 4 of 6 slots filled.",
+    );
+  });
+
+  //a full party refuses the add; the party-full hint already explains it,
+  //so the confirmation line has nothing to confirm
+  it("has nothing to say when the add was refused", () => {
+    expect(teamNote("hydreigon", { kind: "rejected", size: 6 })).toBeNull();
+  });
+
+  it("writes slugged names as words", () => {
+    expect(teamNote("mr-mime", { kind: "joined", size: 1 })).toBe(
+      "Mr Mime joined your party. 1 of 6 slots filled.",
+    );
   });
 });

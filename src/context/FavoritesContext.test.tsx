@@ -47,9 +47,29 @@ describe("FavoritesContext", () => {
     });
 
     expect(result.current.isFavorite("charizard")).toBe(true);
+    //types is [] here because the fixture has none (D48 saves them)
     expect(result.current.favorites).toEqual([
-      { name: "charizard", id: 6, sprite: "charizard.png" },
+      { name: "charizard", id: 6, sprite: "charizard.png", types: [] },
     ]);
+  });
+
+  //D48: the favorites rail underlines each tile in its type color, so a
+  //favorite remembers its types from the moment it is saved
+  it("saves the Pokémon's types with the favorite, primary first", () => {
+    const { result } = renderFavorites();
+
+    act(() => {
+      result.current.toggleFavorite(
+        makePokemon({
+          types: [
+            { slot: 1, type: { name: "fire", url: "" } },
+            { slot: 2, type: { name: "flying", url: "" } },
+          ],
+        }),
+      );
+    });
+
+    expect(result.current.favorites[0].types).toEqual(["fire", "flying"]);
   });
 
   it("toggling an already favorited pokemon removes it", () => {
@@ -78,7 +98,7 @@ describe("FavoritesContext", () => {
       localStorage.getItem("pokemon_favorites") ?? "[]",
     );
     expect(stored).toEqual([
-      { name: "charizard", id: 6, sprite: "charizard.png" },
+      { name: "charizard", id: 6, sprite: "charizard.png", types: [] },
     ]);
   });
 

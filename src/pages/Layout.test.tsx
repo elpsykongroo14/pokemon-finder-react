@@ -82,7 +82,7 @@ describe("Layout", () => {
     expect(screen.queryByText("Home Content")).not.toBeInTheDocument();
   });
 
-  it("exposes the shell as landmarks: banner, navigation, main, favorites", () => {
+  it("exposes the shell as landmarks: banner, navigation, main", () => {
     renderLayout("/");
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -90,9 +90,6 @@ describe("Layout", () => {
       screen.getByRole("navigation", { name: "Main" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
-    expect(
-      screen.getByRole("complementary", { name: "Favorites" }),
-    ).toBeInTheDocument();
   });
 
   it("has exactly one banner and one contentinfo landmark", () => {
@@ -112,9 +109,10 @@ describe("Layout", () => {
     );
   });
 
-  //B&W-3: the party moved up into the header (spec 5.1); favorites stay
-  //in the tray until B&W-4 gives them their rail on the Pokémon page
-  it("puts the party counter in the header and keeps favorites in the tray", () => {
+  //B&W-3 moved the party up into the header (spec 5.1). B&W-4 gave
+  //favorites their rail on the Pokémon page (D48), so the shell's tray,
+  //and its "Favorites" complementary landmark, are gone
+  it("puts the party counter in the header, and has no favorites tray", () => {
     renderLayout("/");
 
     expect(
@@ -122,10 +120,10 @@ describe("Layout", () => {
         name: "Party, 0 of 6",
       }),
     ).toBeInTheDocument();
-    const tray = screen.getByRole("complementary", { name: "Favorites" });
-    expect(within(tray).getByRole("status")).toHaveTextContent(
-      "No favorites yet. Tap ♥ on any Pokémon to keep it here.",
-    );
+    expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Favorites" }),
+    ).not.toBeInTheDocument();
   });
 
   //D42: the global drifting backdrop is retired; the color now lives in

@@ -1,6 +1,10 @@
 import type { FetchFailureKind } from "./fetchErrors";
 import type { StatOutcome } from "./statComparison";
 import type { AnimationMode } from "./preferences";
+import type { FavoriteOutcome, TeamOutcome } from "./type";
+import { formatSlug } from "./text";
+import { MAX_TEAM } from "./teamReducer";
+import type { SpriteMode } from "./sprites";
 
 //every sentence the user reads when something goes wrong lives here
 //components pick a massage by kind,
@@ -24,9 +28,59 @@ export function cardDialogLabel(name: string): string {
 
 export const RETRY_LABEL = "Retry";
 
-//toggle buttons keep ONE name; their state is aria-pressed
+//toggle buttons keep ONE name; their state is aria-pressed. only the
+//visible words swap (D44)
 export const FAVORITE_TOGGLE_LABEL = "Favorite";
 export const TEAM_TOGGLE_LABEL = "Team";
+export const FAVORITE_OFF_TEXT = "Favorite";
+export const FAVORITE_ON_TEXT = "Favorited";
+export const TEAM_OFF_TEXT = "Add to team";
+export const TEAM_ON_TEXT = "On your team";
+export const COMPARE_LINK_TEXT = "Compare";
+export const CARDS_LINK_TEXT = "Cards";
+
+//the inline confirmation under the actions (spec 6.2): one sentence about
+//the last click, replaced by the next one, never stacked
+export const FAVORITE_SAVED = "Saved to your favorites.";
+export const FAVORITE_REMOVED = "Removed from favorites.";
+
+export function favoriteNote({ added, first }: FavoriteOutcome): string {
+  if (!added) return FAVORITE_REMOVED;
+  return first ? FIRST_FAVORITE : FAVORITE_SAVED;
+}
+
+//null for a refused add: the party-full hint already says why
+export function teamNote(name: string, outcome: TeamOutcome): string | null {
+  const who = formatSlug(name);
+  const filled = `${outcome.size} of ${MAX_TEAM} slots filled.`;
+  switch (outcome.kind) {
+    case "joined":
+      return `${who} joined your party. ${filled}`;
+    case "left":
+      return `${who} left your party. ${filled}`;
+    case "rejected":
+      return null;
+  }
+}
+
+//the name plate and the readout (spec 7.2)
+export const BASE_STAT_TOTAL_LABEL = "Base stat total";
+export const READOUT_LABEL = "Pokémon details";
+export const STATS_HEADING = "Base stats";
+export const PROFILE_HEADING = "Profile";
+export const EVOLUTION_HEADING = "Evolution";
+export const MATCHUPS_HEADING = "Type matchups";
+//the phone tabs: shorter words for the same four sections
+export const STATS_TAB = "Stats";
+export const MATCHUPS_TAB = "Matchups";
+export const HIDDEN_ABILITY_LABEL = "Hidden ability";
+export const NO_HIDDEN_ABILITY = "None";
+export const WEAK_TO_LABEL = "Weak to";
+export const RESISTS_LABEL = "Resists";
+export const IMMUNE_TO_LABEL = "Immune to";
+export const EVOLUTION_LOADING = "Loading evolution chain...";
+export const EVOLUTION_FAILED = "Couldn't load evolution data.";
+export const NO_EVOLUTION = "This Pokémon does not evolve.";
 
 export const MENU_PROMPT = "What will you do?";
 
@@ -80,7 +134,7 @@ export function removedFromTeamMessage(name: string): string {
 
 //empty states are invitations: say what is missing AND how to fill it
 export const EMPTY_FAVORITES =
-  "No favorites yet. Tap ♥ on any Pokémon to keep it here.";
+  "No favorites yet. Select Favorite on any Pokémon to keep it here.";
 
 //party screen: an empty slot must still say something to a screen reader,
 //and the remove button must say WHICH pokemon it removes
@@ -140,11 +194,18 @@ export const SETTINGS_LABEL = "Settings";
 //same word, which says whether it is open with aria-expanded
 export const SEARCH_PLACEHOLDER = "Search by name or number";
 export const SEARCH_TOGGLE_LABEL = "Search";
-//until B&W-4 moves favorites onto the Pokémon page, the tray holds only them
-export const FAVORITES_TRAY_LABEL = "Favorites";
+//the black strip of favorites under the Pokémon page's field (D48)
+export const FAVORITES_LABEL = "Favorites";
 export const SETTINGS_NOTE = "Saved in this browser, on this device.";
 export const ANIMATIONS_LABEL = "Animations";
 export const SPRITES_LABEL = "Sprites";
+//one list for both places that choose the sprite look: the settings dialog
+//and the stage's segmented control (spec 5.3)
+export const SPRITE_MODE_OPTIONS = [
+  { value: "pixel", label: "Pixel" },
+  { value: "artwork", label: "Artwork" },
+] as const satisfies readonly { value: SpriteMode; label: string }[];
+export const SHINY_LABEL = "Shiny";
 export const SPRITES_HINT =
   "Pixel sprites move when animations are on. Artwork is always still.";
 
@@ -164,7 +225,7 @@ export function animationsHint(
 }
 
 //celebrations: rare, and only right after the person caused them
-export const FIRST_FAVORITE = "First favorite! It's waiting in your tray.";
+export const FIRST_FAVORITE = "First favorite! It's waiting in the row below.";
 
 //type matchups: the badge inside a type chip ("×½") and what a screen
 //reader says instead. the chart only ever produces these six values;

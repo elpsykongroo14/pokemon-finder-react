@@ -1,12 +1,14 @@
 import "./TypeBadgeList.css";
-import { TypeBadge } from "./TypeBadge";
+import { TypeBadge, type TypeBadgeSize } from "./TypeBadge";
 import type { PokemonType } from "../lib/type";
 
 interface TypeBadgeListProps {
   types: PokemonType[];
+  //lg on the Pokémon page's name plate, md everywhere else
+  size?: TypeBadgeSize;
 }
 
-export function TypeBadgeList({ types }: TypeBadgeListProps) {
+export function TypeBadgeList({ types, size }: TypeBadgeListProps) {
   return (
     <div className="type-badge-list">
       {/* 
@@ -14,7 +16,7 @@ export function TypeBadgeList({ types }: TypeBadgeListProps) {
         we just describe "for each type, here's a badge," and React does the efficient DOM diffing/attaching for us
       */}
       {types.map((t) => (
-        <TypeBadge key={t.type.name} typeName={t.type.name} />
+        <TypeBadge key={t.type.name} typeName={t.type.name} size={size} />
       ))}
     </div>
   );

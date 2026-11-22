@@ -133,4 +133,17 @@ describe("PartyCounter", () => {
     expect(pips()[0]).not.toHaveAttribute("data-joined");
     expect(pips()[1]).toHaveAttribute("data-joined", "true");
   });
+
+  //found in a real browser (B&W-4): Chrome puts a space before an
+  //absolutely positioned hidden span, so "Party" + ", 0 of 6" was read as
+  //"Party , 0 of 6". jsdom does not lay out, so it never showed the gap;
+  //the name is now one string
+  it("writes its name as one string, so no browser can split it", () => {
+    renderCounter();
+
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "aria-label",
+      "Party, 0 of 6",
+    );
+  });
 });
