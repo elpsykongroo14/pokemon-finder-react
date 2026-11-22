@@ -1,15 +1,15 @@
 import "./Layout.css";
 import { Outlet } from "react-router-dom";
-import { SearchBar } from "../components/SearchBar";
+import { HeaderSearch } from "../components/HeaderSearch";
 import { FavoritesList } from "../components/FavoritesList";
 import { MainNav } from "../components/MainNav";
 import { BrandMark } from "../components/BrandMark";
 import { PartyCounter } from "../components/PartyCounter";
-import { Backdrop } from "../components/Backdrop";
 import { SettingsButton } from "../components/SettingsButton";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 import { AppFooter } from "../components/AppFooter";
 import { MAIN_CONTENT_ID, SkipLink } from "../components/SkipLink";
+import { FAVORITES_TRAY_LABEL } from "../lib/copy";
 
 export function Layout() {
   const navigate = useViewTransitionNavigate();
@@ -27,19 +27,18 @@ export function Layout() {
     <div className="app-shell">
       {/* first in the page, so it is the first Tab stop */}
       <SkipLink />
-      <Backdrop />
+      {/* the white bar (spec 5.1). DOM order = Tab order: brand, nav,
+          search, party, settings. On phones CSS moves the nav to a bottom
+          bar; it stays here in the DOM so there is one "Main" landmark */}
       <header className="app-header">
         <h1 className="app-title">
           <BrandMark />
-          Pokémon Finder
+          <span className="app-title__words">Pokémon Finder</span>
         </h1>
         <MainNav />
-
-        <div className="app-search">
-          <SearchBar onSubmit={handleSearch} />
-        </div>
-
-        <div className="app-settings">
+        <div className="app-header__end">
+          <HeaderSearch onSubmit={handleSearch} />
+          <PartyCounter />
           <SettingsButton />
         </div>
       </header>
@@ -50,11 +49,10 @@ export function Layout() {
         {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and tray around it persist across every navigation; only this slot swaps.*/}
       </main>
 
-      <aside className="app-tray" aria-label="Favorites and party">
-        <div className="app-tray__favorites">
-          <FavoritesList />
-        </div>
-        <PartyCounter />
+      {/* favorites only now; B&W-4 moves them to a rail on the Pokémon page
+          and this tray goes */}
+      <aside className="app-tray" aria-label={FAVORITES_TRAY_LABEL}>
+        <FavoritesList />
       </aside>
 
       <AppFooter />

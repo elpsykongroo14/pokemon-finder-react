@@ -12,8 +12,14 @@ function renderNav(path: string) {
   );
 }
 
-const cursorOffset = () =>
-  screen.getByText("▶").style.getPropertyValue("--cursor-offset");
+//the current page is drawn as a slanted Ink plate by CSS on .active
+//(D46), so the contract the tests hold is: exactly one link is current,
+//and the class and aria-current always agree
+function currentLinks() {
+  return screen
+    .getAllByRole("link")
+    .filter((link) => link.getAttribute("aria-current") === "page");
+}
 
 describe("MainNav", () => {
   it("renders the four destinations as links", () => {
@@ -37,38 +43,52 @@ describe("MainNav", () => {
   });
 
   it.each([
-    ["/", "0%"],
-    ["/compare", "100%"],
-    ["/team", "200%"],
-    ["/library", "300%"],
-    ["/library/pikachu", "300%"],
-  ])("puts the active item at %s (%s)", (path, offset) => {
+    ["/", "Home"],
+    ["/compare", "Compare"],
+    ["/team", "Team"],
+    ["/library", "Library"],
+    ["/library/pikachu", "Library"],
+  ])("on %s, marks %s and only %s as current", (path, name) => {
     renderNav(path);
 
-    expect(cursorOffset()).toBe(offset);
+    expect(currentLinks()).toEqual([screen.getByRole("link", { name })]);
+    expect(screen.getByRole("link", { name })).toHaveClass("active");
   });
 
-  it("slides to the new item when the route changes", async () => {
+  it("moves the current mark when the route changes", async () => {
     const user = userEvent.setup();
     renderNav("/");
-    expect(cursorOffset()).toBe("0%");
 
     await user.click(screen.getByRole("link", { name: "Team" }));
 
-    expect(cursorOffset()).toBe("200%");
+    expect(currentLinks()).toEqual([
+      screen.getByRole("link", { name: "Team" }),
+    ]);
   });
 
-  it("shows no cursor on pages that are not a nav destination", () => {
+  it("marks nothing current on a page that is not a nav destination", () => {
     renderNav("/pokemon/pikachu");
 
-    expect(screen.queryByText("▶")).not.toBeInTheDocument();
+    expect(currentLinks()).toEqual([]);
   });
 
-  it("keeps the cursor out of the links' accessible names", () => {
+  //phones show the icons (the bottom bar), desktop hides them; either way
+  //an icon is decoration and must not change what a link is called
+  it("draws an icon for every link, kept out of the links' names", () => {
+    const { container } = renderNav("/");
+
+    const icons = container.querySelectorAll(".main-nav__icon");
+    expect(icons).toHaveLength(4);
+    icons.forEach((icon) =>
+      expect(icon).toHaveAttribute("aria-hidden", "true"),
+    );
+    expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
+  });
+
+  it("no longer draws the old ▶ cursor", () => {
     renderNav("/");
 
-    expect(screen.getByText("▶")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
+    expect(screen.queryByText("▶")).not.toBeInTheDocument();
   });
 });
 

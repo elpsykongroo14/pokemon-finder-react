@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useDebounce } from "./useDebounce";
-import { fetchPokemonIndex, fetchPokemon } from "../lib/api";
-import type { PokemonDetails } from "../lib/type";
+import { fetchPokemonIndex } from "../lib/api";
 import type { PokemonIndexEntry } from "../lib/pokemonIndex";
 import { filterEntries } from "../lib/autocomplete";
 
@@ -9,7 +8,6 @@ interface UseAutocompleteResults {
   matches: PokemonIndexEntry[];
   highlightedIndex: number;
   setHighlightedIndex: (index: number) => void;
-  preview: PokemonDetails | null;
   isOpen: boolean;
   dismiss: () => void;
   notifyQueryEdited: () => void;
@@ -19,7 +17,6 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   const [allEntries, setAllEntries] = useState<PokemonIndexEntry[]>([]);
   const [dismissed, setDismissed] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [preview, setPreview] = useState<PokemonDetails | null>(null);
 
   //empty dependency array: this runs on mount, same as the vanilla main.ts did on pages load
   //fetchAllPokemonNames already catches internally (allNamesCache in lib/api.ts) so even if useAutpcomplete were ever used in two place at once,
@@ -54,37 +51,9 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   }
 
   const isOpen = matches.length > 0 && !dismissed;
-  const highlightedName = matches[highlightedIndex]?.name ?? null;
-
-  //if the highlighted match goes away (dropdown closes or the list becomes empty),
-  //clear the preview immediately this is derived state, not a sync with an external system so it belongs here
-  //not inside the fetch effect below
-  const [prevHighlightedName, setPrevHighlightedName] =
-    useState(highlightedName);
-  if (highlightedName !== prevHighlightedName) {
-    setPrevHighlightedName(highlightedName);
-    if (!highlightedName) {
-      setPreview(null);
-    }
-  }
-
-  useEffect(() => {
-    if (!highlightedName) return;
-
-    const controller = new AbortController();
-
-    fetchPokemon(highlightedName, { signal: controller.signal })
-      .then(setPreview)
-      .catch((err) => {
-        //an aborted fetch rejects with DOMException named "AbortError", that not a real failure
-        //its us cleaning up a stale request so we say nothing to the user, same as the vanilla version
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        //any other error: this is a nice to have thumbnail,
-        //not the main search flow, so fail quietly rather than surfacing an error state
-      });
-
-    return () => controller.abort();
-  }, [highlightedName]);
+  //D51: there used to be a preview here, the full details of the
+  //highlighted match fetched on every arrow key. each row now shows its own
+  //sprite built from the dex number, so that request is gone
 
   function dismiss() {
     setDismissed(true);
@@ -103,7 +72,6 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
     matches,
     highlightedIndex,
     setHighlightedIndex,
-    preview,
     isOpen,
     dismiss,
     notifyQueryEdited,

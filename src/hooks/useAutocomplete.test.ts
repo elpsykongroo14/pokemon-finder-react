@@ -106,22 +106,21 @@ describe("useAutocomplete", () => {
     expect(result.current.highlightedIndex).toBe(2);
   });
 
-  it("fetches a preview for the highlighted match", async () => {
+  //D51: rows show a sprite built from the dex number, so the hook no longer
+  //fetches the full details of whatever is highlighted (one request per
+  //arrow key press, for a thumbnail nobody needed any more)
+  it("does not fetch details for the highlighted match", async () => {
     const { result, rerender } = renderHook(
       ({ query }) => useAutocomplete(query),
       { initialProps: { query: "" } },
     );
 
     rerender({ query: "char" });
+    await waitFor(() => expect(result.current.isOpen).toBe(true));
 
-    await waitFor(() =>
-      expect(result.current.preview?.name).toBe("charmander"),
-    );
+    act(() => result.current.setHighlightedIndex(1));
 
-    expect(fetchPokemon).toHaveBeenCalledWith(
-      "charmander",
-      expect.objectContaining({ signal: expect.any(AbortSignal) }),
-    );
+    expect(fetchPokemon).not.toHaveBeenCalled();
   });
 
   it("hides the dropdown on dismiss, and reopens it on the next keystroke", async () => {

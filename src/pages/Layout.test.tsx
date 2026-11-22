@@ -91,7 +91,7 @@ describe("Layout", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(
-      screen.getByRole("complementary", { name: "Favorites and party" }),
+      screen.getByRole("complementary", { name: "Favorites" }),
     ).toBeInTheDocument();
   });
 
@@ -112,18 +112,28 @@ describe("Layout", () => {
     );
   });
 
-  it("keeps favorites and the party counter together in the tray", () => {
+  //B&W-3: the party moved up into the header (spec 5.1); favorites stay
+  //in the tray until B&W-4 gives them their rail on the Pokémon page
+  it("puts the party counter in the header and keeps favorites in the tray", () => {
     renderLayout("/");
 
-    const tray = screen.getByRole("complementary", {
-      name: "Favorites and party",
-    });
+    expect(
+      within(screen.getByRole("banner")).getByRole("link", {
+        name: "Party, 0 of 6",
+      }),
+    ).toBeInTheDocument();
+    const tray = screen.getByRole("complementary", { name: "Favorites" });
     expect(within(tray).getByRole("status")).toHaveTextContent(
       "No favorites yet. Tap ♥ on any Pokémon to keep it here.",
     );
-    expect(
-      within(tray).getByRole("link", { name: "Party 0/6" }),
-    ).toBeInTheDocument();
+  });
+
+  //D42: the global drifting backdrop is retired; the color now lives in
+  //the fields that show a Pokémon
+  it("no longer paints a backdrop behind the app", () => {
+    const { container } = renderLayout("/");
+
+    expect(container.querySelector(".backdrop")).not.toBeInTheDocument();
   });
 
   it("renders the routed page inside <main>, not in the header or tray", () => {

@@ -2,6 +2,11 @@ import "./Icon.css";
 
 export type IconName =
   | "bluesky"
+  | "compare"
+  | "home"
+  | "library"
+  | "search"
+  | "team"
   | "discord"
   | "documentation"
   | "github"
