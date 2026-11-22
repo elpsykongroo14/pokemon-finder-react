@@ -1,45 +1,37 @@
 import "./MainNav.css";
-import { NavLink, matchPath, useLocation } from "react-router-dom";
-import type { CSSProperties } from "react";
-import { Cursor } from "../ui/Cursor";
+import { NavLink } from "react-router-dom";
+import { Icon, type IconName } from "./Icon";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 import { isPlainLeftClick } from "../lib/clicks";
 
 interface NavItem {
   to: string;
   label: string;
+  icon: IconName;
   end?: boolean;
 }
 
-//one list drives the links, the cell count cursor position
-//so adding a fifth destination is a one line change
+//one list drives the links, so adding a fifth destination is one line
 const NAV_ITEMS: NavItem[] = [
   //without end, NavLink to="/" would report active on every route, because
   //pokemon/pikachu technically starts with "/". end means 'exact match only"
-  { to: "/", label: "Home", end: true },
-  { to: "/compare", label: "Compare" },
-  { to: "/team", label: "Team" },
-  { to: "/library", label: "Library" },
+  { to: "/", label: "Home", icon: "home", end: true },
+  { to: "/compare", label: "Compare", icon: "compare" },
+  { to: "/team", label: "Team", icon: "team" },
+  { to: "/library", label: "Library", icon: "library" },
 ];
 
+//D46: the current page sits on a slanted Ink plate drawn by CSS from
+//.active, which NavLink sets together with aria-current, so the look and
+//what a screen reader hears come from one fact. the ▶ cursor (and the
+//matchPath bookkeeping that positioned it) is gone.
+//on phones (<= 1000px) CSS moves this same <nav> to a bottom bar and shows
+//the icons: one "Main" landmark, never two
 export function MainNav() {
-  const { pathname } = useLocation();
   const goTo = useViewTransitionNavigate();
 
-  //derived every render from the URL, nothing to keep in sync:
-  //same idea as ComparePage's isSelfCompare.
-  //macthpath applies the same rule NavLink uses, so the cursor and aria-current always agree.
-  //-1 means "no nav is active", eg on /pokemon/pikachu
-  const activeIndex = NAV_ITEMS.findIndex((item) =>
-    matchPath({ path: item.to, end: item.end ?? false }, pathname),
-  );
-
   return (
-    <nav
-      className="main-nav"
-      aria-label="Main"
-      style={{ "--nav-count": NAV_ITEMS.length } as CSSProperties}
-    >
+    <nav className="main-nav" aria-label="Main">
       {NAV_ITEMS.map((item) => (
         <NavLink
           key={item.to}
@@ -55,10 +47,12 @@ export function MainNav() {
             goTo(item.to);
           }}
         >
-          {item.label}
+          <span className="main-nav__icon" aria-hidden="true">
+            <Icon name={item.icon} />
+          </span>
+          <span className="main-nav__label">{item.label}</span>
         </NavLink>
       ))}
-      {activeIndex >= 0 && <Cursor axis="x" offset={`${activeIndex * 100}%`} />}
     </nav>
   );
 }

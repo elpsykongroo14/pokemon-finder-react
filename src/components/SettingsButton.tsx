@@ -1,3 +1,4 @@
+import "./SettingsButton.css";
 import { useState } from "react";
 import { IconButton } from "../ui/IconButton";
 import { Icon } from "./Icon";
@@ -11,15 +12,15 @@ export function SettingsButton() {
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <span className="settings-button">
       <IconButton
-        icon={<Icon name="settings" />}
+        icon={<Icon name="settings" size={22} />}
         aria-label={SETTINGS_LABEL}
         onClick={() => setOpen(true)}
       />
       {/* mounting = opening. Dialog moves focus in when it mounts and gives
           it back to whatever had it (this button) when it unmounts */}
       {open && <SettingsDialog onClose={() => setOpen(false)} />}
-    </>
+    </span>
   );
 }

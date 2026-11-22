@@ -38,7 +38,7 @@ describe("Stage", () => {
   it("shows the dex number, the name as a heading, and the type", () => {
     renderStage();
 
-    expect(screen.getByText("#025")).toBeInTheDocument();
+    expect(screen.getByText("No. 025")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "pikachu" }),
     ).toBeInTheDocument();

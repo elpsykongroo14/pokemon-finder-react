@@ -16,10 +16,8 @@ Every `@keyframes` in the app, its tier (roadmap §5.5, plus the Status tier fro
 
 | Keyframe                                 | File                          | Tier                | Trigger                   | Gate       | R10B fate                                                                                                                     |
 | ---------------------------------------- | ----------------------------- | ------------------- | ------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `backdrop-drift`                         | components/Backdrop.css       | Ambient             | always                    | on-only    | **Retire** in B&W-3 (D42)                                                                                                     |
 | `stage-idle`                             | components/Stage.css          | Ambient             | always on the Stage       | on-only    | **Retire** in B&W-4 (D42)                                                                                                     |
-| `shell-drop`, `shell-rise`               | pages/Layout.css              | Transition          | page load                 | token      | **Retire** in B&W-3 (D42: page-load intro)                                                                                    |
-| `cursor-blink`                           | ui/Cursor.css                 | Ambient (cursor)    | menus                     | on-only    | Keep in the primitive; the nav stops using it (D46)                                                                           |
+| `cursor-blink`                           | ui/Cursor.css                 | Ambient (cursor)    | menus                     | on-only    | Kept in the primitive (Menu); **B&W-3**: the nav no longer uses it (D46)                                                      |
 | `compare-stat-grow`                      | components/CompareStatRow.css | Transition          | Compare renders           | token      | Replace in B&W-5 (bars grow from their outer edge)                                                                            |
 | `versus-enter-left/right`                | components/CompareView.css    | Transition          | Compare renders           | token      | Replace in B&W-5 (slide in from the outer edges)                                                                              |
 | `versus-badge-pop`                       | components/CompareView.css    | Response            | Compare renders           | token      | Replace in B&W-5 (VS slam)                                                                                                    |
@@ -35,8 +33,9 @@ Every `@keyframes` in the app, its tier (roadmap §5.5, plus the Status tier fro
 | `spinner-spin`                           | ui/Spinner.css                | Status (D33)        | loading                   | on-only    | Keep                                                                                                                          |
 | `stat-meter-grow`                        | ui/StatMeter.css              | Transition          | stats render              | on-only    | **B&W-2**: replaced `stat-meter-fill` (width → `scaleX`, 600 ms, 50 ms stagger); B&W-4 adds the encounter's 380 ms head start |
 | `message-box-caret`                      | ui/MessageBox.css             | Ambient (caret)     | dialog text finished      | on-only    | **B&W-2**: new. The ▼ bobs, 800 ms `steps(2)`; it is rendered only once the text is typed                                     |
+| `party-pop`                              | components/PartyCounter.css   | Response            | a member joins            | on-only    | **B&W-3**: new. Only the joining member's pip (`usePartyArrival`), never on load; 550 ms `--ease-pop`                         |
 
-Not keyframes, but moving: the theme fade (`styles/theme-transition.css`, token) is retired in B&W-4 (D43), and route view transitions (`styles/route-transition.css`, token) stay.
+Not keyframes, but moving. **B&W-3** removed the global Backdrop drift and the page-load intro (D42) and added three hover transitions on tokens: the nav's Mist wipe (`scaleX`), the brand mark's half turn and the settings gear's 60° turn (`--dur-slow`, `--ease-spring`). Still to go: the theme fade (`styles/theme-transition.css`, token) is retired in B&W-4 (D43), and route view transitions (`styles/route-transition.css`, token) stay.
 
 ## Planned for R10B (spec §6)
 
@@ -49,7 +48,6 @@ Each row moves into the table above, with its file, in the slice that builds it.
 | encounter sprite drop + silhouette  | Transition  | new Pokémon                      | on-only      | B&W-4 |
 | stripe drift (26 s, field only)     | Ambient     | always on the field              | on-only      | B&W-4 |
 | dialog type-out                     | Transition  | Home encounter                   | on-only      | B&W-5 |
-| party pop                           | Response    | member joins                     | token        | B&W-3 |
 | heart burst                         | Celebration | favorite turned on               | JS + on-only | B&W-4 |
 | inline confirmation slide           | Response    | favorite / team toggled          | token        | B&W-4 |
 | hop                                 | Response    | hover / focus on a listed sprite | token        | B&W-4 |

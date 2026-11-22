@@ -68,6 +68,12 @@ export const TEAM_COMPLETE = "Team complete! Your party is ready.";
 
 //party screen announcements
 export const PARTY_LABEL = "Your party";
+//the header counter: the visible word, then the count for screen readers.
+//together they name the link "Party, 4 of 6" (D45)
+export const PARTY_WORD = "Party";
+export function partyCountText(count: number, max: number): string {
+  return `, ${count} of ${max}`;
+}
 export function removedFromTeamMessage(name: string): string {
   return `${name} removed from your team.`;
 }
@@ -129,6 +135,13 @@ export function failureMessage(kind: FetchFailureKind, query: string): string {
 //the same word on purpose: what a screen reader announces matches what a
 //sighted person reads
 export const SETTINGS_LABEL = "Settings";
+
+//header search. on phones the field hides behind an icon button with the
+//same word, which says whether it is open with aria-expanded
+export const SEARCH_PLACEHOLDER = "Search by name or number";
+export const SEARCH_TOGGLE_LABEL = "Search";
+//until B&W-4 moves favorites onto the Pokémon page, the tray holds only them
+export const FAVORITES_TRAY_LABEL = "Favorites";
 export const SETTINGS_NOTE = "Saved in this browser, on this device.";
 export const ANIMATIONS_LABEL = "Animations";
 export const SPRITES_LABEL = "Sprites";

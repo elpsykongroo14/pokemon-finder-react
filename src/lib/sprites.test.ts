@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { getSpriteUrl, integerScale, resolveSprite } from "./sprites";
+import {
+  getSpriteUrl,
+  integerScale,
+  resolveSprite,
+  spriteUrlFromId,
+} from "./sprites";
 import type { PokemonSprites } from "./sprites";
 
 describe("getSpriteUrl", () => {
@@ -155,5 +160,21 @@ describe("integerScale", () => {
   it("returns 1 when the size is unknown (0 or NAN)", () => {
     expect(integerScale({ width: 0, height: 0 }, 180)).toBe(1);
     expect(integerScale({ width: NaN, height: NaN }, 180)).toBe(1);
+  });
+});
+
+describe("spriteUrlFromId", () => {
+  //D51: an autocomplete row only knows a name and a dex number. the sprite
+  //files are named by number, so the row can show one with no API request
+  it("builds the front sprite address from the dex number", () => {
+    expect(spriteUrlFromId(635)).toBe(
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/635.png",
+    );
+  });
+
+  it("returns null for an id that cannot be a Pokémon", () => {
+    expect(spriteUrlFromId(0)).toBeNull();
+    expect(spriteUrlFromId(-1)).toBeNull();
+    expect(spriteUrlFromId(2.5)).toBeNull();
   });
 });

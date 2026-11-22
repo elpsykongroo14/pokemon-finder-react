@@ -4,6 +4,7 @@ import {
   failureMessage,
   multiplierText,
   multiplierSpoken,
+  partyCountText,
 } from "./copy";
 
 describe("EncounterMessage", () => {
@@ -58,5 +59,14 @@ describe("multiplierSpoken", () => {
     [0, "no damage"],
   ])("says %s as %s", (multiplier, words) => {
     expect(multiplierSpoken(multiplier)).toBe(words);
+  });
+});
+
+describe("partyCountText", () => {
+  //read right after the visible word "Party", so the link is named
+  //"Party, 4 of 6": the name starts with what the eye sees (D45, WCAG 2.5.3)
+  it("counts the party out of the maximum", () => {
+    expect(partyCountText(4, 6)).toBe(", 4 of 6");
+    expect(partyCountText(0, 6)).toBe(", 0 of 6");
   });
 });

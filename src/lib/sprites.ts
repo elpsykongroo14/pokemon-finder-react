@@ -93,3 +93,15 @@ export function integerScale(
   if (!(longest > 0)) return 1;
   return Math.max(1, Math.floor(box / longest));
 }
+
+//PokeAPI names its front sprite files by dex number, so a list that only
+//knows numbers (the autocomplete rows, D51) can show a picture without a
+//details request per row. null for ids that cannot be a Pokémon, so the
+//caller can skip the <img> instead of requesting "0.png"
+const SPRITE_BY_ID_BASE =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
+
+export function spriteUrlFromId(id: number): string | null {
+  if (!Number.isInteger(id) || id < 1) return null;
+  return `${SPRITE_BY_ID_BASE}/${id}.png`;
+}

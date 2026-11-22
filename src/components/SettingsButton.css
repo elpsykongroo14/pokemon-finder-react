@@ -1,0 +1,11 @@
+/* the gear turns 60deg on hover (spec 5.1): the gear's own detail, not
+   every icon button's. A token duration, so it is still with motion off */
+@layer features {
+  .settings-button .icon {
+    transition: transform var(--dur-slow) var(--ease-spring);
+  }
+
+  .settings-button:hover .icon {
+    transform: rotate(60deg);
+  }
+}

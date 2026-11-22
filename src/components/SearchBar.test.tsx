@@ -28,7 +28,6 @@ function setAutocomplete(
     matches: [],
     highlightedIndex: -1,
     setHighlightedIndex,
-    preview: null,
     isOpen: false,
     dismiss,
     notifyQueryEdited,
@@ -108,9 +107,9 @@ describe("SearchBar", () => {
     render(<SearchBar onSubmit={() => {}} />);
 
     const first = screen.getByRole("option", { name: "pikachu" });
-    expect(first).toHaveTextContent("#025");
+    expect(first).toHaveTextContent("No. 025");
     expect(screen.getByRole("option", { name: "pichu" })).toHaveTextContent(
-      "#172",
+      "No. 172",
     );
   });
 
@@ -198,6 +197,42 @@ describe("SearchBar", () => {
     await user.click(screen.getByRole("option", { name: "pikachu" }));
 
     expect(handleSubmit).toHaveBeenCalledWith("pikachu");
+  });
+
+  //D51: every row shows its sprite, built from the dex number alone. the
+  //picture is decoration (alt=""): the option is already named by its name
+  it("shows each option's sprite as decoration, built from its dex number", () => {
+    setAutocomplete({
+      matches: PIKACHU_AND_PICHU,
+      isOpen: true,
+      highlightedIndex: 0,
+    });
+    const { container } = render(<SearchBar onSubmit={() => {}} />);
+
+    const sprites = container.querySelectorAll<HTMLImageElement>(
+      ".autocomplete-item img",
+    );
+    expect(sprites).toHaveLength(2);
+    expect(sprites[0]).toHaveAttribute("alt", "");
+    expect(sprites[0].src.endsWith("/25.png")).toBe(true);
+    expect(sprites[0]).toHaveAttribute("loading", "lazy");
+    expect(screen.getByRole("option", { name: "pikachu" })).toBeInTheDocument();
+  });
+
+  it("no longer draws a ▶ cursor in the rows", () => {
+    setAutocomplete({ matches: [PIKACHU], isOpen: true, highlightedIndex: 0 });
+    render(<SearchBar onSubmit={() => {}} />);
+
+    expect(screen.queryByText("▶")).not.toBeInTheDocument();
+  });
+
+  it("asks for a name or a number", () => {
+    render(<SearchBar onSubmit={() => {}} />);
+
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "placeholder",
+      "Search by name or number",
+    );
   });
 });
 
