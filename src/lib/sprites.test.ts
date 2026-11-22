@@ -161,6 +161,14 @@ describe("integerScale", () => {
     expect(integerScale({ width: 0, height: 0 }, 180)).toBe(1);
     expect(integerScale({ width: NaN, height: NaN }, 180)).toBe(1);
   });
+
+  //spec 7.1: 3x for the big Black & White sprites, 4x for small ones. one
+  //box plus a ceiling gives both: Hydreigon (108 px) fits 3x in 330, and
+  //Pikachu (50 px) would fit 6x but stops at 4x
+  it("stops at the ceiling when one is given", () => {
+    expect(integerScale({ width: 90, height: 108 }, 330, 4)).toBe(3);
+    expect(integerScale({ width: 50, height: 46 }, 330, 4)).toBe(4);
+  });
 });
 
 describe("spriteUrlFromId", () => {

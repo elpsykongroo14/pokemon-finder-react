@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { getOrderedStats, percentOf, MAX_BASE_STAT } from "./stats";
+import {
+  getOrderedStats,
+  percentOf,
+  MAX_BASE_STAT,
+  MAX_STAT_TOTAL,
+  statTotal,
+} from "./stats";
 import type { PokemonStat } from "./type";
 
 function makeStat(name: string, base_stat: number): PokemonStat {
@@ -60,5 +66,27 @@ describe("percentOf", () => {
 
   it("uses a ruler of 255, the higehst base stat any pokemon can have", () => {
     expect(MAX_BASE_STAT).toBe(255);
+  });
+});
+
+describe("statTotal", () => {
+  it("adds up every base stat", () => {
+    const stats = [92, 105, 90, 125, 90, 98].map((base_stat) => ({
+      base_stat,
+      effort: 0,
+      stat: { name: "x", url: "" },
+    }));
+    expect(statTotal(stats)).toBe(600);
+  });
+
+  it("is 0 for no stats", () => {
+    expect(statTotal([])).toBe(0);
+  });
+
+  //the plate's bar measures every Pokémon against one ruler, the highest
+  //ordinary total (Arceus, 720), so a 600 reads as most of the way
+  it("measures the total against 720", () => {
+    expect(MAX_STAT_TOTAL).toBe(720);
+    expect(percentOf(600, MAX_STAT_TOTAL)).toBeCloseTo(83.33, 1);
   });
 });

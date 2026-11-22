@@ -88,10 +88,12 @@ export function resolveSprite(
 export function integerScale(
   natural: { width: number; height: number },
   box: number,
+  //optional ceiling: small sprites would otherwise grow huge in a big box
+  max = Infinity,
 ): number {
   const longest = Math.max(natural.width, natural.height);
   if (!(longest > 0)) return 1;
-  return Math.max(1, Math.floor(box / longest));
+  return Math.max(1, Math.min(max, Math.floor(box / longest)));
 }
 
 //PokeAPI names its front sprite files by dex number, so a list that only
