@@ -23,6 +23,9 @@
 
   .tab {
     flex: 1;
+    /* flex items refuse to shrink below their text by default; four tabs
+       at 375 px need to (spec 8 draws them at 13 px, sharing the width) */
+    min-width: 0;
     height: var(--control-md);
     padding: 0 var(--space-4);
     border: none;
@@ -72,5 +75,12 @@
 
   .tab-panel {
     padding: var(--space-4) 0;
+  }
+
+  @media (max-width: 1000px) {
+    .tab {
+      padding: 0 var(--space-2);
+      font-size: var(--text-meta);
+    }
   }
 }

@@ -107,6 +107,8 @@
   --text-xl: 1.5rem;
   --text-2xl: 2rem;
   --text-display: 3rem;
+  --text-display-phone: 2.5rem; /* 40: a Pokémon's name on phones */
+  --text-display-xl: 4.25rem; /* 68: a Pokémon's name on its page */
 
   /*Spacing (unchanged 4px grid)*/
   --space-1: 4px;

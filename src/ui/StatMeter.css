@@ -68,11 +68,14 @@
     background: var(--border-hairline);
   }
 
-  /* 600 ms each, 50 ms apart down the list (spec 5.5). The encounter's
-     380 ms head start belongs to the encounter, B&W-4 adds it there */
+  /* 600 ms each, 50 ms apart down the list (spec 5.5). A screen that
+     plays the encounter sets --stat-head-start (380 ms on the Pokémon
+     page), so the bars grow while the plate is still sliding in */
   :root[data-motion="on"] .stat-meter__fill {
     animation: stat-meter-grow 600ms var(--ease-settle) both;
-    animation-delay: calc(var(--stat-index, 0) * 50ms);
+    animation-delay: calc(
+      var(--stat-head-start, 0ms) + var(--stat-index, 0) * 50ms
+    );
   }
 
   @keyframes stat-meter-grow {
