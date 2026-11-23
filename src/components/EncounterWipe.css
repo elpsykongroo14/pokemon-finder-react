@@ -1,0 +1,53 @@
+/* The wipe (spec 6.1), moved here from PokemonEncounter.css in B&W-5 so
+   Home and Compare can play it too.
+
+   Each slab is the ::before of a full-width box, and the BOX moves:
+   translateX(%) is measured against the box, which is as wide as the
+   field, so -100 % and 135 % mean "one field-width off to the left" and
+   "past the right edge". Both slabs start and end fully off screen (the
+   first prototype's white slab stopped mid-screen). With motion off the
+   slabs are not drawn at all. */
+@layer features {
+  .encounter__wipe {
+    position: absolute;
+    inset: -10% 0;
+    z-index: 3;
+    display: none;
+    pointer-events: none;
+  }
+
+  .encounter__wipe::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 80%;
+    transform: skewX(var(--slant));
+    background: var(--surface-ink);
+  }
+
+  .encounter__wipe[data-white]::before {
+    width: 7%;
+    background: var(--surface-paper);
+  }
+
+  :root[data-motion="on"] .encounter__wipe {
+    display: block;
+    animation: encounter-wipe 640ms var(--ease-wipe) both;
+  }
+
+  :root[data-motion="on"] .encounter__wipe[data-white] {
+    animation-delay: 60ms;
+  }
+
+  @keyframes encounter-wipe {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(135%);
+    }
+  }
+}

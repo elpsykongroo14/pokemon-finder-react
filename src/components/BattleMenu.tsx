@@ -1,32 +1,298 @@
 import "./BattleMenu.css";
-import { useRef, useState, type KeyboardEvent } from "react";
+import {
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { TransitionLink } from "./TransitionLink";
-import { Button } from "../ui/Button";
+import { Icon, type IconName } from "./Icon";
+import { PopIcon } from "../ui/PopIcon";
+import { useTeam } from "../hooks/useTeam";
+import { useTeamAction } from "../hooks/useTeamAction";
 import { moveInGrid } from "../lib/gridNav";
-import { SEARCH_INPUT_ID } from "../lib/ids";
+import {
+  COMPARE_COMMAND_HINT,
+  COMPARE_LINK_TEXT,
+  ENTRY_COMMAND,
+  ENTRY_COMMAND_HINT,
+  MENU_PROMPT,
+  REROLL_COMMAND,
+  REROLL_COMMAND_HINT,
+  TEAM_FULL_ATTEMPT,
+  TEAM_OFF_TEXT,
+  TEAM_ON_TEXT,
+  TEAM_TOGGLE_LABEL,
+  teamCommandHint,
+  teamNote,
+} from "../lib/copy";
+import type { PokemonDetails } from "../lib/type";
 
-const COLUMNS = 2;
+//one column of commands: Up and Down move, and wrap at the ends
+const COLUMNS = 1;
 
-//one list drives what is drawn and how many cells the keyboard logic knows about
-//"link" items go to another page, the "search" item is an action: it moves
-//focus to the search box in the header
-type MenuItem =
-  | { kind: "search"; label: string }
-  | { kind: "link"; label: string; to: string };
+//the props every command gets from the menu, for the roving tabindex:
+//only the remembered command is in the Tab order (tabIndex 0), and
+//focusing any command makes it the remembered one
+interface RovingProps {
+  "data-battle-item": string;
+  tabIndex: number;
+  onFocus: () => void;
+}
 
-const ITEMS: MenuItem[] = [
-  { kind: "search", label: "Search" },
-  { kind: "link", label: "Compare", to: "/compare" },
-  { kind: "link", label: "Team", to: "/team" },
-  { kind: "link", label: "Library", to: "/library" },
-];
+//what a command row shows: a title, the line under it, an icon on the
+//right. the title NAMES the control and the line DESCRIBES it
+//(aria-labelledby / aria-describedby point at the two spans), so a screen
+//reader says "Compare, link, Size it up against another Pokémon"
+function CommandBody({
+  titleId,
+  hintId,
+  title,
+  hint,
+  icon,
+}: {
+  //left out when the control is named some other way (the team command)
+  titleId?: string;
+  hintId: string;
+  title: ReactNode;
+  hint: string;
+  icon: ReactNode;
+}) {
+  return (
+    <span className="command__body">
+      <span className="command__text">
+        <span id={titleId} className="command__title">
+          {title}
+        </span>
+        <span id={hintId} className="command__hint">
+          {hint}
+        </span>
+      </span>
+      <span className="command__icon">{icon}</span>
+    </span>
+  );
+}
 
-//the 2x2 "what will you do?" hub. keyboard model is a roving tabindex:
-//only one item is in the Tab order at at time, so Tab enters the menu once
-//and the next Tab leaves it. the arrow keys then move between the items
-export function BattleMenu() {
+//a command that goes somewhere is a real link (it has an address you can
+//open in a new tab); one that does something here is a button
+function LinkCommand({
+  to,
+  title,
+  hint,
+  icon,
+  primary,
+  roving,
+}: {
+  to: string;
+  title: string;
+  hint: string;
+  icon: IconName;
+  primary: boolean;
+  roving: RovingProps;
+}) {
+  const titleId = useId();
+  const hintId = useId();
+  return (
+    <TransitionLink
+      to={to}
+      className="command"
+      data-primary={primary || undefined}
+      aria-labelledby={titleId}
+      aria-describedby={hintId}
+      {...roving}
+    >
+      <CommandBody
+        titleId={titleId}
+        hintId={hintId}
+        title={title}
+        hint={hint}
+        icon={<Icon name={icon} size={18} />}
+      />
+    </TransitionLink>
+  );
+}
+
+function RerollCommand({
+  onReroll,
+  primary,
+  roving,
+}: {
+  onReroll: () => void;
+  primary: boolean;
+  roving: RovingProps;
+}) {
+  const titleId = useId();
+  const hintId = useId();
+  return (
+    <button
+      type="button"
+      className="command"
+      data-primary={primary || undefined}
+      aria-labelledby={titleId}
+      aria-describedby={hintId}
+      onClick={onReroll}
+      {...roving}
+    >
+      <CommandBody
+        titleId={titleId}
+        hintId={hintId}
+        title={REROLL_COMMAND}
+        hint={REROLL_COMMAND_HINT}
+        icon={<Icon name="shuffle" size={18} />}
+      />
+    </button>
+  );
+}
+
+//"Add to team" / "On your team". a component of its own because it calls
+//hooks (useTeamAction, useTeam), and hooks need a Pokémon: this is only
+//rendered when there is one, so the hooks never run with nothing to act on.
+//
+//D44: one accessible name, "Team", in both states; aria-pressed says which
+function TeamCommand({
+  pokemon,
+  primary,
+  roving,
+  onNote,
+}: {
+  pokemon: PokemonDetails;
+  primary: boolean;
+  roving: RovingProps;
+  onNote: (sentence: string) => void;
+}) {
+  const action = useTeamAction(pokemon);
+  const { team } = useTeam();
+  const hintId = useId();
+
+  //an event: what THIS click did, reported by the toggle itself and put
+  //into words once, in the handler (the same idea as the Pokémon page's
+  //confirmation line)
+  function handleClick() {
+    const outcome = action.toggle();
+    onNote(
+      outcome.kind === "rejected"
+        ? TEAM_FULL_ATTEMPT
+        : (teamNote(pokemon.name, outcome) ?? ""),
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      className="command"
+      data-primary={primary || undefined}
+      aria-pressed={action.onTeam}
+      aria-label={TEAM_TOGGLE_LABEL}
+      aria-describedby={hintId}
+      onClick={handleClick}
+      {...roving}
+    >
+      {/* aria-label above names this one (D44), so its title has no id */}
+      <CommandBody
+        hintId={hintId}
+        title={action.onTeam ? TEAM_ON_TEXT : TEAM_OFF_TEXT}
+        hint={teamCommandHint({
+          name: pokemon.name,
+          onTeam: action.onTeam,
+          partySize: team.length,
+        })}
+        icon={
+          <PopIcon popKey={action.popKey}>
+            <Icon name={action.onTeam ? "check" : "plus"} size={16} />
+          </PopIcon>
+        }
+      />
+    </button>
+  );
+}
+
+interface BattleMenuProps {
+  //the wild Pokémon, or null while it loads or when it could not load
+  pokemon: PokemonDetails | null;
+  onReroll: () => void;
+}
+
+//one entry per command, in screen order. "render" receives the roving
+//props for its position, so the list (not each command) decides who is
+//first, second and so on
+interface Command {
+  key: string;
+  render: (roving: RovingProps, primary: boolean) => ReactNode;
+}
+
+//the command plate (spec 7.1): the black plate on the right of Home's
+//field, four slanted rows. keyboard model: a roving tabindex, so Tab enters
+//the list once and the next Tab leaves it, while Up / Down / Home / End
+//move inside it (moveInGrid, one column wide).
+//
+//the plate is NOT inside the keyed encounter layer: "Look for another"
+//lives here, and a keyed plate would be thrown away by its own click,
+//taking keyboard focus with it. it stays mounted; only the field behind it
+//replays the encounter
+export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
   const listRef = useRef<HTMLUListElement>(null);
+  const headingId = useId();
   const [active, setActive] = useState(0);
+  //what the last team click did, for screen readers (the visible words are
+  //in the command itself). a live region: always rendered, text replaced
+  const [note, setNote] = useState("");
+
+  const name = pokemon ? encodeURIComponent(pokemon.name) : null;
+
+  const commands: Command[] = [];
+  if (pokemon && name) {
+    commands.push({
+      key: "entry",
+      render: (roving, primary) => (
+        <LinkCommand
+          to={`/pokemon/${name}`}
+          title={ENTRY_COMMAND}
+          hint={ENTRY_COMMAND_HINT}
+          icon="library"
+          primary={primary}
+          roving={roving}
+        />
+      ),
+    });
+  }
+  commands.push({
+    key: "compare",
+    render: (roving, primary) => (
+      <LinkCommand
+        to={name ? `/compare?a=${name}` : "/compare"}
+        title={COMPARE_LINK_TEXT}
+        hint={COMPARE_COMMAND_HINT}
+        icon="compare"
+        primary={primary}
+        roving={roving}
+      />
+    ),
+  });
+  if (pokemon) {
+    commands.push({
+      key: "team",
+      render: (roving, primary) => (
+        <TeamCommand
+          pokemon={pokemon}
+          primary={primary}
+          roving={roving}
+          onNote={setNote}
+        />
+      ),
+    });
+  }
+  commands.push({
+    key: "reroll",
+    render: (roving, primary) => (
+      <RerollCommand onReroll={onReroll} primary={primary} roving={roving} />
+    ),
+  });
+
+  //the list can shrink (four commands with a Pokémon, two without), and
+  //the remembered position could then point past the end. derived, not
+  //stored: clamping on every render means it can never be out of range
+  const current = Math.min(active, commands.length - 1);
 
   function focusItem(index: number) {
     const items =
@@ -38,52 +304,45 @@ export function BattleMenu() {
     //alt+left is the browser's Back, ctrl/cmd+arrows belong to the OS. leave them alone
     if (event.altKey || event.ctrlKey || event.metaKey) return;
 
-    const next = moveInGrid(active, event.key, COLUMNS, ITEMS.length);
+    const next = moveInGrid(current, event.key, COLUMNS, commands.length);
     if (next === null) return;
 
     event.preventDefault();
     focusItem(next);
   }
 
-  function focusSearch() {
-    document.getElementById(SEARCH_INPUT_ID)?.focus();
-  }
-
   return (
-    <nav aria-label="Quick menu">
-      <ul className="battle-menu" ref={listRef} onKeyDown={handleKeyDown}>
-        {ITEMS.map((item, index) => {
-          //onFocus keeps `active` in step with where focus really is, whether
-          //it got there by arrow key, by Tab, or by a mouse click
-          const shared = {
-            "data-battle-item": "",
-            tabIndex: index === active ? 0 : -1,
-            onFocus: () => setActive(index),
-          };
-          const content = (
-            <>
-              <span className="battle-menu__cursor" aria-hidden="true">
-                ▶
-              </span>
-              {item.label}
-            </>
-          );
-
-          return (
-            <li key={item.label}>
-              {item.kind === "link" ? (
-                <TransitionLink to={item.to} variant="line" {...shared}>
-                  {content}
-                </TransitionLink>
-              ) : (
-                <Button variant="line" onClick={focusSearch} {...shared}>
-                  {content}
-                </Button>
+    <section className="battle-menu on-dark" aria-labelledby={headingId}>
+      <div className="battle-menu__inner">
+        {/* the dialog box already asks "What will you do?" out loud, so
+            the plate's heading only names the region (spec 7.1) */}
+        <h2 id={headingId} className="visually-hidden">
+          {MENU_PROMPT}
+        </h2>
+        <ul
+          className="battle-menu__list"
+          ref={listRef}
+          onKeyDown={handleKeyDown}
+        >
+          {commands.map((command, index) => (
+            <li key={command.key}>
+              {command.render(
+                {
+                  "data-battle-item": "",
+                  tabIndex: index === current ? 0 : -1,
+                  //onFocus keeps the position in step with where focus
+                  //really is: arrow key, Tab or mouse click
+                  onFocus: () => setActive(index),
+                },
+                index === 0,
               )}
             </li>
-          );
-        })}
-      </ul>
-    </nav>
+          ))}
+        </ul>
+        <p className="visually-hidden" aria-live="polite">
+          {note}
+        </p>
+      </div>
+    </section>
   );
 }

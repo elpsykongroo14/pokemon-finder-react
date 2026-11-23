@@ -127,11 +127,65 @@ describe("SearchBar", () => {
 
     expect(input).toHaveAttribute("aria-expanded", "true");
     expect(input).toHaveAttribute("aria-controls", listbox.id);
-    expect(options.map((o) => o.id)).toEqual([
-      "autocomplete-option-0",
-      "autocomplete-option-1",
-    ]);
+    //B&W-5: the ids are no longer the fixed "autocomplete-option-0": they
+    //come from useId, because Compare now shows three of these at once.
+    //what matters is that they exist, differ, and are what the input points at
+    expect(listbox.id).not.toBe("");
+    expect(new Set(options.map((o) => o.id)).size).toBe(2);
     expect(input).toHaveAttribute("aria-activedescendant", options[1].id);
+  });
+
+  //B&W-5: Compare shows the header search and two pickers on one page. two
+  //elements sharing an id is invalid HTML, and aria-controls pointing at a
+  //duplicated id can lead a screen reader into the wrong list
+  it("gives every search bar its own ids, so several can share a page", () => {
+    setAutocomplete({ matches: [PIKACHU], isOpen: true, highlightedIndex: 0 });
+    render(
+      <>
+        <SearchBar onSubmit={() => {}} inputLabel="First" />
+        <SearchBar onSubmit={() => {}} inputLabel="Second" />
+      </>,
+    );
+
+    const [one, two] = screen.getAllByRole("combobox");
+    const [listOne, listTwo] = screen.getAllByRole("listbox");
+    const [optionOne, optionTwo] = screen.getAllByRole("option");
+
+    expect(one.id).not.toBe(two.id);
+    expect(listOne.id).not.toBe(listTwo.id);
+    expect(optionOne.id).not.toBe(optionTwo.id);
+    expect(one).toHaveAttribute("aria-controls", listOne.id);
+    expect(two).toHaveAttribute("aria-controls", listTwo.id);
+  });
+
+  it("uses the input id it is given (the header search, which others focus by id)", () => {
+    render(<SearchBar onSubmit={() => {}} inputId="pokemon-search" />);
+
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "id",
+      "pokemon-search",
+    );
+  });
+
+  it("can show its label on screen, and then the label names the field", () => {
+    render(<SearchBar onSubmit={() => {}} inputLabel="Second" labelVisible />);
+
+    const field = screen.getByRole("combobox", { name: "Second" });
+    expect(screen.getByText("Second").tagName).toBe("LABEL");
+    expect(field).not.toHaveAttribute("aria-label");
+  });
+
+  it("empties the field after a pick when asked to (the Compare pickers)", async () => {
+    const user = userEvent.setup();
+    const handleSubmit = vi.fn();
+    setAutocomplete({ matches: [PIKACHU], isOpen: true, highlightedIndex: 0 });
+    render(<SearchBar onSubmit={handleSubmit} clearOnSubmit />);
+
+    await user.type(screen.getByRole("combobox"), "pika");
+    await user.click(screen.getByRole("option", { name: "pikachu" }));
+
+    expect(handleSubmit).toHaveBeenCalledWith("pikachu");
+    expect(screen.getByRole("combobox")).toHaveValue("");
   });
 
   it("hides the listbox when the hook reports its closed", () => {

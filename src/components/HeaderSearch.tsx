@@ -39,7 +39,9 @@ export function HeaderSearch({ onSubmit }: HeaderSearchProps) {
         className="header-search__field"
         data-open={open || undefined}
       >
-        <SearchBar onSubmit={handleSubmit} />
+        {/* the one search bar with a fixed id: the disclosure above finds
+            the field by it. every other search bar gets its own id */}
+        <SearchBar onSubmit={handleSubmit} inputId={SEARCH_INPUT_ID} />
       </div>
       <span className="header-search__toggle">
         <IconButton

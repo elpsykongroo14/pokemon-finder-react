@@ -61,4 +61,10 @@
   <symbol id="arrow-icon" viewBox="0 0 56 14">
     <g fill="none" stroke="currentColor" stroke-width="2.4"><path d="M2 7h48"/><path d="M44 1l8 6-8 6"/></g>
   </symbol>
+  <symbol id="shuffle-icon" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/>
+  </symbol>
+  <symbol id="swap-icon" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/>
+  </symbol>
 </svg>

@@ -5,7 +5,7 @@ import {
   outcomeForSide,
   type StatOutcome,
 } from "../lib/statComparison";
-import { STAT_OUTCOME_TEXT } from "../lib/copy";
+import { STAT_OUTCOME_TEXT, statLeadText } from "../lib/copy";
 import { MAX_BASE_STAT, percentOf } from "../lib/stats";
 
 type Side = "left" | "right";
@@ -16,6 +16,15 @@ interface compareStatRowProps {
   rightValue: number;
   //the ruler both bars are measured against. Defaults to the highest possible base stat
   max?: number;
+  //the row's position in the chart: CSS turns it into the grow-in delay
+  index?: number;
+  //"total": the row under the six stats (spec 7.3). bigger values, no bars
+  //and no lead badge: the verdict line below says the margin in words
+  variant?: "stat" | "total";
+  //each side's primary type: its bar wears that theme (data-type), so a
+  //winning bar is painted in its own Pokémon's color by CSS alone
+  leftType?: string;
+  rightType?: string;
 }
 
 //class names are part of the test contract, so they stay as they were
@@ -25,31 +34,40 @@ const OUTCOME_CLASS: Record<StatOutcome, string> = {
   tie: "",
 };
 
-//the visible, non-color cue for sighted users who can't rely on the color change
-const OUTCOME_MARK: Record<StatOutcome, string> = {
-  win: "▲",
-  lose: "▼",
-  tie: "=",
-};
-
+//one side's number. inside it: the number, the lead badge ("+23", on the
+//winning side only), and the word a screen reader says after the number.
+//
+//the number is the span's OWN text, and the badge and the word are child
+//elements. that is why getByText("90") still finds this span: Testing
+//Library matches an element by its own text nodes, not its children's
 function StatValue({
   value,
   outcome,
   side,
+  lead,
 }: {
   value: number;
   outcome: StatOutcome;
   side: Side;
+  //how far ahead this side is, or null when it is not ahead
+  lead: number | null;
 }) {
+  //the badge sits next to the bar: after the number on the left side,
+  //before it on the right (spec 7.3), so DOM order follows the picture
+  const badge = lead !== null && (
+    <span className="compare-stat-lead" aria-hidden="true">
+      {statLeadText(lead)}
+    </span>
+  );
+
   return (
     <span
       className={`compare-stat-value${OUTCOME_CLASS[outcome]}`}
       data-side={side}
     >
+      {side === "right" && badge}
       {value}
-      <span className="compare-stat-mark" aria-hidden="true">
-        {OUTCOME_MARK[outcome]}
-      </span>
+      {side === "left" && badge}
       <span className="visually-hidden">{STAT_OUTCOME_TEXT[outcome]}</span>
     </span>
   );
@@ -61,16 +79,19 @@ function StatBar({
   percent,
   outcome,
   side,
+  type,
 }: {
   percent: number;
   outcome: StatOutcome;
   side: Side;
+  type?: string;
 }) {
   return (
     <div
       className="compare-stat-bar"
       data-side={side}
       data-outcome={outcome}
+      data-type={type}
       aria-hidden="true"
     >
       <div
@@ -86,6 +107,10 @@ export function CompareStatRow({
   leftValue,
   rightValue,
   max = MAX_BASE_STAT,
+  index = 0,
+  variant = "stat",
+  leftType,
+  rightType,
 }: compareStatRowProps) {
   //recomputed from scratch every render, straight off the two props
   //never stored, so theres no window where this can disagree with leftValue/rightValue
@@ -95,24 +120,50 @@ export function CompareStatRow({
   const leftOutcome = outcomeForSide(winner, "left");
   const rightOutcome = outcomeForSide(winner, "right");
 
+  //the lead badge: only on stat rows, only on the side that wins
+  const lead = Math.abs(leftValue - rightValue);
+  const showLead = variant === "stat";
+  const leftLead = showLead && leftOutcome === "win" ? lead : null;
+  const rightLead = showLead && rightOutcome === "win" ? lead : null;
+
   //DOM order is the reading order for a screen reader: label first, then each
   //side, so it hears "speed, 90 higher, 60 lower". CSS grid places the pieces
   //in their visual positions: value, bar, label, bar, value
   return (
-    <div className="compare-stat-row">
+    <div
+      className="compare-stat-row"
+      data-variant={variant}
+      style={{ "--stat-index": index } as CSSProperties}
+    >
       <span className="compare-stat-label">{label}</span>
-      <StatValue value={leftValue} outcome={leftOutcome} side="left" />
-      <StatBar
-        percent={percentOf(leftValue, max)}
+      <StatValue
+        value={leftValue}
         outcome={leftOutcome}
         side="left"
+        lead={leftLead}
       />
-      <StatBar
-        percent={percentOf(rightValue, max)}
+      {variant === "stat" && (
+        <>
+          <StatBar
+            percent={percentOf(leftValue, max)}
+            outcome={leftOutcome}
+            side="left"
+            type={leftType}
+          />
+          <StatBar
+            percent={percentOf(rightValue, max)}
+            outcome={rightOutcome}
+            side="right"
+            type={rightType}
+          />
+        </>
+      )}
+      <StatValue
+        value={rightValue}
         outcome={rightOutcome}
         side="right"
+        lead={rightLead}
       />
-      <StatValue value={rightValue} outcome={rightOutcome} side="right" />
     </div>
   );
 }

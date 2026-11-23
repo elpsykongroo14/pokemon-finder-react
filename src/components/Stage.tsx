@@ -16,16 +16,27 @@ import {
 } from "../lib/copy";
 import type { PokemonDetails } from "../lib/type";
 
+//the box a pixel sprite is scaled into, on wide screens and on phones
+export interface SpriteBox {
+  wide: number;
+  stacked: number;
+}
+
 interface StageProps {
   pokemon: PokemonDetails;
   //the pokemon page offers a shiny switch; the Home encouter does not
   shinyToggle?: boolean;
+  //the Pixel / Artwork control. Home and Compare leave it out (spec 7.1,
+  //7.3): the choice still lives in Settings, and those screens have no room
+  spriteOptions?: boolean;
+  //Compare's halves are smaller than a whole field, so it passes its own
+  box?: SpriteBox;
 }
 
 //the box a pixel sprite is scaled into, and the largest zoom it may get
 //(spec 7.1): a big Black & White sprite (around 100 px) lands at 3x, a
 //small one (Pikachu, 50 px) stops at 4x. phones have a shorter field
-const SPRITE_BOX = { wide: 330, stacked: 270 } as const;
+const SPRITE_BOX: SpriteBox = { wide: 330, stacked: 270 };
 const MAX_SPRITE_SCALE = 4;
 
 //the left side of the encounter field: the battle platform, the sprite
@@ -33,7 +44,12 @@ const MAX_SPRITE_SCALE = 4;
 //is the only place that reads sprite preferences, so SpriteDisplay stays a
 //plain, reusable component. who the Pokémon IS (dex, name, types) is the
 //name plate's job now (NamePlate)
-export function Stage({ pokemon, shinyToggle = false }: StageProps) {
+export function Stage({
+  pokemon,
+  shinyToggle = false,
+  spriteOptions = true,
+  box = SPRITE_BOX,
+}: StageProps) {
   const { spriteMode, setSpriteMode, animationsEnabled } = usePreferences();
   const stacked = useMediaQuery(STACKED_QUERY);
 
@@ -72,7 +88,7 @@ export function Stage({ pokemon, shinyToggle = false }: StageProps) {
               shiny={shiny}
               mode={spriteMode}
               animate={animationsEnabled}
-              size={stacked ? SPRITE_BOX.stacked : SPRITE_BOX.wide}
+              size={stacked ? box.stacked : box.wide}
               maxScale={MAX_SPRITE_SCALE}
               plain
             />
@@ -88,33 +104,37 @@ export function Stage({ pokemon, shinyToggle = false }: StageProps) {
         </div>
       </div>
 
-      <div
-        className="stage__controls"
-        role="group"
-        aria-label={SPRITE_OPTIONS_LABEL}
-      >
-        {/* the same choice, and the same preference, as in Settings: two
-            options, one selected, so radio buttons (spec 5.3) */}
-        <SegmentedControl
-          label={SPRITES_LABEL}
-          options={SPRITE_MODE_OPTIONS}
-          value={spriteMode}
-          onChange={setSpriteMode}
-        />
-        {shinyToggle && (
-          //on or off: a toggle button, named "Shiny" in both states, with
-          //aria-pressed saying which (the same rule as Favorite)
-          <Button
-            variant="line"
-            size="sm"
-            pressed={shiny}
-            onClick={handleShinyClick}
-          >
-            <Icon name="sparkle" />
-            {SHINY_LABEL}
-          </Button>
-        )}
-      </div>
+      {(spriteOptions || shinyToggle) && (
+        <div
+          className="stage__controls"
+          role="group"
+          aria-label={SPRITE_OPTIONS_LABEL}
+        >
+          {/* the same choice, and the same preference, as in Settings: two
+              options, one selected, so radio buttons (spec 5.3) */}
+          {spriteOptions && (
+            <SegmentedControl
+              label={SPRITES_LABEL}
+              options={SPRITE_MODE_OPTIONS}
+              value={spriteMode}
+              onChange={setSpriteMode}
+            />
+          )}
+          {shinyToggle && (
+            //on or off: a toggle button, named "Shiny" in both states, with
+            //aria-pressed saying which (the same rule as Favorite)
+            <Button
+              variant="line"
+              size="sm"
+              pressed={shiny}
+              onClick={handleShinyClick}
+            >
+              <Icon name="sparkle" />
+              {SHINY_LABEL}
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

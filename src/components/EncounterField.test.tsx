@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { EncounterField } from "./EncounterField";
+import { EncounterField, FieldSky } from "./EncounterField";
 
 describe("EncounterField", () => {
   it("is a region named by the heading it is given", () => {
@@ -58,5 +58,44 @@ describe("EncounterField", () => {
     );
 
     expect(container.querySelector(".encounter-field")).toBe(field);
+  });
+
+  //Home has no heading to point at: its field is named by a short label
+  it("can be named by a label instead (Home's 'Wild encounter')", () => {
+    render(
+      <EncounterField label="Wild encounter">
+        <p>x</p>
+      </EncounterField>,
+    );
+
+    expect(
+      screen.getByRole("region", { name: "Wild encounter" }),
+    ).toBeInTheDocument();
+  });
+
+  it("tells CSS which field it is, so Home can be taller", () => {
+    const { container } = render(
+      <EncounterField variant="home">
+        <p>x</p>
+      </EncounterField>,
+    );
+
+    expect(container.querySelector(".encounter-field")).toHaveAttribute(
+      "data-variant",
+      "home",
+    );
+  });
+});
+
+//B&W-5: Compare paints two skies side by side, each in its own Pokémon's
+//colors, so the scenery is a piece of its own
+describe("FieldSky", () => {
+  it("paints a sky, a ground and two stripes, hidden from assistive tech", () => {
+    const { container } = render(<FieldSky />);
+
+    const sky = container.querySelector(".encounter-field__sky");
+    expect(sky).toHaveAttribute("aria-hidden", "true");
+    expect(sky?.querySelector(".encounter-field__ground")).not.toBeNull();
+    expect(sky?.querySelectorAll(".encounter-field__stripe")).toHaveLength(2);
   });
 });

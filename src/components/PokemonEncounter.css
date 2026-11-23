@@ -1,5 +1,6 @@
-/* The keyed encounter layer (spec 6.1, 7.2): the stage, the name plate on
-   the right with its slanted edge, and the two wipe slabs on top. */
+/* The keyed encounter layer (spec 6.1, 7.2): the stage and the name plate
+   on the right with its slanted edge. The wipe slabs on top are their own
+   component since B&W-5 (EncounterWipe.css). */
 @layer features {
   .encounter {
     --plate-edge: 132px; /* where the slanted edge meets the top */
@@ -26,55 +27,6 @@
     padding: calc(var(--space-7) - var(--space-1)) var(--space-8)
       calc(var(--space-7) - var(--space-1))
       calc(var(--plate-edge) + var(--space-gutter));
-  }
-
-  /* the wipe (spec 6.1). Each slab is the ::before of a full-width box,
-     and the BOX moves: translateX(%) is measured against the box, which is
-     as wide as the field, so -100 % and 135 % mean "one field-width off to
-     the left" and "past the right edge". Both slabs start and end fully
-     off screen (the first prototype's white slab stopped mid-screen).
-     With motion off the slabs are not drawn at all. */
-  .encounter__wipe {
-    position: absolute;
-    inset: -10% 0;
-    z-index: 3;
-    display: none;
-    pointer-events: none;
-  }
-
-  .encounter__wipe::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 80%;
-    transform: skewX(var(--slant));
-    background: var(--surface-ink);
-  }
-
-  .encounter__wipe[data-white]::before {
-    width: 7%;
-    background: var(--surface-paper);
-  }
-
-  :root[data-motion="on"] .encounter__wipe {
-    display: block;
-    animation: encounter-wipe 640ms var(--ease-wipe) both;
-  }
-
-  :root[data-motion="on"] .encounter__wipe[data-white] {
-    animation-delay: 60ms;
-  }
-
-  @keyframes encounter-wipe {
-    from {
-      transform: translateX(-100%);
-    }
-
-    to {
-      transform: translateX(135%);
-    }
   }
 
   /* phones (spec 8): the plate under the stage, its slanted edge on top,

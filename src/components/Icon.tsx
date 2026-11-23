@@ -17,7 +17,9 @@ export type IconName =
   | "documentation"
   | "github"
   | "settings"
+  | "shuffle"
   | "social"
+  | "swap"
   | "x";
 
 interface IconProps {
