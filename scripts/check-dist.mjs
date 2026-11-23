@@ -34,7 +34,14 @@ const TEXT_FILE = /\.(html|js|css|map|json|txt)$/;
 // Pokémon page (field, encounter, plate, rail, readout) lands while Home
 // still ships StageConsole, Panel, BattleMenu, Menu and Cursor (about
 // 1.5 kB, gone in B&W-5). B&W-8 ratchets this back down.
-const BUDGET_KB = { js: 93, css: 13.5 };
+// R10B (D64): JS 93 -> 93.5 and CSS 13.5 -> 14.5 at B&W-5 (measured 93.23 /
+// 14.46). The retired Home CSS did leave (StageConsole, Panel, Menu, Cursor,
+// the old BattleMenu and versus badge: 0 rules left in the bundle); what
+// remains is new: the command plate, the versus field, the identity band
+// with its pickers, the stat duel (+1.23 kB CSS gzip), and the command,
+// reroll, pick / swap and pending-comparison logic (+1.83 kB JS gzip).
+// B&W-8 ratchets both back down.
+const BUDGET_KB = { js: 93.5, css: 14.5 };
 
 if (!existsSync(DIST)) {
   console.error(`check-dist: no ${DIST}/ folder. Run "npm run build" first.`);
