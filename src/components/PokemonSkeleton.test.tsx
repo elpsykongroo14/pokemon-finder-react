@@ -22,4 +22,16 @@ describe("PokemonSkeleton", () => {
       container.querySelector('.stage__sprite .skeleton[data-shape="circle"]'),
     ).toHaveStyle({ height: "240px" });
   });
+
+  //Home's dialog says "Searching the tall grass…" already: the picture
+  //must not say it a second time
+  it("can be only a picture, when something else announces the loading", () => {
+    const { container } = render(<PokemonSkeleton decorative />);
+
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(container.querySelector(".pokemon-skeleton")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
 });

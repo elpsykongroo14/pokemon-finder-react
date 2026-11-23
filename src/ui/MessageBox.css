@@ -68,4 +68,42 @@
       transform: translateY(var(--space-1));
     }
   }
+
+  /* ---- typing="lines" (Home's encounter dialog, spec 6.1) ----
+     Every line is in the page from the start; each one is uncovered left
+     to right by clip-path in as many steps as it has letters (--chars,
+     set by MessageBox), on the encounter's clock: line one at 950 ms,
+     line two at 2050 ms. Nothing outside the keyframes hides the text:
+     the "covered" state exists only while the animation applies it
+     (fill-mode both), so if the animation cannot run, or motion is off,
+     the text is simply there. */
+  .message-box__line {
+    display: block;
+  }
+
+  .message-box__clip {
+    display: inline-block;
+  }
+
+  :root[data-motion="on"] .message-box[data-typing="lines"] .message-box__clip {
+    animation: message-box-type 900ms steps(var(--chars, 20), end) 950ms both;
+  }
+
+  :root[data-motion="on"]
+    .message-box[data-typing="lines"]
+    [data-line="2"]
+    .message-box__clip {
+    animation-duration: 500ms;
+    animation-delay: 2050ms;
+  }
+
+  @keyframes message-box-type {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0);
+    }
+  }
 }

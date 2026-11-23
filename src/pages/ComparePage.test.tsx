@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ComparePage } from "./ComparePage";
 import { PreferencesProvider } from "../context/PreferencesContext";
 import { usePokemon } from "../hooks/usePokemon";
@@ -34,19 +34,38 @@ vi.mock("../components/SearchBar", () => ({
   ),
 }));
 
+//the stand-in shows what it was given and offers the band's two actions
+//(a pick for the second slot, and Swap) as plain buttons
 vi.mock("../components/CompareView", () => ({
   CompareView: ({
     primary,
     secondary,
+    pending,
+    onPick,
+    onSwap,
   }: {
     primary: { name: string };
     secondary: { name: string };
+    pending?: boolean;
+    onPick: (slot: "a" | "b", query: string) => void;
+    onSwap: () => void;
   }) => (
-    <div data-testid="compare-view">
+    <div data-testid="compare-view" data-pending={pending || undefined}>
       {primary.name} vs {secondary.name}
+      <button onClick={onSwap}>fake-swap</button>
+      <button onClick={() => onPick("b", "squirtle")}>
+        fake-pick-squirtle
+      </button>
+      <button onClick={() => onPick("b", "pikachu")}>fake-pick-pikachu</button>
     </div>
   ),
 }));
+
+//where the page has sent the URL
+function Probe() {
+  const { search } = useLocation();
+  return <p data-testid="search">{search}</p>;
+}
 
 const pikachuData = { name: "pikachu", id: 25 } as PokemonDetails;
 const charmanderData = { name: "charmander", id: 4 } as PokemonDetails;
@@ -71,6 +90,7 @@ function renderComparePage(initialPath: string) {
         <Routes>
           <Route path="/compare" element={<ComparePage />} />
         </Routes>
+        <Probe />
       </MemoryRouter>
     </PreferencesProvider>,
   );
@@ -257,6 +277,85 @@ describe("ComparePage", () => {
     expect(screen.getByTestId("compare-view")).toHaveTextContent(
       "pikachu vs charmander",
     );
+  });
+
+  //B&W-5 (spec 7.3): the versus field and the names take the title's
+  //place on screen. the h2 stays, for the page outline and screen readers
+  it("keeps the page heading for screen readers only once the comparison is up", () => {
+    mockLookups({
+      pikachu: { data: pikachuData },
+      charmander: { data: charmanderData },
+    });
+
+    renderComparePage("/compare?a=pikachu&b=charmander");
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: COMPARE_HEADING }),
+    ).toHaveClass("visually-hidden");
+    expect(screen.queryByText(COMPARE_SUBTITLE)).not.toBeInTheDocument();
+  });
+
+  describe("identity band", () => {
+    const both = {
+      pikachu: { data: pikachuData },
+      charmander: { data: charmanderData },
+    };
+
+    it("swaps the two sides in the URL", async () => {
+      mockLookups(both);
+      const user = userEvent.setup();
+
+      renderComparePage("/compare?a=pikachu&b=charmander");
+      await user.click(screen.getByRole("button", { name: "fake-swap" }));
+
+      expect(screen.getByTestId("search")).toHaveTextContent(
+        "?a=charmander&b=pikachu",
+      );
+    });
+
+    it("puts a picked Pokémon in its slot", async () => {
+      mockLookups({ ...both, squirtle: { loading: true } });
+      const user = userEvent.setup();
+
+      renderComparePage("/compare?a=pikachu&b=charmander");
+      await user.click(
+        screen.getByRole("button", { name: "fake-pick-squirtle" }),
+      );
+
+      expect(screen.getByTestId("search")).toHaveTextContent(
+        "?a=pikachu&b=squirtle",
+      );
+    });
+
+    it("swaps instead when the Pokémon on the other side is picked", async () => {
+      mockLookups(both);
+      const user = userEvent.setup();
+
+      renderComparePage("/compare?a=pikachu&b=charmander");
+      await user.click(
+        screen.getByRole("button", { name: "fake-pick-pikachu" }),
+      );
+
+      expect(screen.getByTestId("search")).toHaveTextContent(
+        "?a=charmander&b=pikachu",
+      );
+    });
+
+    //the comparison must not drop to a loading message while the new
+    //opponent loads: the picker that was just used lives inside it
+    it("keeps the comparison up, marked pending, while the new pick loads", async () => {
+      mockLookups({ ...both, squirtle: { loading: true } });
+      const user = userEvent.setup();
+
+      renderComparePage("/compare?a=pikachu&b=charmander");
+      await user.click(
+        screen.getByRole("button", { name: "fake-pick-squirtle" }),
+      );
+
+      const view = screen.getByTestId("compare-view");
+      expect(view).toHaveTextContent("pikachu vs charmander");
+      expect(view).toHaveAttribute("data-pending", "true");
+    });
   });
 });
 

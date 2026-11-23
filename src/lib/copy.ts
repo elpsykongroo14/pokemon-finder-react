@@ -84,6 +84,33 @@ export const NO_EVOLUTION = "This Pokémon does not evolve.";
 
 export const MENU_PROMPT = "What will you do?";
 
+//Home (spec 7.1): the field is a named region, and the command plate's four
+//rows are a title plus one line saying what each does
+export const WILD_ENCOUNTER_LABEL = "Wild encounter";
+export const ENTRY_COMMAND = "Check its entry";
+export const ENTRY_COMMAND_HINT = "Stats, evolution and type matchups";
+export const COMPARE_COMMAND_HINT = "Size it up against another Pokémon";
+export const REROLL_COMMAND = "Look for another";
+export const REROLL_COMMAND_HINT = "A different wild Pokémon appears";
+
+//the line under "Add to team" on Home: what selecting it will do, given the
+//party right now. the title above it swaps between TEAM_OFF_TEXT/TEAM_ON_TEXT
+export function teamCommandHint({
+  name,
+  onTeam,
+  partySize,
+}: {
+  name: string;
+  onTeam: boolean;
+  partySize: number;
+}): string {
+  if (onTeam)
+    return `${formatSlug(name)} joined your party. Select again to release it`;
+  if (partySize >= MAX_TEAM)
+    return "Your party is full. Release one on the Team page";
+  return `Your party has room for ${MAX_TEAM - partySize} more`;
+}
+
 //compare page: the empty state invites, the self compare error says what to do
 export const EMPTY_COMPARE =
   "Search for a Pokémon first, then hit Compare to bring it here.";
@@ -94,6 +121,37 @@ export const SELF_COMPARE = "Choose a different Pokémon to compare.";
 //screen reader can tell it apart from the header search
 export const COMPARE_HEADING = "Compare Pokémon";
 export const OPPONENT_SEARCH_LABEL = "Choose an opponent";
+
+//the identity band (spec 7.3, D52): a picker per side, its visible label
+//("First") and its search landmark's name, then the Swap button
+export const COMPARE_FIRST_LABEL = "First";
+export const COMPARE_SECOND_LABEL = "Second";
+export const COMPARE_FIRST_SEARCH_LABEL = "Choose the first Pokémon";
+export const COMPARE_SECOND_SEARCH_LABEL = "Choose the second Pokémon";
+export const SWAP_SIDES_LABEL = "Swap sides";
+export const TOTAL_LABEL = "Total";
+
+export function compareRegionLabel(first: string, second: string): string {
+  return `Comparing ${first} and ${second}`;
+}
+
+//the small "+23" badge next to the winning value: by how much it wins
+export function statLeadText(lead: number): string {
+  return `+${lead}`;
+}
+
+//the verdict under the stat duel: who has the higher base stat total, and
+//by how much. a tie names both, so nobody "wins" it
+export function compareVerdict(
+  left: { name: string; total: number },
+  right: { name: string; total: number },
+): string {
+  if (left.total === right.total)
+    return `${formatSlug(left.name)} and ${formatSlug(right.name)} have the same base stat total.`;
+  const [winner, loser] =
+    left.total > right.total ? [left, right] : [right, left];
+  return `${formatSlug(winner.name)} has the higher base stat total, by ${winner.total - loser.total}.`;
+}
 
 //the words a screen reader says after a compared state value, so the result
 //never depends on color alone. Record<StatOutcome, ...? makes the compiler
@@ -193,6 +251,7 @@ export const SETTINGS_LABEL = "Settings";
 //header search. on phones the field hides behind an icon button with the
 //same word, which says whether it is open with aria-expanded
 export const SEARCH_PLACEHOLDER = "Search by name or number";
+export const SEARCH_INPUT_LABEL = "Search Pokémon";
 export const SEARCH_TOGGLE_LABEL = "Search";
 //the black strip of favorites under the Pokémon page's field (D48)
 export const FAVORITES_LABEL = "Favorites";

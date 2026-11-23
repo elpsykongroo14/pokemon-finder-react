@@ -1,10 +1,19 @@
 import "./SearchBar.css";
-import { useState, useRef, type FormEvent, type KeyboardEvent } from "react";
+import {
+  useId,
+  useState,
+  useRef,
+  type FormEvent,
+  type KeyboardEvent,
+} from "react";
 import { useAutocomplete } from "../hooks/useAutocomplete";
 import { spriteUrlFromId } from "../lib/sprites";
-import { SEARCH_INPUT_ID } from "../lib/ids";
 import { formatDexNumber } from "../lib/dex";
-import { SEARCH_PLACEHOLDER, SEARCH_TOGGLE_LABEL } from "../lib/copy";
+import {
+  SEARCH_INPUT_LABEL,
+  SEARCH_PLACEHOLDER,
+  SEARCH_TOGGLE_LABEL,
+} from "../lib/copy";
 import { Icon } from "./Icon";
 
 interface SearchBarProps {
@@ -12,15 +21,41 @@ interface SearchBarProps {
   placeholder?: string;
   //names the search landmark, only needed when a page  has more than one search form
   label?: string;
+  //names the field itself ("Search Pokémon" unless told otherwise)
+  inputLabel?: string;
+  //true: that name is shown on screen as a real <label> next to the field
+  //(Compare's "First" and "Second", spec 7.3) instead of an aria-label
+  labelVisible?: boolean;
+  //the input's id. only the header search passes one (SEARCH_INPUT_ID),
+  //because other code finds that field by id to focus it. every other
+  //search bar gets a unique id of its own from useId
+  inputId?: string;
+  //true: the field empties after a submit. for pickers whose choice shows
+  //up elsewhere on the page (the identity band shows the picked name)
+  clearOnSubmit?: boolean;
 }
 
 export function SearchBar({
   onSubmit,
   placeholder = SEARCH_PLACEHOLDER,
   label,
+  inputLabel = SEARCH_INPUT_LABEL,
+  labelVisible = false,
+  inputId,
+  clearOnSubmit = false,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  //one id "stem" per search bar. Compare shows three search bars at once
+  //(header, First, Second); fixed ids like "autocomplete-list" would exist
+  //three times, and a duplicated id is invalid HTML that can point
+  //aria-controls at the wrong list. useId is unique per component instance
+  //and stays the same on every render
+  const baseId = useId();
+  const fieldId = inputId ?? `${baseId}-input`;
+  const listId = `${baseId}-list`;
+  const optionId = (index: number) => `${baseId}-option-${index}`;
 
   const {
     matches,
@@ -36,6 +71,7 @@ export function SearchBar({
     if (!trimmed) return;
     onSubmit(trimmed);
     dismiss();
+    if (clearOnSubmit) setQuery("");
   }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -75,9 +111,7 @@ export function SearchBar({
   }
 
   const activeId =
-    highlightedIndex >= 0
-      ? `autocomplete-option-${highlightedIndex}`
-      : undefined;
+    highlightedIndex >= 0 ? optionId(highlightedIndex) : undefined;
 
   return (
     <div className="search-bar-wrapper">
@@ -87,9 +121,14 @@ export function SearchBar({
         role="search"
         aria-label={label}
       >
+        {labelVisible && (
+          <label className="search-bar__label" htmlFor={fieldId}>
+            {inputLabel}
+          </label>
+        )}
         <input
           ref={inputRef}
-          id={SEARCH_INPUT_ID}
+          id={fieldId}
           className="search-bar__input"
           type="text"
           value={query}
@@ -99,10 +138,12 @@ export function SearchBar({
           }}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          aria-label="Search Pokémon"
+          //a visible <label> already names the field; an aria-label would
+          //override it, and the two could drift apart
+          aria-label={labelVisible ? undefined : inputLabel}
           role="combobox"
           aria-expanded={isOpen}
-          aria-controls="autocomplete-list"
+          aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={activeId}
         />
@@ -120,8 +161,11 @@ export function SearchBar({
       </form>
 
       {isOpen && (
-        <div className="autocomplete-panel">
-          <ul id="autocomplete-list" role="listbox">
+        //on-light: the panel is always white, even when the search bar
+        //sits on a black plate (Compare's pickers), so it takes the light
+        //roles back for everything inside it
+        <div className="autocomplete-panel on-light">
+          <ul id={listId} role="listbox">
             {matches.map((entry, index) => {
               //null when the entry has no usable number: then no <img> at
               //all, rather than a request for a broken address
@@ -129,7 +173,7 @@ export function SearchBar({
               return (
                 <li
                   key={entry.name}
-                  id={`autocomplete-option-${index}`}
+                  id={optionId(index)}
                   role="option"
                   aria-selected={index === highlightedIndex}
                   className={

@@ -110,6 +110,22 @@ describe("Stage", () => {
     ).not.toBeInTheDocument();
   });
 
+  //B&W-5: Home and Compare draw no sprite controls at all (spec 7.1, 7.3);
+  //the same choice stays in Settings. no empty "Sprite options" group either
+  it("can leave the sprite options out entirely (Home, Compare)", () => {
+    render(
+      <PreferencesProvider>
+        <Stage pokemon={pokemon} spriteOptions={false} />
+      </PreferencesProvider>,
+    );
+
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("group", { name: "Sprite options" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "pikachu" })).toBeInTheDocument();
+  });
+
   //a toggle button: one name, aria-pressed says on or off
   it("swaps to the shiny sprite when Shiny is switched on", async () => {
     const user = userEvent.setup();

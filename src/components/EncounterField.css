@@ -20,6 +20,13 @@
     height: var(--field-height);
   }
 
+  /* Home (spec 7.1): taller, with the horizon higher, so the battle dialog
+     stands on the ground under the sprite */
+  .encounter-field[data-variant="home"] {
+    --field-height: 660px;
+    --field-ground-height: 44%;
+  }
+
   .encounter-field__sky {
     position: absolute;
     inset: 0;
@@ -123,6 +130,11 @@
 
       height: auto;
       min-height: var(--field-stage-height);
+    }
+
+    .encounter-field[data-variant="home"] {
+      --field-stage-height: 540px;
+      --field-ground-height: 44%;
     }
 
     .encounter-field__sky {

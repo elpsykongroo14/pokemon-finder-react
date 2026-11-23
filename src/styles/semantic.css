@@ -8,9 +8,12 @@
    the dark slate design used; only what they point at changed, which
    is why one file can re-skin the whole app.
 
-   Two scopes override the defaults:
+   Three scopes override the defaults:
    .on-dark        a black plate (name plates, the command plate, the
                    card dialog): text and focus ring flip to white
+   .on-light       a white surface that can open INSIDE a black plate
+                   (the autocomplete panel under Compare's pickers):
+                   every role .on-dark flipped goes back to :root's
    .surface-window the old light panel. On a white page it now equals
                    the defaults; it stays until the last component
                    that sets it is restyled (B&W-8 removes it) */
@@ -106,6 +109,25 @@
   --accent-select: var(--paper);
   --focus-ring: var(--paper);
   --focus-halo: var(--ink);
+
+  color: var(--text-primary);
+}
+
+/* A white island on a black plate. The mirror of .on-dark: the same roles,
+   pointed back where :root points them. Written out instead of "unset",
+   because custom properties inherit, and "unset" would inherit the
+   .on-dark value from the plate around it */
+.on-light {
+  --text-primary: var(--ink);
+  --text-secondary: var(--graphite);
+  --text-tertiary: var(--graphite);
+  --text-danger: var(--red-800);
+  --text-success: var(--green-800);
+  --border-line: var(--ink);
+  --border-hairline: var(--line);
+  --accent-select: var(--ink);
+  --focus-ring: var(--ink);
+  --focus-halo: var(--paper);
 
   color: var(--text-primary);
 }

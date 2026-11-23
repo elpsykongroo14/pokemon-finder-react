@@ -72,6 +72,34 @@ describe("CompareStatsChart", () => {
       "Speed",
     ]);
   });
+
+  //spec 7.3: under the six rows, the two base stat totals
+  it("adds a total row with both base stat totals", () => {
+    const leftStats = [makeStat("hp", 35), makeStat("attack", 55)];
+    const rightStats = [makeStat("hp", 60), makeStat("attack", 90)];
+
+    render(<CompareStatsChart leftStats={leftStats} rightStats={rightStats} />);
+
+    const total = screen.getByText("Total").closest(".compare-stat-row");
+    expect(total).toHaveAttribute("data-variant", "total");
+    expect(total).toHaveTextContent("90");
+    expect(total).toHaveTextContent("150");
+  });
+
+  it("numbers the rows in order, so their bars grow one after another", () => {
+    const stats = [makeStat("hp", 35), makeStat("attack", 55)];
+
+    const { container } = render(
+      <CompareStatsChart leftStats={stats} rightStats={stats} />,
+    );
+
+    const indexes = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        '.compare-stat-row[data-variant="stat"]',
+      ),
+    ).map((row) => row.style.getPropertyValue("--stat-index"));
+    expect(indexes).toEqual(["0", "1"]);
+  });
 });
 
 //this test doesnt just check today's behavior, it looks in the specific fix for a documented bug from the vanilla version
