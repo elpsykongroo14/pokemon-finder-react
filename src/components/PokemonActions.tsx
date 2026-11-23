@@ -1,53 +1,84 @@
 import "./PokemonActions.css";
-import { useId } from "react";
-import { FavoriteButton, FavoriteStatus } from "./FavoriteButton";
+import { useId, useState } from "react";
+import { FavoriteButton } from "./FavoriteButton";
+import { HeartBurst } from "./HeartBurst";
+import { Icon } from "./Icon";
 import { TeamStatus, TeamToggle } from "../context/TeamButton";
 import { useTeamAction } from "../hooks/useTeamAction";
-import { TransitionLink } from "./TransitionLink";
-import { ACTIONS_COLLECT_LABEL, ACTIONS_EXPLORE_LABEL } from "../lib/copy";
-import type { PokemonDetails } from "../lib/type";
 import { useFavoriteAction } from "../hooks/useFavoriteAction";
+import { usePreferences } from "../hooks/usePreferences";
+import { TransitionLink } from "./TransitionLink";
+import {
+  ACTIONS_COLLECT_LABEL,
+  ACTIONS_EXPLORE_LABEL,
+  CARDS_LINK_TEXT,
+  COMPARE_LINK_TEXT,
+  favoriteNote,
+  teamNote,
+} from "../lib/copy";
+import type { PokemonDetails } from "../lib/type";
 
 interface PokemonActionsProps {
   pokemon: PokemonDetails;
 }
 
-//what we can do with this pokemon, sorted by what each contol acts on
+//one confirmation at a time. id goes up with every new sentence, and is
+//used as the line's key: a new key means a new element, so the slide-in
+//plays again even when the sentence is the same as the last one
+interface Note {
+  text: string;
+  id: number;
+}
+
+//the 2 x 2 action grid on the name plate (spec 7.2). two labelled groups,
+//one per row, sorted by what each control acts on:
 //  Collect  = buttons that change our collection (favorites, team)
 //  Explore  = links that take us to another page (compare, cards)
-//how the sprite looks is not here anymore: those switches live on the Stage,
-//next to the sprite they change
-//the team feature's messages (party full, party complete, errors) are about
-//the whole party, not one button, so they are drawn once, under both  groups
-//instead of inside "Collect" where they could only make one group taller
-
+//the captions are for screen readers only ("Collect, group"): the design
+//draws the grid without them
 export function PokemonActions({ pokemon }: PokemonActionsProps) {
-  const FavoriteAction = useFavoriteAction(pokemon);
+  const favoriteAction = useFavoriteAction(pokemon);
+  const teamAction = useTeamAction(pokemon);
+  const { animationsEnabled } = usePreferences();
   const name = encodeURIComponent(pokemon.name);
   const collectId = useId();
   const exploreId = useId();
-  const teamAction = useTeamAction(pokemon);
+
+  //the inline confirmation (spec 6.2). an EVENT ("this click did that"), so
+  //it is set in the click handlers, from what each toggle reports it did
+  const [note, setNote] = useState<Note | null>(null);
+
+  function confirm(text: string | null) {
+    if (text === null) return; //nothing happened worth confirming
+    setNote((previous) => ({ text, id: (previous?.id ?? 0) + 1 }));
+  }
 
   return (
     <div className="pokemon-actions">
-      {/* role="group" + aria-labelledby: a screen reader announces
-          "Collect, group" on entering, from the same caption people see */}
       <div
         className="pokemon-actions__group"
         role="group"
         aria-labelledby={collectId}
       >
-        <span id={collectId} className="pokemon-actions__caption">
+        <span id={collectId} className="visually-hidden">
           {ACTIONS_COLLECT_LABEL}
         </span>
-        <div className="pokemon-actions__row">
+        <div className="pokemon-actions__favorite">
           <FavoriteButton
-            isFavorite={FavoriteAction.isFavorite}
-            onToggle={FavoriteAction.toggle}
-            popKey={FavoriteAction.popKey}
+            isFavorite={favoriteAction.isFavorite}
+            onToggle={() => confirm(favoriteNote(favoriteAction.toggle()))}
+            popKey={favoriteAction.popKey}
           />
-          <TeamToggle action={teamAction} />
+          {/* same gates as the shiny sparkle: JS (not rendered with motion
+              off) and a new key per add, so every add bursts afresh */}
+          {animationsEnabled && favoriteAction.popKey > 0 && (
+            <HeartBurst key={favoriteAction.popKey} />
+          )}
         </div>
+        <TeamToggle
+          action={teamAction}
+          onToggle={() => confirm(teamNote(pokemon.name, teamAction.toggle()))}
+        />
       </div>
 
       <div
@@ -55,22 +86,34 @@ export function PokemonActions({ pokemon }: PokemonActionsProps) {
         role="group"
         aria-labelledby={exploreId}
       >
-        <span id={exploreId} className="pokemon-actions__caption">
+        <span id={exploreId} className="visually-hidden">
           {ACTIONS_EXPLORE_LABEL}
         </span>
-        <div className="pokemon-actions__row">
-          <TransitionLink to={`/compare?a=${name}`} variant="line">
-            {/* decorative: hidden so the link is named "Compare", not
-                "crossed swords, Compare" */}
-            <span aria-hidden="true">⚔️</span> Compare
-          </TransitionLink>
-          <TransitionLink to={`/library/${name}`} variant="line">
-            View Cards
-          </TransitionLink>
-        </div>
+        <TransitionLink to={`/compare?a=${name}`} variant="ghost">
+          <Icon name="compare" size={18} />
+          {COMPARE_LINK_TEXT}
+        </TransitionLink>
+        <TransitionLink to={`/library/${name}`} variant="ghost">
+          <Icon name="library" size={18} />
+          {CARDS_LINK_TEXT}
+        </TransitionLink>
       </div>
 
-      <FavoriteStatus action={FavoriteAction} />
+      {/* polite: it waits for the screen reader to finish, then reads the
+          new line. the region itself is always there (a live region that
+          appears together with its text is often not announced); only the
+          line inside it is replaced */}
+      <p className="pokemon-actions__note" aria-live="polite">
+        {note && (
+          <span key={note.id} className="pokemon-actions__note-line">
+            <Icon name="check" size={16} />
+            {note.text}
+          </span>
+        )}
+      </p>
+
+      {/* the party's own messages: the party-full hint (which the Team button
+          is described by), the six-of-six celebration, errors */}
       <TeamStatus action={teamAction} />
     </div>
   );

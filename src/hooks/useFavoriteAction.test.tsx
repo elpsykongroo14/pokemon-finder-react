@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { FavoritesProvider } from "../context/FavoritesContext";
 import { useFavoriteAction } from "./useFavoriteAction";
-import { FIRST_FAVORITE } from "../lib/copy";
+import type { FavoriteOutcome } from "../lib/type";
 import type { PokemonDetails } from "../lib/type";
 
 function makePokemon(name: string, id: number) {
-  return { name, id, sprites: {} } as PokemonDetails;
+  return { name, id, sprites: {}, types: [] } as unknown as PokemonDetails;
 }
 
 const pikachu = makePokemon("pikachu", 25);
@@ -29,47 +29,55 @@ function seedFavorites(names: string[]) {
 beforeEach(() => localStorage.clear());
 
 describe("useFavoriteAction", () => {
-  it("celebrates and announces the very first favorite", () => {
+  //the toggle reports what it did, so the page can confirm it in words
+  it("reports the very first favorite as an add, and as the first", () => {
     const { result } = renderAction();
+    let outcome: FavoriteOutcome | undefined;
 
-    act(() => result.current.toggle());
+    act(() => {
+      outcome = result.current.toggle();
+    });
 
     expect(result.current.isFavorite).toBe(true);
-    expect(result.current.celebratingFirst).toBe(true);
-    expect(result.current.announcement).toBe(FIRST_FAVORITE);
+    expect(outcome).toEqual({ added: true, first: true });
   });
 
   it("does not call it 'first' when other favorites already exist", () => {
     seedFavorites(["bulbasaur"]);
     const { result } = renderAction();
+    let outcome: FavoriteOutcome | undefined;
 
-    act(() => result.current.toggle());
+    act(() => {
+      outcome = result.current.toggle();
+    });
 
-    expect(result.current.isFavorite).toBe(true);
-    expect(result.current.celebratingFirst).toBe(false);
-    expect(result.current.announcement).toBe("");
+    expect(outcome).toEqual({ added: true, first: false });
   });
 
-  it("stops celebrating once that favorite is removed again", () => {
+  it("reports a removal", () => {
+    seedFavorites(["pikachu"]);
     const { result } = renderAction();
+    let outcome: FavoriteOutcome | undefined;
 
-    act(() => result.current.toggle());
-    act(() => result.current.toggle());
+    act(() => {
+      outcome = result.current.toggle();
+    });
 
-    expect(result.current.celebratingFirst).toBe(false);
+    expect(result.current.isFavorite).toBe(false);
+    expect(outcome).toEqual({ added: false, first: false });
   });
 
-  it("counts adds for the icon pop, not removals", () => {
+  it("counts adds for the icon pop and the burst, not removals", () => {
     const { result } = renderAction();
     expect(result.current.popKey).toBe(0);
 
-    act(() => result.current.toggle()); //add
+    act(() => void result.current.toggle()); //add
     expect(result.current.popKey).toBe(1);
 
-    act(() => result.current.toggle()); //remove
+    act(() => void result.current.toggle()); //remove
     expect(result.current.popKey).toBe(1);
 
-    act(() => result.current.toggle()); //add again
+    act(() => void result.current.toggle()); //add again
     expect(result.current.popKey).toBe(2);
   });
 

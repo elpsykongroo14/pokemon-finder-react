@@ -5,6 +5,8 @@ import { MemoryRouter, useLocation } from "react-router-dom";
 import { PokemonActions } from "./PokemonActions";
 import type { PokemonDetails } from "../lib/type";
 import type { FavoritesContextValue } from "../hooks/useFavorites";
+import type { TeamOutcome } from "../lib/type";
+import { PreferencesProvider } from "../context/PreferencesContext";
 
 const { toggleFavorite, teamAction } = vi.hoisted(() => ({
   toggleFavorite: vi.fn(),
@@ -17,12 +19,15 @@ const { toggleFavorite, teamAction } = vi.hoisted(() => ({
     error: null as string | null,
     announcement: "",
     hintId: "team-hint",
-    toggle: () => {},
+    popKey: 0,
+    //what the click reports back; each test can set what happened
+    toggle: (): TeamOutcome => ({ kind: "joined", size: 5 }),
   },
 }));
 
 beforeEach(() => {
   teamAction.partyFull = false;
+  teamAction.toggle = () => ({ kind: "joined", size: 5 });
 });
 
 vi.mock("../hooks/useFavorites", () => ({
@@ -44,14 +49,22 @@ function Probe() {
   return <p data-testid="where">{pathname + search}</p>;
 }
 
+//PokemonActions reads the animation preference (for the heart burst)
 function renderActions(name = "pikachu") {
-  render(
-    <MemoryRouter initialEntries={["/pokemon/x"]}>
-      <PokemonActions pokemon={{ name } as PokemonDetails} />
-      <Probe />
-    </MemoryRouter>,
+  return render(
+    <PreferencesProvider>
+      <MemoryRouter initialEntries={["/pokemon/x"]}>
+        <PokemonActions pokemon={{ name } as PokemonDetails} />
+        <Probe />
+      </MemoryRouter>
+    </PreferencesProvider>,
   );
 }
+
+const note = () =>
+  screen.getByText(
+    (_, el) => el?.tagName === "P" && el.getAttribute("aria-live") === "polite",
+  );
 
 describe("PokemonActions", () => {
   it("groups the collection buttons under 'Collect'", () => {
@@ -74,7 +87,7 @@ describe("PokemonActions", () => {
       within(explore).getByRole("link", { name: "Compare" }),
     ).toBeInTheDocument();
     expect(
-      within(explore).getByRole("link", { name: "View Cards" }),
+      within(explore).getByRole("link", { name: "Cards" }),
     ).toBeInTheDocument();
   });
 
@@ -111,6 +124,65 @@ describe("PokemonActions", () => {
     expect(toggleFavorite).toHaveBeenCalledWith({ name: "pikachu" });
   });
 
+  //spec 6.2: one polite line under the actions, saying what the click did
+  it("confirms a new favorite in words, in a polite live region", async () => {
+    const user = userEvent.setup();
+    renderActions();
+    expect(note()).toBeEmptyDOMElement();
+
+    await user.click(screen.getByRole("button", { name: /favorite/i }));
+
+    //the mocked list was empty, so this was the very first favorite
+    expect(note()).toHaveTextContent("First favorite!");
+  });
+
+  it("confirms a join with the party count", async () => {
+    const user = userEvent.setup();
+    renderActions("hydreigon");
+
+    await user.click(screen.getByRole("button", { name: "Team" }));
+
+    expect(note()).toHaveTextContent(
+      "Hydreigon joined your party. 5 of 6 slots filled.",
+    );
+  });
+
+  //replaced, not stacked: the newest sentence is the only one
+  it("replaces the last confirmation instead of adding another", async () => {
+    const user = userEvent.setup();
+    renderActions("hydreigon");
+
+    await user.click(screen.getByRole("button", { name: /favorite/i }));
+    await user.click(screen.getByRole("button", { name: "Team" }));
+
+    expect(note().children).toHaveLength(1);
+    expect(note()).toHaveTextContent("Hydreigon joined your party.");
+  });
+
+  it("says nothing new when a full party refuses the add", async () => {
+    teamAction.toggle = () => ({ kind: "rejected", size: 6 });
+    const user = userEvent.setup();
+    renderActions();
+
+    await user.click(screen.getByRole("button", { name: "Team" }));
+
+    expect(note()).toBeEmptyDOMElement();
+  });
+
+  //the burst belongs to the moment of adding (spec 6.2): never on arrival
+  it("bursts only after a favorite is added", async () => {
+    const user = userEvent.setup();
+    const { container } = renderActions();
+    expect(container.querySelector(".heart-burst")).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: /favorite/i }));
+
+    expect(container.querySelector(".heart-burst")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
   it("builds the destinations from the pokemon's name", () => {
     renderActions("pikachu");
 
@@ -118,7 +190,7 @@ describe("PokemonActions", () => {
       "href",
       "/compare?a=pikachu",
     );
-    expect(screen.getByRole("link", { name: "View Cards" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Cards" })).toHaveAttribute(
       "href",
       "/library/pikachu",
     );

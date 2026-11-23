@@ -1,78 +1,158 @@
+/* The stage: the left side of the encounter field (spec 7.2). Where the
+   stage itself sits in the field is EncounterField.css's job; this file
+   draws what stands on it.
+
+   The platform is the third shape rule (spec 4.3): an ellipse of white
+   at 34 % with a dark ring, a brighter inner ellipse, and a shadow ellipse
+   just above its center. Its colors are field tokens (type-themes.css).
+   The sizes describe one illustration, so they are named once here and
+   swapped as a set on phones. */
 @layer features {
   .stage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
-  }
+    --platform-width: 400px;
+    --platform-height: 84px;
+    --platform-bottom: 92px;
+    --shadow-width: 180px;
+    --shadow-height: 26px;
+    --shadow-bottom: 118px;
+    --sprite-bottom: 126px;
+    /* tall enough for the sprite box on its platform. Inside a field the
+       field sets the height; elsewhere (Home, until B&W-5 gives it a
+       field) the stage still stands up on its own */
+    --stage-min-height: 480px;
 
-  .stage__header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    text-align: center;
-  }
-
-  .stage__dex {
-    font-size: var(--text-sm);
-    letter-spacing: 0.1em;
-    color: var(--theme-soft-ink);
-    opacity: 0.8;
-  }
-
-  .stage__name {
-    text-transform: capitalize;
-    overflow-wrap: anywhere;
-    /* headings set their own color globally; inherit the panel's instead */
-    color: inherit;
-  }
-
-  .stage__sprite {
     position: relative;
-    padding-bottom: var(--space-3);
+    min-height: var(--stage-min-height);
   }
 
-  /* every "how does the sprite look" switch, on one centered row */
-  .stage__controls {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-3) var(--space-4);
-  }
-
-  /* ground shadow under the sprite */
-  .stage__sprite::after {
-    content: "";
+  .stage__platform,
+  .stage__shadow {
     position: absolute;
     left: 50%;
-    bottom: 0;
-    width: 60%;
-    height: 14px;
-    transform: translateX(-50%);
+    translate: -50% 0;
     border-radius: 50%;
-    background: radial-gradient(
-      closest-side,
-      color-mix(in srgb, var(--theme-accent-deep) 55%, transparent),
-      transparent
-    );
   }
 
-  /* idle bob, only for sprites that are not already animated GIFs.
-     Ambient tier. Motion gate: runs ONLY under :root[data-motion="on"] */
-  :root[data-motion="on"]
-    .stage__sprite
-    .sprite-display:not([data-kind="animated"]) {
-    animation: stage-idle 2.4s ease-in-out infinite alternate;
+  .stage__platform {
+    bottom: var(--platform-bottom);
+    width: var(--platform-width);
+    height: var(--platform-height);
+    background: var(--field-platform);
+    box-shadow: inset 0 0 0 var(--border-width-thick) var(--field-platform-ring);
   }
 
-  @keyframes stage-idle {
-    from {
-      transform: translateY(0);
+  .stage__platform::after {
+    content: "";
+    position: absolute;
+    inset: 24% 18%;
+    border-radius: 50%;
+    background: var(--field-platform-inner);
+  }
+
+  .stage__shadow {
+    bottom: var(--shadow-bottom);
+    width: var(--shadow-width);
+    height: var(--shadow-height);
+    background: var(--field-platform-shadow);
+  }
+
+  /* the sprite's feet stand on the platform; the sprite box (SpriteDisplay
+     with "plain") puts the image on its bottom edge */
+  .stage__sprite {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: var(--sprite-bottom);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .stage__drop {
+    position: relative;
+    transform-origin: 50% 100%;
+  }
+
+  .stage__controls {
+    position: absolute;
+    left: var(--space-gutter);
+    bottom: calc(var(--space-5) + var(--space-1) / 2);
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* ---- the encounter (spec 6.1), only inside the keyed encounter layer
+     and only with motion on: with motion off these rules do not exist,
+     so the sprite is simply there ---- */
+
+  /* falls 60 px onto the platform, squashes, rebounds 6 px, settles */
+  :root[data-motion="on"] .encounter .stage__drop {
+    animation: stage-drop 500ms var(--ease-settle) 300ms both;
+  }
+
+  /* a black silhouette, a white flash, then full color: how a wild
+     Pokémon appears in Black and White. steps(1): hard cuts, no fades */
+  :root[data-motion="on"] .encounter .stage__reveal {
+    animation: stage-reveal 900ms steps(1, end) both;
+  }
+
+  @keyframes stage-drop {
+    0% {
+      opacity: 0;
+      transform: translateY(-60px);
     }
 
-    to {
-      transform: translateY(-6px);
+    62% {
+      opacity: 1;
+      transform: translateY(0) scale(1.05, 0.93);
+    }
+
+    82% {
+      transform: translateY(-6px) scale(0.99, 1.02);
+    }
+
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes stage-reveal {
+    0%,
+    72% {
+      filter: brightness(0);
+    }
+
+    80% {
+      filter: brightness(0) invert(1);
+    }
+
+    88%,
+    100% {
+      filter: none;
+    }
+  }
+
+  /* phones (spec 8): a 370 px field, so a smaller platform, set lower */
+  @media (max-width: 1000px) {
+    .stage {
+      --platform-width: 280px;
+      --platform-height: 60px;
+      --platform-bottom: 62px;
+      --shadow-width: 130px;
+      --shadow-height: 18px;
+      --shadow-bottom: 84px;
+      --sprite-bottom: 92px;
+      --stage-min-height: 370px;
+    }
+
+    .stage__controls {
+      left: var(--space-4);
+      bottom: calc(var(--space-6) + var(--space-3));
+      gap: var(--space-2);
     }
   }
 }

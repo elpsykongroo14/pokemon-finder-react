@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import type { FavoritePokemon, PokemonDetails } from "../lib/type";
-import { getSpriteUrl } from "../lib/sprites";
+import { toTeamMember } from "../lib/teamMember";
 import { FavoritesContext } from "../hooks/useFavorites";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 
@@ -16,14 +16,9 @@ function favoritesReducer(
     case "ADD": {
       const pokemon = action.payload;
       if (state.some((f) => f.name === pokemon.name)) return state;
-      return [
-        ...state,
-        {
-          name: pokemon.name,
-          id: pokemon.id,
-          sprite: getSpriteUrl(pokemon.sprites),
-        },
-      ];
+      //a favorite and a team member are saved as the same small summary
+      //(name, id, sprite and, since D48, types), so one function builds both
+      return [...state, toTeamMember(pokemon)];
     }
     case "REMOVE":
       return state.filter((f) => f.name !== action.payload);

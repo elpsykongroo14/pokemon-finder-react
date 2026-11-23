@@ -9,6 +9,9 @@ interface TransitionLinkProps extends Omit<LinkProps, "to" | "className"> {
   //give it a variant and the link is drawn like a Button, it is still a
   //real <a href>, because it takes you somewhere
   variant?: ButtonVariant;
+  //a link drawn some other way (a favorites tile, an evolution stage)
+  //brings its own class instead of a variant
+  className?: string;
 }
 
 //a real link that animates plain clicks through the View Transitions
@@ -17,6 +20,7 @@ interface TransitionLinkProps extends Omit<LinkProps, "to" | "className"> {
 export function TransitionLink({
   to,
   variant,
+  className,
   onClick,
   children,
   ...rest
@@ -27,7 +31,7 @@ export function TransitionLink({
     <Link
       {...rest}
       to={to}
-      className={variant ? "btn" : undefined}
+      className={variant ? "btn" : className}
       data-variant={variant}
       onClick={(event) => {
         onClick?.(event);

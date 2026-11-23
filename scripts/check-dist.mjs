@@ -30,7 +30,11 @@ const TEXT_FILE = /\.(html|js|css|map|json|txt)$/;
 // down then.
 // R10B (D61): CSS raised 11.5 -> 12 at B&W-2. The new primitives ship while
 // the retired shell/stage/menu CSS still does (it leaves in B&W-3 to B&W-5).
-const BUDGET_KB = { js: 93, css: 12 };
+// R10B (D63): CSS raised 12 -> 13.5 at B&W-4 (measured 13.18). The whole
+// Pokémon page (field, encounter, plate, rail, readout) lands while Home
+// still ships StageConsole, Panel, BattleMenu, Menu and Cursor (about
+// 1.5 kB, gone in B&W-5). B&W-8 ratchets this back down.
+const BUDGET_KB = { js: 93, css: 13.5 };
 
 if (!existsSync(DIST)) {
   console.error(`check-dist: no ${DIST}/ folder. Run "npm run build" first.`);

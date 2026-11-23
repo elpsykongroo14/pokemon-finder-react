@@ -3,12 +3,12 @@ import { Dialog } from "../ui/Dialog";
 import { SegmentedControl } from "../ui/SegmentedControl";
 import { usePreferences } from "../hooks/usePreferences";
 import type { AnimationMode } from "../lib/preferences";
-import type { SpriteMode } from "../lib/sprites";
 import {
   ANIMATIONS_LABEL,
   SETTINGS_LABEL,
   SETTINGS_NOTE,
   SPRITES_HINT,
+  SPRITE_MODE_OPTIONS,
   SPRITES_LABEL,
   animationsHint,
 } from "../lib/copy";
@@ -21,11 +21,6 @@ const ANIMATION_OPTIONS = [
   { value: "on", label: "On" },
   { value: "off", label: "Off" },
 ] as const satisfies readonly { value: AnimationMode; label: string }[];
-
-const SPRITE_OPTIONS = [
-  { value: "pixel", label: "Pixel" },
-  { value: "artwork", label: "Artwork" },
-] as const satisfies readonly { value: SpriteMode; label: string }[];
 
 interface SettingsDialogProps {
   onClose: () => void;
@@ -63,7 +58,7 @@ export function SettingsDialog({ onClose }: SettingsDialogProps) {
           <SegmentedControl
             label={SPRITES_LABEL}
             labelVisible
-            options={SPRITE_OPTIONS}
+            options={SPRITE_MODE_OPTIONS}
             value={spriteMode}
             onChange={setSpriteMode}
             description={SPRITES_HINT}

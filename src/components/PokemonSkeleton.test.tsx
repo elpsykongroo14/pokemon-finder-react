@@ -12,11 +12,14 @@ describe("PokemonSkeleton", () => {
     ).toBeInTheDocument();
   });
 
-  it("reserves the same 240px sprite space as the real stage", () => {
+  //spec 7.6: an empty platform with a silhouette where the sprite will
+  //stand, built from the Stage's own classes so it sits in the same place
+  it("stands a silhouette on an empty platform, in the stage's place", () => {
     const { container } = render(<PokemonSkeleton />);
 
+    expect(container.querySelector(".stage .stage__platform")).not.toBeNull();
     expect(
-      container.querySelector('.skeleton[data-shape="circle"]'),
-    ).toHaveStyle({ width: "240px", height: "240px" });
+      container.querySelector('.stage__sprite .skeleton[data-shape="circle"]'),
+    ).toHaveStyle({ height: "240px" });
   });
 });

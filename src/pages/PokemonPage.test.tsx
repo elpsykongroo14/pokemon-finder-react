@@ -10,9 +10,23 @@ import userEvent from "@testing-library/user-event";
 vi.mock("../hooks/usePokemon");
 const retry = vi.fn();
 
-vi.mock("../components/PokemonCard", () => ({
-  PokemonCard: ({ pokemon }: { pokemon: { name: string } }) => (
+//B&W-4: PokemonCard was split into the encounter layer (inside the field)
+//and the readout (below it), with the favorites rail between them. all
+//three have their own tests; here they are stand-ins that show what the
+//page handed them
+vi.mock("../components/PokemonEncounter", () => ({
+  PokemonEncounter: ({ pokemon }: { pokemon: { name: string } }) => (
     <div data-testid="pokemon-card">{pokemon.name}</div>
+  ),
+}));
+vi.mock("../components/PokemonReadout", () => ({
+  PokemonReadout: ({ pokemon }: { pokemon: { name: string } }) => (
+    <div data-testid="pokemon-readout">{pokemon.name}</div>
+  ),
+}));
+vi.mock("../components/FavoritesList", () => ({
+  FavoritesList: ({ current }: { current?: string }) => (
+    <nav data-testid="favorites-rail">{current ?? "none"}</nav>
   ),
 }));
 
@@ -21,7 +35,7 @@ function makePokemon(overrides: Partial<PokemonDetails> = {}): PokemonDetails {
 }
 
 function renderPokemonPage(initialPath: string) {
-  return render(
+  const ui = (
     //MessageBox reads the animation preference, so the page needs the provider
     <PreferencesProvider>
       <MemoryRouter initialEntries={[initialPath]}>
@@ -30,9 +44,11 @@ function renderPokemonPage(initialPath: string) {
           <Route path="/pokemon/:name" element={<PokemonPage />} />
         </Routes>
       </MemoryRouter>
-      ,
-    </PreferencesProvider>,
+    </PreferencesProvider>
   );
+  //ui is returned too, so a test can rerender the same tree after
+  //changing what usePokemon returns
+  return { ...render(ui), ui };
 }
 
 describe("PokemonPage", () => {
@@ -139,7 +155,7 @@ describe("PokemonPage", () => {
     );
   });
 
-  it("renders the pokemon card when data loads", () => {
+  it("renders the encounter and the readout when data loads", () => {
     vi.mocked(usePokemon).mockReturnValue({
       data: makePokemon(),
       loading: false,
@@ -150,6 +166,67 @@ describe("PokemonPage", () => {
     renderPokemonPage("/pokemon/pikachu");
 
     expect(screen.getByTestId("pokemon-card")).toHaveTextContent("pikachu");
+    expect(screen.getByTestId("pokemon-readout")).toHaveTextContent("pikachu");
+  });
+
+  //the rail marks the tile of the Pokémon on screen; while loading there
+  //is none yet
+  it("tells the favorites rail which Pokémon is on screen", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: makePokemon(),
+      loading: false,
+      error: null,
+      retry,
+    });
+    renderPokemonPage("/pokemon/pikachu");
+    expect(screen.getByTestId("favorites-rail")).toHaveTextContent("pikachu");
+  });
+
+  //D43: the field outlives each Pokémon: loading the next one must not
+  //replace it, or its sky could not change color under the slab
+  it("keeps the same field from one Pokémon, through loading, to the next", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: makePokemon(),
+      loading: false,
+      error: null,
+      retry,
+    });
+    const view = renderPokemonPage("/pokemon/pikachu");
+    const field = view.container.querySelector(".encounter-field");
+    expect(field).not.toBeNull();
+
+    vi.mocked(usePokemon).mockReturnValue({
+      data: makePokemon(),
+      loading: true,
+      error: null,
+      retry,
+    });
+    view.rerender(view.ui);
+    expect(view.container.querySelector(".encounter-field")).toBe(field);
+
+    vi.mocked(usePokemon).mockReturnValue({
+      data: makePokemon({ name: "raichu" }),
+      loading: false,
+      error: null,
+      retry,
+    });
+    view.rerender(view.ui);
+    expect(view.container.querySelector(".encounter-field")).toBe(field);
+  });
+
+  //the field is a region named after the Pokémon only once there is one
+  it("names the field after the Pokémon once it has loaded", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: makePokemon(),
+      loading: true,
+      error: null,
+      retry,
+    });
+    const { container } = renderPokemonPage("/pokemon/pikachu");
+
+    expect(container.querySelector(".encounter-field")).not.toHaveAttribute(
+      "aria-labelledby",
+    );
   });
 
   it("shows a not found message when the fetch succeeds with no data", () => {

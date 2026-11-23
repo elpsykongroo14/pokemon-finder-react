@@ -1,11 +1,17 @@
 import "./Icon.css";
 
 export type IconName =
+  | "arrow"
   | "bluesky"
+  | "check"
   | "compare"
+  | "heart"
+  | "heart-outline"
   | "home"
   | "library"
+  | "plus"
   | "search"
+  | "sparkle"
   | "team"
   | "discord"
   | "documentation"

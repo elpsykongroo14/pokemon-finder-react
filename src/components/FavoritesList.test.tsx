@@ -1,22 +1,29 @@
 import { type ReactNode } from "react";
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { FavoritesProvider } from "../context/FavoritesContext";
 import { FavoritesList } from "./FavoritesList";
 import type { FavoritePokemon } from "../lib/type";
 import { PreferencesProvider } from "../context/PreferencesContext";
 import { useFavorites } from "../hooks/useFavorites";
+import { EMPTY_FAVORITES } from "../lib/copy";
+
+function Where() {
+  return <p data-testid="where">{useLocation().pathname}</p>;
+}
 
 //plain function that calls the real render underneath
 //with the app's specific provider stack baked in
-//the helper now includes the preferences provider
 function renderWithProviders(ui: ReactNode) {
   return render(
     <PreferencesProvider>
       <MemoryRouter>
-        <FavoritesProvider>{ui}</FavoritesProvider>
+        <FavoritesProvider>
+          {ui}
+          <Where />
+        </FavoritesProvider>
       </MemoryRouter>
     </PreferencesProvider>,
   );
@@ -26,69 +33,93 @@ const storedPikachu: FavoritePokemon = {
   name: "pikachu",
   id: 25,
   sprite: "https://img.example/pikachu.png",
+  types: ["electric"],
 };
+
+//saved before D48: no types
+const storedOldEevee: FavoritePokemon = {
+  name: "eevee",
+  id: 133,
+  sprite: "https://img.example/eevee.png",
+};
+
+function seed(...favorites: FavoritePokemon[]) {
+  localStorage.setItem("pokemon_favorites", JSON.stringify(favorites));
+}
+
+const tile = (name: RegExp) => screen.getByRole("link", { name });
 
 beforeEach(() => {
   localStorage.clear();
 });
 
+//B&W-4: the favorites tray became the rail under the Pokémon page's field
+//(spec 7.2). each favorite is a tile that LINKS to its page; there is no
+//remove button any more (unfavorite on the Pokémon's own page), so the
+//remove test became the "goes to its page" and "marks the current" tests
 describe("FavoritesList", () => {
   it("shows an empty state message when there are no favorites", () => {
     renderWithProviders(<FavoritesList />);
 
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "No favorites yet. Tap ♥ on any Pokémon to keep it here.",
-    );
+    expect(screen.getByRole("status")).toHaveTextContent(EMPTY_FAVORITES);
   });
 
-  it("lists a favorite that was already saved", () => {
-    localStorage.setItem("pokemon_favorites", JSON.stringify([storedPikachu]));
+  it("is a navigation landmark named Favorites", () => {
+    seed(storedPikachu);
     renderWithProviders(<FavoritesList />);
 
-    expect(screen.getByRole("link", { name: /pikachu/i })).toBeInTheDocument();
+    const rail = screen.getByRole("navigation", { name: "Favorites" });
+    expect(within(rail).getByRole("list")).toBeInTheDocument();
   });
 
-  it("removes a favorite when its remove button is clicked", async () => {
-    localStorage.setItem("pokemon_favorites", JSON.stringify([storedPikachu]));
+  it("lists a saved favorite as a link to its page", async () => {
+    seed(storedPikachu);
     const user = userEvent.setup();
     renderWithProviders(<FavoritesList />);
 
-    await user.click(
-      screen.getByRole("button", { name: "Remove pikachu from favorites" }),
-    );
+    await user.click(tile(/pikachu/i));
 
-    expect(
-      screen.queryByRole("link", { name: /pikachu/i }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "No favorites yet. Tap ♥ on any Pokémon to keep it here.",
-    );
+    expect(screen.getByTestId("where")).toHaveTextContent("/pokemon/pikachu");
   });
 
-  it("names the list so a screen reader announces what it is", () => {
-    localStorage.setItem("pokemon_favorites", JSON.stringify([storedPikachu]));
+  //the sprite is decoration: the name (visually hidden) names the link
+  it("names each tile by the Pokémon, not by its picture", () => {
+    seed(storedPikachu);
     renderWithProviders(<FavoritesList />);
 
-    expect(screen.getByRole("list", { name: "Favorites" })).toBeInTheDocument();
+    expect(tile(/pikachu/i)).toHaveAccessibleName("pikachu");
+    expect(tile(/pikachu/i).querySelector("img")).toHaveAttribute("alt", "");
   });
 
-  it("gives favorites present at the start a one after another entrance", () => {
-    const three = ["bulbasaur", "charmander", "squirtle"].map((name, i) => ({
-      name,
-      id: i + 1,
-      sprite: null,
-    }));
-    localStorage.setItem("pokemon_favorites", JSON.stringify(three));
+  it("marks the tile of the Pokémon whose page this is", () => {
+    seed(storedPikachu, storedOldEevee);
+    renderWithProviders(<FavoritesList current="eevee" />);
+
+    expect(tile(/eevee/i)).toHaveAttribute("aria-current", "page");
+    expect(tile(/pikachu/i)).not.toHaveAttribute("aria-current");
+  });
+
+  //D48: the underline takes the primary type's color; a favorite saved
+  //before types were stored gets no type, so a neutral underline
+  it("themes a tile by its primary type, when it knows one", () => {
+    seed(storedPikachu, storedOldEevee);
     renderWithProviders(<FavoritesList />);
 
-    const slots = screen
-      .getAllByRole("listitem")
-      .map((li) => li.style.getPropertyValue("--fav-slot"));
-    expect(slots).toEqual(["0", "1", "2"]);
+    expect(tile(/pikachu/i)).toHaveAttribute("data-type", "electric");
+    expect(tile(/eevee/i)).not.toHaveAttribute("data-type");
   });
 
-  it("lets a favorite added later pop in at once, not behind a queue", async () => {
-    localStorage.setItem("pokemon_favorites", JSON.stringify([storedPikachu]));
+  //D42: nothing moves on its own when the page loads
+  it("does not animate the favorites that were there from the start", () => {
+    seed(storedPikachu, storedOldEevee);
+    renderWithProviders(<FavoritesList />);
+
+    expect(tile(/pikachu/i)).not.toHaveAttribute("data-new");
+    expect(tile(/eevee/i)).not.toHaveAttribute("data-new");
+  });
+
+  it("pops in a favorite added while you are on the page", async () => {
+    seed(storedPikachu);
     const user = userEvent.setup();
 
     //a stand-in for the Favorite button on a Pokémon page
@@ -101,6 +132,7 @@ describe("FavoritesList", () => {
               name: "eevee",
               id: 133,
               sprites: { front_default: null },
+              types: [],
             } as never)
           }
         >
@@ -117,8 +149,8 @@ describe("FavoritesList", () => {
 
     await user.click(screen.getByRole("button", { name: "add eevee" }));
 
-    const items = screen.getAllByRole("listitem");
-    expect(items).toHaveLength(2);
-    expect(items[1].style.getPropertyValue("--fav-slot")).toBe("0");
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(tile(/eevee/i)).toHaveAttribute("data-new");
+    expect(tile(/pikachu/i)).not.toHaveAttribute("data-new");
   });
 });

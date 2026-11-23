@@ -1,4 +1,5 @@
-/* App shell: header / main / tray / footer.
+/* App shell: header / main / footer. (The favorites tray left in B&W-4:
+   favorites are a rail on the Pokémon page now, D48.)
 
    One breakpoint for the shell: 1000 px (spec 4.4), the desktop-to-
    stacked switch. CSS cannot read var() inside @media, so it lives here
@@ -17,7 +18,7 @@
 
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 1fr auto auto;
+    grid-template-rows: auto 1fr auto;
     min-height: 100svh;
     padding-bottom: var(--bottom-bar);
   }
@@ -63,9 +64,13 @@
     view-transition-name: page;
   }
 
-  .app-tray {
-    padding: var(--space-4) var(--shell-gutter);
-    border-top: var(--border-width-line) solid var(--border-line);
+  /* a page that runs edge to edge (an encounter field) marks its root
+     .page--bleed, and main lets go of its column and gutters. :has() asks
+     the question from the parent's side, so no page has to undo main's
+     padding with negative margins */
+  .app-main:has(> .page--bleed) {
+    width: 100%;
+    padding: 0;
   }
 
   @media (max-width: 1000px) {

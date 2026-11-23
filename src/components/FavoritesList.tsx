@@ -1,65 +1,75 @@
-//FavoritesList now reaches into the context directly instead of taking favorites/onRemove as props
-
 import "./FavoritesList.css";
-import { useState, type CSSProperties } from "react";
-import { Link } from "react-router-dom";
+import { useId, useState } from "react";
 import { useFavorites } from "../hooks/useFavorites";
-import { MessageBox } from "../ui/MessageBox";
-import { EMPTY_FAVORITES } from "../lib/copy";
-import { staggerSlot } from "../lib/stagger";
+import { TransitionLink } from "./TransitionLink";
+import { EMPTY_FAVORITES, FAVORITES_LABEL } from "../lib/copy";
 
-export function FavoritesList() {
-  const { favorites, removeFavorite } = useFavorites();
-
-  //how many favorites existed on the very first render. only thos take part
-  //in the one after another entrance, anything added later pops in on its own
-  //useState's initial value is read once and then ignored, so this number
-  //never changes, even as favorites come and go
-  const [settledCount] = useState(favorites.length);
-
-  if (favorites.length === 0) {
-    return <MessageBox text={EMPTY_FAVORITES} />;
-  }
-
-  return (
-    <ul className="favorites-list" aria-label="Favorites">
-      {favorites.map((f, position) => (
-        <li
-          key={f.name}
-          style={
-            {
-              "--fav-slot": staggerSlot(position, settledCount),
-            } as CSSProperties
-          }
-        >
-          <Link
-            to={`/pokemon/${encodeURIComponent(f.name)}`}
-            className="favorite-link"
-          >
-            {f.sprite && (
-              <img
-                src={f.sprite}
-                alt=""
-                width={32}
-                height={32}
-                decoding="async"
-              />
-            )}{" "}
-            {f.name}
-          </Link>
-          <button
-            type="button"
-            onClick={() => removeFavorite(f.name)}
-            aria-label={`Remove ${f.name} from favorites`}
-          >
-            ×
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
+interface FavoritesListProps {
+  //the Pokémon whose page this is: its tile is white and aria-current
+  current?: string;
 }
 
-//onSelect is still a plain prop, not pulled from Context. That's correct, not an oversight
-//"which pokemon to search for" is App's concern, not a globally shared piece of state
-//so it stays as ordinary prop-based inversion of control. Context replaces prop drilling; it isn't a replacement for props in general.
+//the favorites rail (spec 7.2, D48): a black strip right under the field,
+//one slanted tile per favorite, each a link to that Pokémon's page. it
+//reaches into the favorites context itself instead of taking props.
+//
+//a <nav>: it is a set of links to other pages, so screen reader users can
+//jump to it like the main nav. it is named by a visible caption, not a
+//heading: an h2 here would sit between the Pokémon's name and its
+//readout sections and wrongly "own" them in the outline
+export function FavoritesList({ current }: FavoritesListProps) {
+  const { favorites } = useFavorites();
+  const captionId = useId();
+
+  //the favorites that were there when the rail first rendered. they did
+  //not just arrive, so they do not animate (D42: nothing moves on its own
+  //at load). only a tile added while you are here pops in.
+  //useState's initializer runs once, so this set never changes afterwards
+  const [namesAtStart] = useState(() => new Set(favorites.map((f) => f.name)));
+
+  return (
+    <nav className="favorites-rail on-dark" aria-labelledby={captionId}>
+      <span id={captionId} className="favorites-rail__caption">
+        {FAVORITES_LABEL}
+      </span>
+      {favorites.length === 0 ? (
+        //role="status": when the last favorite is removed, the empty
+        //message is announced instead of the rail silently emptying
+        <p className="favorites-rail__empty" role="status">
+          {EMPTY_FAVORITES}
+        </p>
+      ) : (
+        <ul className="favorites-rail__list">
+          {favorites.map((f) => (
+            <li key={f.name}>
+              <TransitionLink
+                to={`/pokemon/${encodeURIComponent(f.name)}`}
+                className="favorite-tile"
+                aria-current={f.name === current ? "page" : undefined}
+                //the tile's underline takes the favorite's primary type
+                //color: [data-type] gives this subtree its own theme.
+                //favorites saved before D48 have no types: no attribute,
+                //and the underline stays neutral
+                data-type={f.types?.[0]}
+                data-new={!namesAtStart.has(f.name) || undefined}
+              >
+                {f.sprite && (
+                  <img
+                    className="favorite-tile__sprite"
+                    src={f.sprite}
+                    alt=""
+                    width={96}
+                    height={96}
+                    decoding="async"
+                  />
+                )}
+                <span className="visually-hidden">{f.name}</span>
+                <span className="favorite-tile__line" aria-hidden="true" />
+              </TransitionLink>
+            </li>
+          ))}
+        </ul>
+      )}
+    </nav>
+  );
+}

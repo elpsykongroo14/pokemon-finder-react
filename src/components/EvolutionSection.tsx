@@ -4,6 +4,7 @@ import { useEvolutionChain } from "../hooks/useEvolutionChain";
 import type { PokemonDetails } from "../lib/type";
 import { EvolutionNode } from "./EvolutionNode";
 import { usePreferences } from "../hooks/usePreferences";
+import { EVOLUTION_FAILED, EVOLUTION_LOADING, NO_EVOLUTION } from "../lib/copy";
 
 interface EvolutionSectionProps {
   pokemon: PokemonDetails;
@@ -18,7 +19,7 @@ export function EvolutionSection({ pokemon }: EvolutionSectionProps) {
   if (loading) {
     return (
       <p role="status" className="status-message">
-        Loading evolution chain...
+        {EVOLUTION_LOADING}
       </p>
     );
   }
@@ -26,7 +27,7 @@ export function EvolutionSection({ pokemon }: EvolutionSectionProps) {
   if (error) {
     return (
       <p role="alert" className="status-message status-message--error">
-        Couldn't load evolution data.
+        {EVOLUTION_FAILED}
       </p>
     );
   }
@@ -35,12 +36,17 @@ export function EvolutionSection({ pokemon }: EvolutionSectionProps) {
   //fetched, fine, this pokemon just doesnt evolve
   //different from `error`, this is a successful empty result not a failure
   if (!tree || tree.children.length === 0) {
-    return <p className="no-evolution">This Pokémon does not evolve.</p>;
+    return <p className="no-evolution">{NO_EVOLUTION}</p>;
   }
 
   return (
     <div className="evolution-chain">
-      <EvolutionNode data={tree} sprites={sprites} mode={spriteMode} />
+      <EvolutionNode
+        data={tree}
+        sprites={sprites}
+        mode={spriteMode}
+        current={pokemon.name}
+      />
     </div>
   );
 }

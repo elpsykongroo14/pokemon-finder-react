@@ -1,0 +1,123 @@
+/* The black name plate (spec 7.2, 4.3). Where it sits in the field is
+   EncounterField.css's job (right half on desktop, under the stage on
+   phones); this file draws its contents.
+
+   One Jersey 10 line (the dex number, in the type's soft tint), the name
+   in the display style, large chips, the base stat total, the actions. */
+@layer features {
+  .name-plate {
+    /* the widest the stat bar and the action grid get (spec 7.2) */
+    --plate-measure: 460px;
+
+    background: var(--surface-ink);
+    color: var(--text-primary);
+  }
+
+  .name-plate__inner {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-4) + var(--space-1) / 2);
+  }
+
+  .name-plate__dex {
+    margin: 0;
+    font-family: var(--font-game);
+    font-size: calc(var(--text-2xl) - var(--space-1) / 2);
+    line-height: 1;
+    color: var(--field-dex);
+  }
+
+  .name-plate__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-display-xl);
+    font-weight: var(--weight-black);
+    font-style: italic;
+    font-stretch: var(--width-display);
+    letter-spacing: var(--tracking-display);
+    line-height: 0.92;
+    text-transform: capitalize;
+    overflow-wrap: anywhere;
+    color: inherit;
+  }
+
+  .name-plate__total {
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--plate-measure);
+  }
+
+  .name-plate__total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 0;
+    font-size: var(--text-md);
+    color: var(--text-secondary);
+  }
+
+  .name-plate__total-row strong {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  /* a 12 px slanted bar: the track skews directly (it holds no text) */
+  .name-plate__bar {
+    position: relative;
+    display: block;
+    height: var(--space-3);
+    overflow: hidden;
+    background: var(--white-a20);
+    transform: skewX(var(--slant));
+  }
+
+  .name-plate__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--theme-accent);
+    transform: scaleX(var(--fill, 0));
+    transform-origin: left center;
+  }
+
+  /* the encounter (spec 6.1): the plate's contents slide in from 56 px to
+     the right, and the total grows a beat later. only inside the keyed
+     encounter layer, only with motion on */
+  :root[data-motion="on"] .encounter .name-plate__inner {
+    animation: name-plate-in 460ms var(--ease-settle) 260ms both;
+  }
+
+  :root[data-motion="on"] .encounter .name-plate__fill {
+    animation: name-plate-total-grow 600ms var(--ease-settle) 420ms both;
+  }
+
+  @keyframes name-plate-in {
+    from {
+      opacity: 0;
+      transform: translateX(56px);
+    }
+  }
+
+  @keyframes name-plate-total-grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .name-plate__inner {
+      gap: calc(var(--space-3) + var(--space-1) / 2);
+    }
+
+    .name-plate__dex {
+      font-size: var(--text-xl);
+    }
+
+    .name-plate__name {
+      font-size: var(--text-display-phone);
+      line-height: 1;
+    }
+  }
+}

@@ -1,48 +1,38 @@
 import { useState } from "react";
 import { useFavorites } from "./useFavorites";
-import { FIRST_FAVORITE } from "../lib/copy";
-import type { PokemonDetails } from "../lib/type";
+import type { FavoriteOutcome, PokemonDetails } from "../lib/type";
 
-//the favorite feature, shaped like useTeamAction: state and logic here, drawn
-//by FavoriteButton (the control) and FavoriteStatus (the messages)
+//the favorite feature, shaped like useTeamAction: state and logic here,
+//drawn by FavoriteButton. what to SAY about a click is the page's job: the
+//toggle returns what happened, and the page turns that into its one
+//confirmation line (favoriteNote in copy.ts)
 export interface FavoriteAction {
   isFavorite: boolean;
-  toggle: () => void;
+  toggle: () => FavoriteOutcome;
+  //goes up by one each time a click ADDS the favorite: the icon pop and the
+  //heart burst replay on it
   popKey: number;
-  celebratingFirst: boolean;
-  announcement: string;
 }
 
 export function useFavoriteAction(pokemon: PokemonDetails): FavoriteAction {
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(pokemon.name);
 
-  //both are events ("it just happened"), so both are set in the click handler.
-  //the one place that knows an add really happened. reading them off
-  //the favorite list later could not tell "just added apart" from
-  //"was already there when the page opened"
+  //an event counter, set in the click handler: the one place that knows an
+  //add really happened. read off the favorites list later, "just added"
+  //would look the same as "was already there when the page opened"
   const [popKey, setPopKey] = useState(0);
-  const [justFirst, setJustFirst] = useState(false);
 
-  //the banner shows only while that first favorite is still a favorite
-  const celebratingFirst = justFirst && favorite;
-
-  function toggle() {
-    const adding = !favorite;
-    //decide from the list as it was at click time (same rule as the team's "completes the party"):
-    //an empty list plus an add = the first favorite
-    const isFirst = adding && favorites.length === 0;
+  function toggle(): FavoriteOutcome {
+    const added = !favorite;
+    //decided from the list as it was at click time (the same rule as the
+    //team's "completes the party"): an empty list plus an add = the first
+    const first = added && favorites.length === 0;
 
     toggleFavorite(pokemon);
-    if (adding) setPopKey((key) => key + 1);
-    setJustFirst(isFirst);
+    if (added) setPopKey((key) => key + 1);
+    return { added, first };
   }
 
-  return {
-    isFavorite: favorite,
-    toggle,
-    popKey,
-    celebratingFirst,
-    announcement: celebratingFirst ? FIRST_FAVORITE : "",
-  };
+  return { isFavorite: favorite, toggle, popKey };
 }

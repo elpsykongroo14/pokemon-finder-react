@@ -23,6 +23,14 @@ interface SpriteDisplayProps {
   //true: no dark circle behind the sprite, and it stands on the bottom
   //edge of its box. For places that already have their own backdrop
   plain?: boolean;
+  //the largest whole-number zoom a pixel sprite may get (spec 7.1: 3x for
+  //the big Black & White sprites, 4x for the small ones). no limit when
+  //left out, the way every other caller has always worked
+  maxScale?: number;
+  //true: alt="" (the image says nothing to a screen reader). for a sprite
+  //inside a link or button that already shows the name as text, where the
+  //alt would make the name say "deino deino"
+  decorative?: boolean;
 }
 
 export function SpriteDisplay({
@@ -34,9 +42,11 @@ export function SpriteDisplay({
   size = 180,
   lazy = false,
   plain = false,
+  maxScale,
+  decorative = false,
 }: SpriteDisplayProps) {
   const sprite = resolveSprite(sprites, { shiny, mode, animate });
-  const alt = `${name}${shiny ? "(shiny)" : ""}`;
+  const alt = decorative ? "" : `${name}${shiny ? "(shiny)" : ""}`;
 
   return (
     <div
@@ -53,9 +63,17 @@ export function SpriteDisplay({
           alt={alt}
           box={size}
           lazy={lazy}
+          maxScale={maxScale}
         />
       ) : (
-        <div className="sprite-placeholder">No image available</div>
+        //decorative: the name next to it already says which Pokémon this
+        //is, so "No image available" would only pad a link's name
+        <div
+          className="sprite-placeholder"
+          aria-hidden={decorative || undefined}
+        >
+          No image available
+        </div>
       )}
     </div>
   );
@@ -66,11 +84,13 @@ function SpriteImage({
   alt,
   box,
   lazy,
+  maxScale,
 }: {
   sprite: ResolvedSprite;
   alt: string;
   box: number;
   lazy: boolean;
+  maxScale?: number;
 }) {
   const [width, setWidth] = useState<number | undefined>(undefined);
 
@@ -80,6 +100,7 @@ function SpriteImage({
     const scale = integerScale(
       { width: naturalWidth, height: naturalHeight },
       box,
+      maxScale,
     );
     setWidth(naturalWidth * scale);
   }

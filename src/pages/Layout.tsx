@@ -1,7 +1,6 @@
 import "./Layout.css";
 import { Outlet } from "react-router-dom";
 import { HeaderSearch } from "../components/HeaderSearch";
-import { FavoritesList } from "../components/FavoritesList";
 import { MainNav } from "../components/MainNav";
 import { BrandMark } from "../components/BrandMark";
 import { PartyCounter } from "../components/PartyCounter";
@@ -9,7 +8,6 @@ import { SettingsButton } from "../components/SettingsButton";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 import { AppFooter } from "../components/AppFooter";
 import { MAIN_CONTENT_ID, SkipLink } from "../components/SkipLink";
-import { FAVORITES_TRAY_LABEL } from "../lib/copy";
 
 export function Layout() {
   const navigate = useViewTransitionNavigate();
@@ -46,14 +44,8 @@ export function Layout() {
       {/* tabIndex -1: focusable by the skip link, but not a Tab stop */}
       <main className="app-main" id={MAIN_CONTENT_ID} tabIndex={-1}>
         <Outlet />
-        {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and tray around it persist across every navigation; only this slot swaps.*/}
+        {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and footer around it persist across every navigation; only this slot swaps.*/}
       </main>
-
-      {/* favorites only now; B&W-4 moves them to a rail on the Pokémon page
-          and this tray goes */}
-      <aside className="app-tray" aria-label={FAVORITES_TRAY_LABEL}>
-        <FavoritesList />
-      </aside>
 
       <AppFooter />
     </div>
