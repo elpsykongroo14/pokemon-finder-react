@@ -104,4 +104,79 @@ describe("getComparePageState", () => {
       getComparePageState({ a: "pikachu", b: "x", first, second }),
     ).toEqual({ status: "first-loading" });
   });
+
+  //B&W-5: a pick in the identity band or a Swap reloads one or both sides.
+  //the comparison already on screen stays there, marked pending, until the
+  //new one is ready: the field, the pickers and keyboard focus survive
+  describe("while a comparison on screen is being replaced", () => {
+    const shown = { primary: pikachu, secondary: charmander };
+    const reloading = { ...idle, loading: true };
+
+    it("keeps showing it, marked pending, while one side reloads", () => {
+      expect(
+        getComparePageState({
+          a: "pikachu",
+          b: "squirtle",
+          first: loaded(pikachu),
+          second: reloading,
+          shown,
+        }),
+      ).toEqual({
+        status: "ready",
+        primary: pikachu,
+        secondary: charmander,
+        pending: true,
+      });
+    });
+
+    it("keeps showing it while both sides reload (a swap)", () => {
+      expect(
+        getComparePageState({
+          a: "charmander",
+          b: "pikachu",
+          first: reloading,
+          second: reloading,
+          shown,
+        }),
+      ).toMatchObject({ status: "ready", pending: true });
+    });
+
+    it("lets a failure replace it", () => {
+      expect(
+        getComparePageState({
+          a: "pikachu",
+          b: "nope",
+          first: loaded(pikachu),
+          second: { ...idle, error: "not-found" as const },
+          shown,
+        }),
+      ).toEqual({ status: "second-failed", kind: "not-found", name: "nope" });
+    });
+
+    it("does not hold it when there is no second Pokémon to wait for", () => {
+      expect(
+        getComparePageState({
+          a: "pikachu",
+          b: "",
+          first: reloading,
+          second: idle,
+          shown,
+        }),
+      ).toEqual({ status: "first-loading" });
+    });
+
+    it("shows the new comparison, not pending, once both sides have loaded", () => {
+      const squirtle = { name: "squirtle", id: 7 } as PokemonDetails;
+
+      expect(
+        getComparePageState({
+          a: "pikachu",
+          b: "squirtle",
+          first: loaded(pikachu),
+          second: loaded(squirtle),
+          shown,
+        }),
+      ).toEqual({ status: "ready", primary: pikachu, secondary: squirtle });
+    });
+  });
 });

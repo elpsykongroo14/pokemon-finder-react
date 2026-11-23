@@ -7,6 +7,9 @@ import {
   partyCountText,
   favoriteNote,
   teamNote,
+  teamCommandHint,
+  compareVerdict,
+  statLeadText,
   FIRST_FAVORITE,
 } from "./copy";
 
@@ -117,5 +120,69 @@ describe("teamNote", () => {
     expect(teamNote("mr-mime", { kind: "joined", size: 1 })).toBe(
       "Mr Mime joined your party. 1 of 6 slots filled.",
     );
+  });
+});
+
+//Home's "Add to team" command (spec 7.1): the line under its title says
+//what selecting it will do, given the party right now
+describe("teamCommandHint", () => {
+  it("says how much room is left", () => {
+    expect(
+      teamCommandHint({ name: "zoroark", onTeam: false, partySize: 4 }),
+    ).toBe("Your party has room for 2 more");
+  });
+
+  it("says how to undo it once the Pokémon is on the team", () => {
+    expect(
+      teamCommandHint({ name: "zoroark", onTeam: true, partySize: 5 }),
+    ).toBe("Zoroark joined your party. Select again to release it");
+  });
+
+  it("says where to make room when the party is full", () => {
+    expect(
+      teamCommandHint({ name: "zoroark", onTeam: false, partySize: 6 }),
+    ).toBe("Your party is full. Release one on the Team page");
+  });
+
+  it("talks about the Pokémon, not the party, when it is the sixth member", () => {
+    expect(
+      teamCommandHint({ name: "mr-mime", onTeam: true, partySize: 6 }),
+    ).toBe("Mr Mime joined your party. Select again to release it");
+  });
+});
+
+//Compare's verdict line (spec 7.3)
+describe("compareVerdict", () => {
+  it("names the winner and the margin", () => {
+    expect(
+      compareVerdict(
+        { name: "samurott", total: 528 },
+        { name: "volcarona", total: 550 },
+      ),
+    ).toBe("Volcarona has the higher base stat total, by 22.");
+  });
+
+  it("works whichever side wins", () => {
+    expect(
+      compareVerdict(
+        { name: "volcarona", total: 550 },
+        { name: "samurott", total: 528 },
+      ),
+    ).toBe("Volcarona has the higher base stat total, by 22.");
+  });
+
+  it("says when the totals are the same", () => {
+    expect(
+      compareVerdict(
+        { name: "mr-mime", total: 460 },
+        { name: "lucario", total: 460 },
+      ),
+    ).toBe("Mr Mime and Lucario have the same base stat total.");
+  });
+});
+
+describe("statLeadText", () => {
+  it("writes the winning margin with a plus sign", () => {
+    expect(statLeadText(23)).toBe("+23");
   });
 });
