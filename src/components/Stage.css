@@ -17,8 +17,8 @@
     --shadow-bottom: 118px;
     --sprite-bottom: 126px;
     /* tall enough for the sprite box on its platform. Inside a field the
-       field sets the height; elsewhere (Home, until B&W-5 gives it a
-       field) the stage still stands up on its own */
+       field sets the height; anywhere else the stage still stands up on
+       its own */
     --stage-min-height: 480px;
 
     position: relative;
@@ -84,18 +84,21 @@
     gap: var(--space-3);
   }
 
-  /* ---- the encounter (spec 6.1), only inside the keyed encounter layer
+  /* ---- the encounter (spec 6.1), only inside an element marked
+     data-encounter (the Pokémon page's keyed layer, Home's stage slot)
      and only with motion on: with motion off these rules do not exist,
-     so the sprite is simply there ---- */
+     so the sprite is simply there. The Stage itself is keyed by name in
+     both places, so a new Pokémon mounts fresh wrappers and replays this.
+     Compare plays its own entrance (CompareView.css) ---- */
 
   /* falls 60 px onto the platform, squashes, rebounds 6 px, settles */
-  :root[data-motion="on"] .encounter .stage__drop {
+  :root[data-motion="on"] [data-encounter] .stage__drop {
     animation: stage-drop 500ms var(--ease-settle) 300ms both;
   }
 
   /* a black silhouette, a white flash, then full color: how a wild
      Pokémon appears in Black and White. steps(1): hard cuts, no fades */
-  :root[data-motion="on"] .encounter .stage__reveal {
+  :root[data-motion="on"] [data-encounter] .stage__reveal {
     animation: stage-reveal 900ms steps(1, end) both;
   }
 

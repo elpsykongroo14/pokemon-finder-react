@@ -112,6 +112,47 @@ describe(".on-dark (black plates)", () => {
   });
 });
 
+//B&W-5: a white surface that can open INSIDE a black plate (the
+//autocomplete panel under Compare's pickers). it must win back every role
+//.on-dark flipped, or its text would be white on white
+describe(".on-light (white islands on a black plate)", () => {
+  const onLight = block(semantic, ".on-light");
+
+  it.each(["text-primary", "text-secondary", "text-danger", "text-success"])(
+    "--%s is readable on Paper",
+    (text) => {
+      expect(
+        contrastRatio(resolveHex(text, onLight), resolveHex("surface-paper")),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    },
+  );
+
+  it("puts back the Ink focus ring and rules", () => {
+    expect(
+      contrastRatio(
+        resolveHex("focus-ring", onLight),
+        resolveHex("surface-paper"),
+      ),
+    ).toBeGreaterThanOrEqual(AA_UI);
+    expect(
+      contrastRatio(
+        resolveHex("border-line", onLight),
+        resolveHex("surface-paper"),
+      ),
+    ).toBeGreaterThanOrEqual(AA_UI);
+  });
+
+  //every role .on-dark changes, .on-light changes back
+  it("resets every role that .on-dark flips", () => {
+    const flipped = [
+      ...block(semantic, ".on-dark").matchAll(/(--[a-z0-9-]+):/g),
+    ].map((m) => m[1]);
+    const reset = [...onLight.matchAll(/(--[a-z0-9-]+):/g)].map((m) => m[1]);
+
+    expect(reset).toEqual(expect.arrayContaining(flipped));
+  });
+});
+
 describe("the field and its plate", () => {
   //"No. 635" is drawn in the theme's soft tint on the black name plate
   it.each(Object.keys(TYPE_CHART))(
