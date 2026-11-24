@@ -1,36 +1,31 @@
+/* The Library page (spec 7.4): the hero edge to edge, then the sticky
+   toolbar and the cards in the Library's own measure (1360 px).
+
+   --library-toolbar-height is set here, once: the toolbar keeps at least
+   that height, and the grid's sticky era headings stop just below it */
 @layer features {
-  /*missing library-view class*/
-
-  .library-back {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: var(--text-sm);
+  .library-page {
+    --library-toolbar-height: 72px;
   }
 
-  .library-back:hover {
-    color: var(--text-primary);
+  .library-page__body {
+    max-width: var(--measure-library);
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-gutter) calc(2 * var(--space-7));
   }
 
-  /* on a narrow screen the title and the controls cannot share one row:
-     let them wrap onto two instead of squeezing each other */
-  .card-panel-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2) var(--space-3);
-    margin: var(--space-5) 0 var(--space-3);
+  /* "Open the binder" scrolls the cards up; leave no gap under the header */
+  .library-page__cards {
+    scroll-margin-top: 0;
   }
 
-  .card-panel-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-  }
+  @media (max-width: 1000px) {
+    .library-page {
+      --library-toolbar-height: 64px;
+    }
 
-  .card-panel-title {
-    margin: 0;
-    font-size: var(--text-lg);
+    .library-page__body {
+      padding: var(--space-4) var(--space-gutter-phone) var(--space-7);
+    }
   }
 }

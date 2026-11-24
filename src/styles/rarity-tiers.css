@@ -1,18 +1,43 @@
 /* src/styles/rarity-tiers.css
-   The ONE place a rarity tier is turned into a color. Any element that
-   carries data-rarity="rare|holo|ultra" gets --tier-color, and each view
-   (grid card, table row, later binder and modal) just READS that variable.
-   "common" sets nothing on purpose: it falls back to the quiet defaults. */
+   The ONE place a rarity tier becomes a look (spec 7.4). Anything that
+   carries data-rarity="common|rare|holo|ultra" (a tier mark, a legend
+   swatch, a card face, a tile) gets:
+     --tier-fill, --tier-ink, --tier-ring   how its mark is painted
+     --tier-glare                           how bright the glare gets (0..1)
+     --tier-foil                            how strong the foil band gets
+   and each view just reads them. The light per tier is the spec's table:
+   common none, rare glare only, holo glare + faint foil, ultra glare +
+   full foil. */
 @layer features {
+  [data-rarity="common"] {
+    --tier-fill: var(--tier-common-fill);
+    --tier-ink: var(--tier-common-ink);
+    --tier-ring: var(--tier-common-ring);
+    --tier-glare: 0;
+    --tier-foil: 0;
+  }
+
   [data-rarity="rare"] {
-    --tier-color: var(--rarity-rare);
+    --tier-fill: var(--tier-rare-fill);
+    --tier-ink: var(--tier-rare-ink);
+    --tier-ring: var(--tier-rare-ring);
+    --tier-glare: 1;
+    --tier-foil: 0;
   }
 
   [data-rarity="holo"] {
-    --tier-color: var(--rarity-holo);
+    --tier-fill: var(--tier-holo-fill);
+    --tier-ink: var(--tier-holo-ink);
+    --tier-ring: var(--tier-holo-ring);
+    --tier-glare: 1;
+    --tier-foil: 0.28;
   }
 
   [data-rarity="ultra"] {
-    --tier-color: var(--rarity-ultra);
+    --tier-fill: var(--tier-ultra-fill);
+    --tier-ink: var(--tier-ultra-ink);
+    --tier-ring: var(--tier-ultra-ring);
+    --tier-glare: 1;
+    --tier-foil: 0.5;
   }
 }

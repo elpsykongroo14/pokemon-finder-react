@@ -1,33 +1,225 @@
+/* The binder (spec 7.4): a black binder, 14 px corners, 28 px padding,
+   two sleeve pages and a 44 px spine of three rings between them. Each
+   page is a 3x3 grid of pockets (63:88, a dark sleeve with a top sheen and
+   a hairline edge), each card sitting 5 px inside its pocket.
+
+   The page turn (spec 6.2): the incoming page swings in about the spine
+   from 92deg, dark to lit, while the other page fades in. Only on the
+   spread a Previous / Next led to ([data-turn]), only with motion on.
+   Phones (D55): one page, no spine. */
 @layer features {
-  .binder {
-    max-width: 42rem;
-    margin-inline: auto;
+  .binder-view {
+    --binder-gap: calc(var(--space-4) - var(--space-1) / 2); /* 14 px */
+    --binder-pad: calc(var(--space-6) - var(--space-1)); /* 28 px */
+    --binder-spine: 44px;
+    --binder-ring-size: 30px;
+    --pocket-inset: 5px;
+
+    display: grid;
+    gap: var(--space-5);
   }
 
-  /* always three columns: a binder page is a 3 x 3 sleeve */
+  .binder {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--binder-spine) minmax(0, 1fr);
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: var(--binder-pad);
+    border-radius: var(--radius-dialog);
+    background: var(--surface-ink);
+    perspective: 2200px;
+  }
+
+  .binder[data-pages="1"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* the right page sits in the third column, past the spine */
+  .binder__page[data-side="right"] {
+    grid-column: 3;
+    grid-row: 1;
+    transform-origin: left center;
+  }
+
+  .binder__page[data-side="left"] {
+    grid-column: 1;
+    grid-row: 1;
+    transform-origin: right center;
+  }
+
+  .binder__spine {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .binder__ring {
+    width: var(--binder-ring-size);
+    height: var(--binder-ring-size);
+    border: calc(var(--space-1) + 1px) solid var(--binder-ring);
+    border-radius: 50%;
+    background: var(--surface-ink);
+  }
+
   .binder__page {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-3);
+    align-content: start;
+    gap: var(--binder-gap);
+    margin: 0;
+    padding: calc(var(--space-5) - var(--border-width-line));
+    border-radius: var(--radius-sm);
+    background: var(--surface-binder-page);
+    list-style: none;
   }
 
-  .binder__slot {
-    aspect-ratio: 5 / 7;
-    border: 1px dashed var(--border-hairline);
-    border-radius: var(--radius-md);
+  .binder__page--end {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .binder__end {
+    margin: 0;
+    font-weight: var(--weight-semibold);
+    color: var(--text-end-note);
+  }
+
+  .binder__pocket {
+    position: relative;
+    aspect-ratio: 63 / 88;
+    border-radius: var(--pocket-inset);
+    background: var(--surface-binder-pocket);
+    box-shadow: inset 0 0 0 var(--border-width-hairline)
+      var(--binder-pocket-edge);
+  }
+
+  /* the plastic sleeve over the card: a sheen at the top, a hairline edge */
+  .binder__pocket::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      var(--binder-sleeve-sheen) 0,
+      transparent 14%
+    );
+    box-shadow: inset 0 0 0 var(--border-width-hairline)
+      var(--binder-sleeve-edge);
+    pointer-events: none;
+  }
+
+  .binder__card {
+    position: absolute;
+    inset: var(--pocket-inset);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .binder__card .holo-card {
+    box-shadow: var(--shadow-card-pocket);
+  }
+
+  /* lift out of the pocket on hover or focus: 6 px up, a touch bigger */
+  .binder__card:hover .holo-card,
+  .binder__card:focus-visible .holo-card {
+    translate: 0 calc(var(--space-1) * -1.5);
+    scale: 1.04;
+    box-shadow: var(--shadow-card-pocket-lifted);
+  }
+
+  .binder__card:focus-visible {
+    outline: none;
+  }
+
+  /* on the black binder the ring is white (the binder is not an .on-dark
+     scope: the pages around it are white) */
+  .binder__card:focus-visible .holo-card {
+    outline: var(--border-width-thick) solid var(--surface-paper);
+    outline-offset: var(--border-width-thick);
   }
 
   .binder__nav {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
+    justify-content: center;
+    gap: var(--space-5);
   }
 
   .binder__status {
+    min-width: 200px;
     margin: 0;
-    color: var(--text-secondary);
-    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    font-stretch: var(--width-heading);
+    text-align: center;
+  }
+
+  .binder__loading {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--binder-gap);
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ---- the page turn, only with motion on ---- */
+  :root[data-motion="on"] .binder[data-turn="next"] [data-side="right"] {
+    animation: binder-turn-from-right 600ms var(--ease-settle) both;
+  }
+
+  :root[data-motion="on"] .binder[data-turn="previous"] [data-side="left"] {
+    animation: binder-turn-from-left 600ms var(--ease-settle) both;
+  }
+
+  :root[data-motion="on"] .binder[data-turn="next"] [data-side="left"],
+  :root[data-motion="on"] .binder[data-turn="previous"] [data-side="right"],
+  :root[data-motion="on"] .binder[data-pages="1"][data-turn] .binder__page {
+    animation: binder-page-fade 450ms var(--ease-standard) both;
+  }
+
+  @keyframes binder-turn-from-right {
+    from {
+      transform: rotateY(-92deg);
+      filter: brightness(0.4);
+    }
+  }
+
+  @keyframes binder-turn-from-left {
+    from {
+      transform: rotateY(92deg);
+      filter: brightness(0.4);
+    }
+  }
+
+  @keyframes binder-page-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .binder {
+      padding: var(--binder-gap);
+    }
+
+    .binder__page {
+      gap: var(--space-2);
+      padding: var(--space-2);
+    }
+
+    .binder__nav {
+      gap: var(--space-2);
+    }
+
+    .binder__status {
+      min-width: 0;
+    }
   }
 }

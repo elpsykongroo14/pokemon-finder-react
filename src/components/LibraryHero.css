@@ -1,0 +1,359 @@
+/* The Library hero (spec 7.4): a 560 px field in the searched Pokémon's
+   colors (FieldSky reads the field tokens through the hero's data-type),
+   "the hand" of three cards fanned on its left 58 %, and the black plate
+   on the right 48 % with a slanted left edge.
+
+   The fan is one illustration, so its numbers are named once here and
+   swapped as a set on phones: card width, how far the side cards sit from
+   the middle (and how far on hover), how much they turn and drop. */
+@layer features {
+  .library-hero {
+    --hero-height: 560px;
+    --hand-card: 270px; /* card width */
+    --hand-spread: 178px; /* side card offset */
+    --hand-spread-open: 206px; /* on hover */
+    --hand-turn: 13deg;
+    --hand-turn-open: 17deg;
+    --hand-drop: 18px; /* side cards sit a little lower */
+    --hand-drop-open: 10px;
+    --hand-bottom: 86px;
+    --hand-shadow-width: 420px;
+    --plate-cut: 130px; /* how far the plate's left edge slants */
+    --hero-title: 3.75rem; /* 60 px */
+
+    position: relative;
+    isolation: isolate;
+    height: var(--hero-height);
+    overflow: hidden;
+  }
+
+  .library-hero__field {
+    --field-ground-height: 30%;
+    --field-stage-height: 100%;
+
+    position: absolute;
+    inset: 0;
+    isolation: isolate;
+  }
+
+  /* the hand stays still under the plate: the stripes do not drift here,
+     the deal is the Library's one entrance (D42) */
+  :root[data-motion="on"] .library-hero .encounter-field__stripes {
+    animation: none;
+  }
+
+  .library-hero__shadow,
+  .library-hero__hand {
+    position: absolute;
+    left: 0;
+    width: 58%;
+  }
+
+  /* a dark ellipse under the hand: the cards cast it on the ground */
+  .library-hero__shadow {
+    bottom: calc(var(--hand-bottom) - var(--space-6) + var(--space-1));
+    left: 29%;
+    width: var(--hand-shadow-width);
+    height: calc(var(--space-6) + var(--space-2));
+    translate: -50% 0;
+    border-radius: 50%;
+    background: var(--shadow-hand);
+  }
+
+  .library-hero__hand {
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .library-hero__slot {
+    position: absolute;
+    left: 50%;
+    bottom: var(--hand-bottom);
+    width: var(--hand-card);
+    margin-left: calc(var(--hand-card) / -2);
+    transform-origin: 50% 110%;
+    transition: transform var(--dur-slow) var(--ease-settle);
+  }
+
+  /* the rarest card in front, the other two fanned behind it */
+  .library-hero__slot[data-slot="center"] {
+    z-index: 1;
+  }
+
+  .library-hero__slot[data-slot="left"] {
+    transform: translateX(calc(var(--hand-spread) * -1))
+      translateY(var(--hand-drop)) rotate(calc(var(--hand-turn) * -1))
+      scale(0.86);
+  }
+
+  .library-hero__slot[data-slot="right"] {
+    transform: translateX(var(--hand-spread)) translateY(var(--hand-drop))
+      rotate(var(--hand-turn)) scale(0.86);
+  }
+
+  /* hovering the hand spreads it */
+  .library-hero__hand:hover [data-slot="left"] {
+    transform: translateX(calc(var(--hand-spread-open) * -1))
+      translateY(var(--hand-drop-open)) rotate(calc(var(--hand-turn-open) * -1))
+      scale(0.86);
+  }
+
+  .library-hero__hand:hover [data-slot="right"] {
+    transform: translateX(var(--hand-spread-open))
+      translateY(var(--hand-drop-open)) rotate(var(--hand-turn-open))
+      scale(0.86);
+  }
+
+  .library-hero__card {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .library-hero__lift {
+    display: block;
+    transition: transform var(--dur-base) var(--ease-settle);
+  }
+
+  .library-hero__card:hover .library-hero__lift,
+  .library-hero__card:focus-visible .library-hero__lift {
+    transform: translateY(calc(var(--space-4) * -1 + var(--border-width-line)));
+  }
+
+  .library-hero__card:focus-visible {
+    outline: none;
+  }
+
+  .library-hero__card:focus-visible .holo-card {
+    outline: var(--border-width-thick) solid var(--focus-ring);
+    outline-offset: var(--space-1);
+  }
+
+  /* ---- the deal (spec 6.2): the three cards rise from below the field
+     and fan out, middle first (150 ms), then left (350), then right (450).
+     Only with motion on; the cards' resting places are their own
+     transforms above, so each keyframe only says where it starts ---- */
+  :root[data-motion="on"] .library-hero__slot[data-slot="center"] {
+    animation: hand-deal-center 700ms var(--ease-settle) 150ms both;
+  }
+
+  :root[data-motion="on"] .library-hero__slot[data-slot="left"] {
+    animation: hand-deal-side 700ms var(--ease-settle) 350ms both;
+  }
+
+  :root[data-motion="on"] .library-hero__slot[data-slot="right"] {
+    animation: hand-deal-side 700ms var(--ease-settle) 450ms both;
+  }
+
+  @keyframes hand-deal-center {
+    from {
+      opacity: 0;
+      transform: translateY(420px);
+    }
+
+    70% {
+      opacity: 1;
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes hand-deal-side {
+    from {
+      opacity: 0;
+      transform: translateY(420px) scale(0.86);
+    }
+  }
+
+  /* ---- the plate ---- */
+  .library-hero__plate {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    width: 48%;
+    background: var(--surface-ink);
+    clip-path: polygon(var(--plate-cut) 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .library-hero__plate-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--space-4) + var(--border-width-line));
+    width: 100%;
+    padding: var(--space-7) var(--space-8) var(--space-7)
+      calc(var(--plate-cut) + var(--space-6) + var(--space-2));
+  }
+
+  .library-hero__dex {
+    margin: 0;
+    font-family: var(--font-game);
+    font-size: 1.75rem; /* 28 px */
+    line-height: 1;
+    color: var(--text-secondary);
+  }
+
+  .library-hero__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--hero-title);
+    font-weight: var(--weight-black);
+    font-style: italic;
+    font-stretch: var(--width-display);
+    letter-spacing: var(--tracking-display);
+    line-height: 0.95;
+  }
+
+  .library-hero__lead {
+    max-width: 30em;
+    margin: 0;
+    font-size: var(--text-lg);
+    line-height: var(--leading-body);
+    color: var(--text-secondary);
+  }
+
+  /* the search: a label above, a black field with a white border, and a
+     light "Search" button beside it */
+  .library-hero__search {
+    width: 100%;
+    max-width: 440px;
+  }
+
+  .library-hero__search .search-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2) calc(var(--space-2) + var(--border-width-line));
+  }
+
+  .library-hero__search .search-bar__label {
+    grid-column: 1 / -1;
+    font-size: var(--text-chip);
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+  }
+
+  .library-hero__search .search-bar__input {
+    padding: 0 var(--space-4) 0 calc(var(--space-4) - var(--border-width-line));
+    border-color: var(--border-line);
+    background: var(--surface-ink);
+    color: var(--text-primary);
+  }
+
+  .library-hero__search .search-bar__input::placeholder {
+    color: var(--text-tertiary);
+  }
+
+  .library-hero__search .search-bar__input:focus-visible {
+    border-color: var(--border-line);
+    background: var(--surface-paper);
+    color: var(--surface-ink);
+    outline: var(--border-width-thick) solid var(--focus-ring);
+    outline-offset: var(--border-width-thick);
+  }
+
+  /* the submit as a light slanted plate with its word */
+  .library-hero__search .search-bar__submit {
+    position: relative;
+    inset: auto;
+    isolation: isolate;
+    width: auto;
+    height: var(--control-md);
+    padding: 0 var(--space-5);
+    color: var(--surface-ink);
+    font-weight: var(--weight-bold);
+    font-stretch: var(--width-heading);
+  }
+
+  .library-hero__search .search-bar__submit::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--surface-paper);
+    transform: skewX(var(--slant));
+  }
+
+  .library-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-4);
+    margin-top: calc(var(--space-1) + var(--border-width-line));
+  }
+
+  .library-hero__featured {
+    font-size: var(--text-chip);
+    color: var(--text-secondary);
+  }
+
+  .library-hero__featured:hover {
+    color: var(--text-primary);
+  }
+
+  /* ---- phones (spec 8): a 250 px field with 128 px cards, then the
+     plate stacked under it, overlapping by 28 px with a slanted top. The
+     search and buttons step aside: the top bar's search and the toolbar's
+     view switch do those jobs on a phone (the phone design draws none) ---- */
+  @media (max-width: 1000px) {
+    .library-hero {
+      --hero-height: auto;
+      --hand-card: 128px;
+      --hand-spread: 92px;
+      --hand-spread-open: 104px;
+      --hand-drop: 10px;
+      --hand-drop-open: 6px;
+      --hand-bottom: 40px;
+      --hand-shadow-width: 220px;
+      --hero-title: var(--text-display-phone);
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    .library-hero__field {
+      position: relative;
+      height: 250px;
+    }
+
+    .library-hero__shadow,
+    .library-hero__hand {
+      width: 100%;
+    }
+
+    .library-hero__shadow {
+      left: 50%;
+    }
+
+    .library-hero__plate {
+      position: relative;
+      width: 100%;
+      margin-top: calc(var(--space-6) * -1 + var(--space-1));
+      clip-path: polygon(0 var(--space-6), 100% 0, 100% 100%, 0 100%);
+    }
+
+    .library-hero__plate-inner {
+      gap: var(--space-3);
+      padding: calc(var(--space-7) + var(--space-2)) var(--space-gutter-phone)
+        var(--space-6);
+    }
+
+    .library-hero__dex {
+      font-size: var(--text-xl);
+    }
+
+    .library-hero__search,
+    .library-hero__actions,
+    .library-hero__featured {
+      display: none;
+    }
+  }
+}

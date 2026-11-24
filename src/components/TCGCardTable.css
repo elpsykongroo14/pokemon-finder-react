@@ -1,44 +1,79 @@
+/* The Library table (spec 7.4): a real <table>, rows 76 px tall with Line
+   hairlines and a Mist hover, a 2 px Ink rule under the header. The
+   thumbnail is a small card that pivots -6deg and grows on row hover; the
+   card's name is a link-style button. Released and Artist step aside on
+   phones (.tcg-table__wide). */
 @layer features {
   .tcg-table-wrap {
     overflow-x: auto;
   }
 
   .tcg-table {
+    --row-height: 76px;
+    --thumb-width: 46px;
+
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--text-sm);
+    font-size: var(--text-md);
   }
 
   .tcg-table th,
   .tcg-table td {
+    height: var(--row-height);
     padding: var(--space-2) var(--space-3);
+    border-bottom: var(--border-width-hairline) solid var(--border-hairline);
     text-align: left;
-    border-bottom: 1px solid var(--border-hairline);
+    vertical-align: middle;
   }
 
   .tcg-table thead th {
+    height: auto;
+    padding-top: var(--space-1);
+    padding-bottom: var(--space-3);
+    border-bottom: var(--border-width-line) solid var(--border-line);
+    font-size: var(--text-chip);
+    font-weight: var(--weight-semibold);
     color: var(--text-secondary);
-    font-weight: 600;
     white-space: nowrap;
   }
 
   .tcg-table tbody th {
-    font-weight: 600;
+    font-weight: var(--weight-regular);
+  }
+
+  .tcg-table tbody tr {
+    transition: background-color var(--dur-fast) var(--ease-standard);
   }
 
   .tcg-table tbody tr:hover {
     background: var(--surface-well);
   }
 
+  .tcg-table__thumb {
+    width: calc(var(--thumb-width) + var(--space-5));
+  }
+
+  .tcg-table__thumb img {
+    display: block;
+    width: var(--thumb-width);
+    border-radius: var(--radius-square);
+    box-shadow: var(--shadow-card-thumb);
+    transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  .tcg-table tbody tr:hover .tcg-table__thumb img {
+    transform: rotate(-6deg) scale(1.12);
+  }
+
   /* header and name buttons look like text, not like boxed buttons */
   .tcg-table__sort,
   .tcg-table__open {
     padding: 0;
-    font: inherit;
-    color: inherit;
-    text-align: left;
-    background: none;
     border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
     cursor: pointer;
   }
 
@@ -48,15 +83,28 @@
     gap: var(--space-1);
   }
 
-  .tcg-table__sort:hover,
+  /* the card's name reads as a link: a Line underline that turns Ink */
+  .tcg-table__open {
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--border-hairline);
+    text-decoration-thickness: var(--border-width-line);
+    text-underline-offset: var(--border-width-thick);
+  }
+
   .tcg-table__open:hover {
+    text-decoration-color: var(--border-line);
+  }
+
+  .tcg-table__sort:hover {
     color: var(--text-primary);
   }
 
   .tcg-table__sort:focus-visible,
   .tcg-table__open:focus-visible {
-    outline: var(--border-width-line) solid var(--focus-ring);
-    outline-offset: 2px;
+    outline: var(--border-width-thick) solid var(--focus-ring);
+    outline-offset: var(--border-width-line);
   }
 
   /* reserve room for the arrow so headers don't jiggle when it appears */
@@ -66,13 +114,46 @@
     font-size: var(--text-xs);
   }
 
-  .tcg-table__rarity {
-    color: var(--tier-color, var(--text-secondary));
+  /* a cell must stay a table cell, so the set is a block line under the
+     name rather than the cell becoming a grid */
+  .tcg-table__set {
+    display: block;
+    margin-top: var(--border-width-line);
+    font-size: var(--text-meta);
+    color: var(--text-secondary);
+  }
+
+  .tcg-table__number {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tcg-table__muted {
+    color: var(--text-secondary);
   }
 
   .tcg-table-loading {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
+  }
+
+  /* tile in, for rows (spec 6.2): only after a view or sort change */
+  :root[data-motion="on"] .tcg-table-wrap[data-entering] tbody tr {
+    animation: tcg-tile-in 350ms var(--ease-settle) both;
+  }
+
+  @media (max-width: 1000px) {
+    .tcg-table {
+      --thumb-width: 38px;
+    }
+
+    .tcg-table__wide {
+      display: none;
+    }
+
+    .tcg-table th,
+    .tcg-table td {
+      padding-inline: var(--space-2);
+    }
   }
 }

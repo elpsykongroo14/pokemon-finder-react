@@ -1,69 +1,96 @@
-/* The holo shine, shared by every surface that shows a card image:
-   the grid card and the card dialog.
+/* A trading card that tilts toward the pointer and catches the light
+   (spec 7.4), shared by the hand, the grid, the binder, the table's
+   thumbnails and the card dialog.
 
-   how to use it: put data-rarity="<tier>" on an ancestor, and give the
-   element that wraps the image the class "holo-shine". this file draws the
-   shine on that wrapper's ::after. the ancestor decides when it is bright
-   (hover or keyboard focus). useHoloPointer writes --mx / --my onto the
-   ancestor while a real mouse moves; without them the fallbacks below keep
-   a static gloss, which is what touch and reduced-motion users see. */
+   How it fits together:
+   - HoloCard draws .holo-card: the picture in a card-shaped frame
+   - the button around it carries .holo-target and gets useHoloPointer's
+     variables (--rx --ry --mx --my) while a mouse moves over it. Custom
+     properties inherit, so the face reads them without knowing who wrote
+     them
+   - the face's own data-rarity picks --tier-glare and --tier-foil
+     (rarity-tiers.css), so the light per tier is data, not rules
+
+   The glare is ::before, the foil band ::after. Both are off at rest and
+   come up only on hover; neither exists with motion off. Cards are
+   physical objects: the one place a soft shadow is allowed (D41). */
 @layer features {
-  /* the strength per tier is data; one rule below reads it.
-     common sets nothing: no layer, no effect */
-  [data-rarity="rare"] {
-    --gloss-rest: 0.12;
-    --gloss-hover: 0.35;
-  }
-
-  [data-rarity="holo"] {
-    --gloss-rest: 0.2;
-    --gloss-hover: 0.6;
-    --foil-layer: var(--holo-foil);
-  }
-
-  [data-rarity="ultra"] {
-    --gloss-rest: 0.3;
-    --gloss-hover: 0.85;
-    --foil-layer: var(--holo-foil);
-  }
-
-  .holo-shine {
+  .holo-card {
     position: relative;
+    display: block;
+    aspect-ratio: 63 / 88;
+    border-radius: var(--radius-card);
+    background: var(--surface-ink);
+    box-shadow: var(--shadow-card);
+    transform: perspective(900px) rotateX(var(--rx, 0deg))
+      rotateY(var(--ry, 0deg));
   }
 
-  [data-rarity]:not([data-rarity="common"]) .holo-shine::after {
+  .holo-card__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
+
+  .holo-card::before,
+  .holo-card::after {
     content: "";
     position: absolute;
     inset: 0;
+    border-radius: inherit;
     pointer-events: none;
-    background-image:
-      radial-gradient(
-        circle at var(--mx, 30%) var(--my, 20%),
-        var(--gloss-highlight),
-        transparent 55%
-      ),
-      var(--foil-layer, none);
-    background-size:
-      100% 100%,
-      300% 300%;
-    background-position:
-      0 0,
-      var(--mx, 30%) var(--my, 20%);
-    mix-blend-mode: soft-light;
-    opacity: var(--gloss-rest);
-    transition: opacity var(--dur-fast) var(--ease-standard);
+    opacity: 0;
   }
 
-  /* keyboard users get the bright shine too, just without the tilt */
-  [data-rarity]:not([data-rarity="common"]):focus-visible .holo-shine::after {
-    opacity: var(--gloss-hover);
+  /* the glare: a soft white spot where the pointer is */
+  .holo-card::before {
+    background: radial-gradient(
+      circle at var(--mx, 50%) var(--my, 30%),
+      var(--gloss-highlight),
+      transparent 46%
+    );
+    mix-blend-mode: overlay;
   }
 
-  /* bright shine on hover only for a real mouse: on a touch screen a tap
-     leaves :hover stuck on */
+  /* the foil: a rainbow band that slides as the pointer moves */
+  .holo-card::after {
+    background: var(--holo-foil);
+    background-position: var(--mx, 50%) var(--my, 50%);
+    background-size: 260% 260%;
+    mix-blend-mode: color-dodge;
+  }
+
+  /* ---- only while motion is on, and only for a real hovering pointer:
+     a tap leaves :hover stuck on a touch screen ---- */
+
+  /* back to rest slowly; while tracking, follow the pointer almost at
+     once (80 ms), so the card feels held rather than chasing */
+  :root[data-motion="on"] .holo-card {
+    transition:
+      transform 500ms var(--ease-settle),
+      box-shadow 250ms var(--ease-standard);
+  }
+
+  :root[data-motion="on"] .holo-card::before,
+  :root[data-motion="on"] .holo-card::after {
+    transition: opacity 250ms var(--ease-standard);
+  }
+
   @media (hover: hover) and (pointer: fine) {
-    [data-rarity]:not([data-rarity="common"]):hover .holo-shine::after {
-      opacity: var(--gloss-hover);
+    :root[data-motion="on"] .holo-target:hover .holo-card {
+      transition:
+        transform 80ms linear,
+        box-shadow 250ms var(--ease-standard);
+    }
+
+    :root[data-motion="on"] .holo-target:hover .holo-card::before {
+      opacity: var(--tier-glare);
+    }
+
+    :root[data-motion="on"] .holo-target:hover .holo-card::after {
+      opacity: var(--tier-foil);
     }
   }
 }
