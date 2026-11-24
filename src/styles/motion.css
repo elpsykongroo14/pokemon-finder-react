@@ -26,6 +26,8 @@
   --ease-pop: cubic-bezier(0.3, 1.7, 0.5, 1);
   /* R10B: slow, fast, slow. The encounter slabs crossing the field */
   --ease-wipe: cubic-bezier(0.7, 0, 0.3, 1);
+  /* B&W-6: starts slow and speeds away. A party card leaving */
+  --ease-leave: cubic-bezier(0.6, 0, 0.8, 0.4);
 }
 
 @media (prefers-reduced-motion: reduce) {
