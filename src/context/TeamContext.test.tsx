@@ -22,7 +22,12 @@ function makePokemon(overrides: Partial<PokemonDetails> = {}): PokemonDetails {
     ],
     sprites: { front_default: "charizard.png" },
     abilities: [],
-    stats: [],
+    //78 + 84 + 78 + 109 + 85 + 100 = 534 (D49: saved with the member)
+    stats: [78, 84, 78, 109, 85, 100].map((base_stat) => ({
+      base_stat,
+      effort: 0,
+      stat: { name: "", url: "" },
+    })),
     species: { name: "charizard", url: "" },
     ...overrides,
   };
@@ -78,6 +83,7 @@ describe("TeamProvider", () => {
         id: 6,
         sprite: "charizard.png",
         types: ["fire", "flying"],
+        statTotal: 534,
       },
     ]);
   });
@@ -101,6 +107,7 @@ describe("TeamProvider", () => {
         id: 6,
         sprite: "charizard.png",
         types: ["fire", "flying"],
+        statTotal: 534,
       },
     ]);
 

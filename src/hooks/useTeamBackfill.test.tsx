@@ -9,7 +9,11 @@ import type { PokemonDetails } from "../lib/type";
 const { fetchPokemon } = vi.hoisted(() => ({ fetchPokemon: vi.fn() }));
 vi.mock("../lib/api", () => ({ fetchPokemon }));
 
-function makePokemon(name: string, typeName: string): PokemonDetails {
+function makePokemon(
+  name: string,
+  typeName: string,
+  baseStats: number[] = [],
+): PokemonDetails {
   return {
     name,
     id: 1,
@@ -18,7 +22,11 @@ function makePokemon(name: string, typeName: string): PokemonDetails {
     types: [{ slot: 1, type: { name: typeName, url: "" } }],
     sprites: { front_default: `${name}.png` },
     abilities: [],
-    stats: [],
+    stats: baseStats.map((base_stat) => ({
+      base_stat,
+      effort: 0,
+      stat: { name: "", url: "" },
+    })),
     species: { name, url: "" },
   };
 }
@@ -56,8 +64,18 @@ beforeEach(() => {
 });
 
 describe("useTeamBackfill", () => {
-  it("makes no request when every member already has types", () => {
-    seedTeam([{ name: "pikachu", id: 25, sprite: null, types: ["electric"] }]);
+  //changed in B&W-6 (D49): a complete member now has a stat total too,
+  //so the seeded one gained it
+  it("makes no request when every member already has types and a stat total", () => {
+    seedTeam([
+      {
+        name: "pikachu",
+        id: 25,
+        sprite: null,
+        types: ["electric"],
+        statTotal: 320,
+      },
+    ]);
 
     renderBackfill();
 
@@ -82,6 +100,20 @@ describe("useTeamBackfill", () => {
       ]);
     });
     expect(fetchPokemon).toHaveBeenCalledTimes(2);
+  });
+
+  it("fills in the stat total for members saved with types but without one", async () => {
+    seedTeam([{ name: "pikachu", id: 25, sprite: null, types: ["electric"] }]);
+    fetchPokemon.mockResolvedValue(
+      makePokemon("pikachu", "electric", [35, 55, 40, 50, 50, 90]),
+    );
+
+    const { result } = renderBackfill();
+
+    await waitFor(() => {
+      expect(result.current.team[0]?.statTotal).toBe(320);
+    });
+    expect(fetchPokemon).toHaveBeenCalledTimes(1);
   });
 
   it("fetches one member at a time, not all at once", async () => {

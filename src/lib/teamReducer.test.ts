@@ -11,6 +11,12 @@ const mockPikachu = {
   id: 25,
   sprites: { front_default: "https://img.example/pikachu.png" },
   types: [{ slot: 1, type: { name: "electric", url: "" } }],
+  //35 + 55 + 40 + 50 + 50 + 90 = 320
+  stats: [35, 55, 40, 50, 50, 90].map((base_stat) => ({
+    base_stat,
+    effort: 0,
+    stat: { name: "", url: "" },
+  })),
 } as PokemonDetails;
 
 describe("TeamReducer", () => {
@@ -26,6 +32,7 @@ describe("TeamReducer", () => {
         id: 25,
         sprite: "https://img.example/pikachu.png",
         types: ["electric"],
+        statTotal: 320, //D49
       },
     ]);
     expect(result.error).toBeNull();
@@ -118,14 +125,51 @@ describe("TeamReducer", () => {
       });
 
       expect(result.members).toEqual([
-        { name: "pikachu", id: 25, sprite: "old.png", types: ["electric"] },
+        {
+          name: "pikachu",
+          id: 25,
+          sprite: "old.png",
+          types: ["electric"],
+          statTotal: 320,
+        },
       ]);
     });
 
-    it("returns the very same state when the member already has types", () => {
+    //D49: a member saved after types existed but before B&W-6 has types
+    //and no stat total. it needs the backfill too
+    it("adds the stat total to a member saved with types but without one", () => {
       const state = makeState({
         members: [
           { name: "pikachu", id: 25, sprite: null, types: ["electric"] },
+        ],
+      });
+
+      const result = TeamReducer(state, {
+        type: "BACKFILL",
+        payload: mockPikachu,
+      });
+
+      expect(result.members[0]).toEqual({
+        name: "pikachu",
+        id: 25,
+        sprite: null,
+        types: ["electric"],
+        statTotal: 320,
+      });
+    });
+
+    //changed in B&W-6 (D49): "complete" used to mean "has types"; it now
+    //means "has types AND a stat total", so this fixture gained one
+    it("returns the very same state when the member already has types and a stat total", () => {
+      const state = makeState({
+        members: [
+          {
+            name: "pikachu",
+            id: 25,
+            sprite: null,
+            types: ["electric"],
+            statTotal: 320,
+          },
         ],
       });
 

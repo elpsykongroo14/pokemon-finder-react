@@ -28,10 +28,13 @@ export interface FavoritePokemon {
   types?: string[];
 }
 
-//what we persist for a team member: today the same summary as a favorite
-//(types moved up into FavoritePokemon with D48). its own name, because the
-//two are free to grow apart: B&W-6 adds statTotal here (D49)
-export type TeamMember = FavoritePokemon;
+//what we persist for a team member: a favorite's summary plus the base
+//stat total, which the Team page's cards show (D49). optional for the same
+//reason types are: teams saved before B&W-6 have none, and the Team page's
+//backfill fills it in
+export interface TeamMember extends FavoritePokemon {
+  statTotal?: number;
+}
 
 //---pokeAPI's universal building blocks:
 //almost every pokeAPI object references other resources this way instead of embeding them.
