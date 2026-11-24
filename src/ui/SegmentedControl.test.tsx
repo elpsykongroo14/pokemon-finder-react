@@ -124,3 +124,27 @@ describe("SegmentedControl, labelled and described", () => {
     );
   });
 });
+
+//B&W-7: the Library's view switch shows an icon before each word (spec
+//7.4). the icon is decoration: each radio is still named by its word
+describe("SegmentedControl, with icons", () => {
+  it("draws an option's icon, hidden, and keeps the word as its name", () => {
+    render(
+      <SegmentedControl
+        label="View"
+        options={[
+          { value: "a", label: "Grid", icon: <svg data-testid="grid-icon" /> },
+          { value: "b", label: "Table" },
+        ]}
+        value="a"
+        onChange={() => {}}
+      />,
+    );
+
+    expect(screen.getByRole("radio", { name: "Grid" })).toBeChecked();
+    expect(screen.getByTestId("grid-icon").parentElement).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+});

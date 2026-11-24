@@ -22,9 +22,15 @@
   --black-a18: rgba(0, 0, 0, 0.18);
   --black-a20: rgba(0, 0, 0, 0.2);
   --black-a22: rgba(0, 0, 0, 0.22);
+  --black-a28: rgba(0, 0, 0, 0.28);
+  --black-a50: rgba(0, 0, 0, 0.5);
   --black-a55: rgba(0, 0, 0, 0.55);
+  --black-a60: rgba(0, 0, 0, 0.6);
   --black-a92: rgba(0, 0, 0, 0.92);
+  --white-a08: rgba(255, 255, 255, 0.08);
   --white-a12: rgba(255, 255, 255, 0.12);
+  --white-a14: rgba(255, 255, 255, 0.14);
+  --white-a18: rgba(255, 255, 255, 0.18);
   --white-a20: rgba(255, 255, 255, 0.2);
   --white-a34: rgba(255, 255, 255, 0.34);
   --white-a40: rgba(255, 255, 255, 0.4);
@@ -39,6 +45,18 @@
   --foil-yellow-a50: rgba(255, 243, 176, 0.5);
   --foil-mint-a50: rgba(198, 247, 233, 0.5);
   --foil-blue-a50: rgba(205, 216, 255, 0.5);
+  /* the light that runs across a holo card (B&W-7): the same four hues,
+     saturated, so color-dodge has something to brighten with */
+  --foil-band-pink: rgba(255, 60, 160, 0.5);
+  --foil-band-yellow: rgba(255, 225, 60, 0.5);
+  --foil-band-mint: rgba(60, 255, 200, 0.5);
+  --foil-band-blue: rgba(90, 130, 255, 0.5);
+
+  /* the binder (B&W-7): a page and its plastic pockets, the only two
+     greys between Graphite and Ink, and the keyboard hint's key outline */
+  --binder-page: #2a2c31;
+  --binder-pocket: #1d1f23;
+  --key-outline: #6b7080;
 
   /*Functional (not brand, not chrome)*/
   --green-500: #3fd68a; /* success on dark */

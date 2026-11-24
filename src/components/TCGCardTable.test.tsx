@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TCGCardTable } from "./TCGCardTable";
 import type { TCGCard } from "../lib/type";
@@ -41,9 +41,13 @@ function renderTable(
   return render(<TCGCardTable {...props} />);
 }
 
-//the card names in the order the rows are currently shown
+//the card names in the order the rows are currently shown.
+//changed in B&W-7: the row's header cell now holds the set under the name
+//(spec 7.4), so the name is read from the cell's button
 function shownNames(): (string | null)[] {
-  return screen.getAllByRole("rowheader").map((cell) => cell.textContent);
+  return screen
+    .getAllByRole("rowheader")
+    .map((cell) => within(cell).getByRole("button").textContent);
 }
 
 describe("TCGCardTable", () => {
@@ -53,7 +57,8 @@ describe("TCGCardTable", () => {
     expect(
       screen.getByRole("table", { name: "Featured Cards" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole("columnheader")).toHaveLength(4);
+    //B&W-7: picture, Card, Number, Released, Rarity, Artist (spec 7.4)
+    expect(screen.getAllByRole("columnheader")).toHaveLength(6);
     //one header row plus one row per card
     expect(screen.getAllByRole("row")).toHaveLength(CARDS.length + 1);
     expect(shownNames()).toEqual(["Charizard", "Abra", "Blastoise"]);
@@ -70,8 +75,11 @@ describe("TCGCardTable", () => {
   it("starts unsorted: no column announces a direction, rows keep their order", () => {
     renderTable();
 
-    for (const header of screen.getAllByRole("columnheader")) {
-      expect(header).toHaveAttribute("aria-sort", "none");
+    for (const name of ["Card", "Released", "Rarity"]) {
+      expect(screen.getByRole("columnheader", { name })).toHaveAttribute(
+        "aria-sort",
+        "none",
+      );
     }
     expect(shownNames()).toEqual(["Charizard", "Abra", "Blastoise"]);
   });
@@ -79,8 +87,9 @@ describe("TCGCardTable", () => {
   it("cycles a column ascending, descending, then back to the original order", async () => {
     const user = userEvent.setup();
     renderTable();
-    const nameButton = screen.getByRole("button", { name: "Name" });
-    const nameHeader = screen.getByRole("columnheader", { name: "Name" });
+    //B&W-7: the name column is headed "Card" now (spec 7.4)
+    const nameButton = screen.getByRole("button", { name: "Card" });
+    const nameHeader = screen.getByRole("columnheader", { name: "Card" });
 
     await user.click(nameButton);
     expect(nameHeader).toHaveAttribute("aria-sort", "ascending");
@@ -99,14 +108,14 @@ describe("TCGCardTable", () => {
     const user = userEvent.setup();
     renderTable();
 
-    await user.click(screen.getByRole("button", { name: "Name" }));
-    await user.click(screen.getByRole("button", { name: "Set" }));
+    //B&W-7: there is no Set column any more; Released stands in for it
+    await user.click(screen.getByRole("button", { name: "Card" }));
+    await user.click(screen.getByRole("button", { name: "Released" }));
 
-    expect(screen.getByRole("columnheader", { name: "Set" })).toHaveAttribute(
-      "aria-sort",
-      "ascending",
-    );
-    expect(screen.getByRole("columnheader", { name: "Name" })).toHaveAttribute(
+    expect(
+      screen.getByRole("columnheader", { name: "Released" }),
+    ).toHaveAttribute("aria-sort", "ascending");
+    expect(screen.getByRole("columnheader", { name: "Card" })).toHaveAttribute(
       "aria-sort",
       "none",
     );
@@ -147,6 +156,54 @@ describe("TCGCardTable", () => {
       "data-rarity",
       "common",
     );
+  });
+
+  //B&W-7 (spec 7.4): the set under the name, the number, a readable date,
+  //the tier mark, and the artist or "Not listed"
+  it("shows the number, a readable date, the tier mark and the artist", () => {
+    renderTable({
+      cards: [
+        {
+          id: "sv8-240",
+          name: "Hydreigon ex",
+          number: "240",
+          rarity: "Special Illustration Rare",
+          artist: "Akira Egawa",
+          set: {
+            name: "Surging Sparks",
+            printedTotal: 191,
+            releaseDate: "2024/11/08",
+          },
+        },
+      ],
+    });
+
+    const row = screen.getByRole("row", { name: /Hydreigon ex/ });
+    expect(row).toHaveTextContent("Surging Sparks");
+    expect(row).toHaveTextContent("240/191");
+    expect(row).toHaveTextContent("8 Nov 2024");
+    expect(row).toHaveTextContent("Akira Egawa");
+    expect(row.querySelector(".tier-mark")).toHaveAttribute(
+      "data-rarity",
+      "ultra",
+    );
+  });
+
+  it("says Not listed for a card without an artist", () => {
+    renderTable({ cards: [{ id: "9", name: "Mystery", number: "1" }] });
+
+    expect(screen.getByText("Not listed")).toBeInTheDocument();
+  });
+
+  it("names the picture column for screen readers, and keeps the picture itself silent", () => {
+    renderTable({
+      cards: [{ id: "9", name: "Mystery", images: { small: "m.png" } }],
+    });
+
+    expect(
+      screen.getByRole("columnheader", { name: "Picture" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("presentation")).toHaveAttribute("src", "m.png");
   });
 
   it("shows one loading status and no table while loading", () => {

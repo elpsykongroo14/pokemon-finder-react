@@ -80,4 +80,28 @@ describe("Dialog", () => {
     await userEvent.keyboard("{Escape}");
     expect(openButton).toHaveFocus();
   });
+
+  //B&W-7: the card dialog is the same dialog on a black stage (spec 7.4);
+  //CSS reads the variant, the behavior is untouched
+  it("is the white sheet by default, and can be the black card stage", () => {
+    const { rerender } = render(
+      <Dialog aria-label="Plain" onClose={() => {}}>
+        <p>Body</p>
+      </Dialog>,
+    );
+    expect(document.querySelector(".dialog")).toHaveAttribute(
+      "data-variant",
+      "sheet",
+    );
+
+    rerender(
+      <Dialog aria-label="Plain" onClose={() => {}} variant="stage">
+        <p>Body</p>
+      </Dialog>,
+    );
+    expect(document.querySelector(".dialog")).toHaveAttribute(
+      "data-variant",
+      "stage",
+    );
+  });
 });

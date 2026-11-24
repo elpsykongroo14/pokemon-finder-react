@@ -6,6 +6,7 @@ import { PokemonEncounter } from "../components/PokemonEncounter";
 import { PokemonReadout } from "../components/PokemonReadout";
 import { PokemonSkeleton } from "../components/PokemonSkeleton";
 import { FavoritesList } from "../components/FavoritesList";
+import { CardsTeaser } from "../components/CardsTeaser";
 import { MessageBox } from "../ui/MessageBox";
 import { useTypeTheme } from "../hooks/useTypeTheme";
 import { getPokemonPageState } from "../lib/pokemonPageState";
@@ -98,6 +99,9 @@ export function PokemonPage() {
       {/* keyed like the encounter: a new Pokémon's bars grow again, and on
           phones its tabs start on Stats */}
       {pokemon && <PokemonReadout key={pokemon.name} pokemon={pokemon} />}
+
+      {/* keyed: a new Pokémon starts its own lazy card lookup (B&W-7) */}
+      {pokemon && <CardsTeaser key={pokemon.name} name={pokemon.name} />}
     </div>
   );
 }

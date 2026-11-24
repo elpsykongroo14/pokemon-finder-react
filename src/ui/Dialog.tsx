@@ -14,12 +14,16 @@ const FOCUSABLE_SELECTOR =
 interface DialogProps {
   onClose: () => void;
   "aria-label": string;
+  //sheet: the white sheet (settings). stage: the black card stage, which
+  //turns into a bottom sheet on phones (B&W-7, spec 7.4 and 8)
+  variant?: "sheet" | "stage";
   children: ReactNode;
 }
 
 export function Dialog({
   onClose,
   "aria-label": arialabel,
+  variant = "sheet",
   children,
 }: DialogProps) {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -70,11 +74,15 @@ export function Dialog({
   }
 
   return createPortal(
-    <div className="dialog">
+    <div className="dialog" data-variant={variant}>
       <div className="dialog__backdrop" onClick={onClose} />
       <div
         ref={contentRef}
-        className="dialog__content"
+        //the stage is black: its close button and anything else that
+        //reads the text and focus roles flips to white
+        className={
+          variant === "stage" ? "dialog__content on-dark" : "dialog__content"
+        }
         role="dialog"
         aria-modal="true"
         aria-label={arialabel}

@@ -67,6 +67,9 @@ describe("TeamPage", () => {
       id: 25,
       types: [{ slot: 1, type: { name: "electric", url: "" } }],
       sprites: {},
+      //a real Pokémon always has stats; since D49 the backfill sums them
+      //(fixed in B&W-7: without this the late answer threw after the test)
+      stats: [],
     });
 
     render(
