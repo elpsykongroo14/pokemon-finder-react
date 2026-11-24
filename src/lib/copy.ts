@@ -200,9 +200,7 @@ export const LEAD_LABEL = "Lead";
 //page headers: a name, and one sentence saying what the page is FOR
 export const COMPARE_SUBTITLE =
   "Two Pokémon side by side: see who wins each stat.";
-export const TEAM_HEADING = "Your Team";
-export const TEAM_SUBTITLE =
-  "Build a party of up to six. It stays saved in this browser.";
+export const TEAM_HEADING = "Your team";
 export const LIBRARY_HEADING = "TCG Library";
 export const LIBRARY_SUBTITLE =
   "Trading cards for any Pokémon, as a grid, a table or a binder.";
@@ -221,9 +219,18 @@ export const FOOTER_DISCLAIMER =
   "Unofficial fan project, not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.";
 export const FOOTER_MADE_BY = "Made by";
 
-export function emptySlotLabel(slotNumber: number): string {
-  return `Empty slot ${slotNumber}`;
+//the Team page (spec 7.5). the band's sentence replaces the old subtitle:
+//it says how full the party is AND that it is kept, in one line
+export function teamBandText(count: number): string {
+  if (count >= MAX_TEAM) return "Six of six. Your party is ready.";
+  return `${count} of ${MAX_TEAM} slots filled. Your team is saved in this browser.`;
 }
+//shown in the open slot, so the eye and a screen reader get the same words
+export function emptySlotLabel(slotNumber: number): string {
+  return `Slot ${slotNumber} is open`;
+}
+export const FIND_POKEMON_LABEL = "Find a Pokémon";
+export const DETAILS_LABEL = "Details";
 export function removeFromTeamLabel(name: string): string {
   return `Remove ${name} from team`;
 }

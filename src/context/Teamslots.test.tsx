@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { TeamSLots } from "./TeamSlots";
 import { TeamProvider } from "./TeamContext";
+import { PreferencesProvider } from "./PreferencesContext";
 import { MAX_TEAM } from "../lib/teamReducer";
 import type { TeamMember } from "../lib/type";
 
@@ -21,10 +22,14 @@ function makeMembers(count: number): TeamMember[] {
 
 function renderSlots() {
   return render(
+    //PreferencesProvider: B&W-6, the card asks whether animations are on
+    //before it waits for an exit animation
     <MemoryRouter>
-      <TeamProvider>
-        <TeamSLots />
-      </TeamProvider>
+      <PreferencesProvider>
+        <TeamProvider>
+          <TeamSLots />
+        </TeamProvider>
+      </PreferencesProvider>
     </MemoryRouter>,
   );
 }
@@ -94,16 +99,77 @@ describe("TeamSLots", () => {
       },
     );
 
-    it("gives every empty slot a spoken name, numbered by its position", () => {
+    //changed in B&W-6: the words were a hidden "Empty slot 3"; the slot
+    //now shows them (spec 7.5), so the test asks for the visible wording
+    it("gives every empty slot a name, numbered by its position", () => {
       seedTeam(makeMembers(2));
 
       renderSlots();
 
-      expect(screen.queryByText("Empty slot 1")).not.toBeInTheDocument();
-      expect(screen.queryByText("Empty slot 2")).not.toBeInTheDocument();
+      expect(screen.queryByText("Slot 1 is open")).not.toBeInTheDocument();
+      expect(screen.queryByText("Slot 2 is open")).not.toBeInTheDocument();
       for (const n of [3, 4, 5, 6]) {
-        expect(screen.getByText(`Empty slot ${n}`)).toBeInTheDocument();
+        expect(screen.getByText(`Slot ${n} is open`)).toBeVisible();
       }
+    });
+
+    //spec 7.5: an open slot is an invitation, so it says how to fill it
+    it("offers a way to find a Pokémon in every open slot", () => {
+      seedTeam(makeMembers(4));
+
+      renderSlots();
+
+      const links = screen.getAllByRole("link", { name: "Find a Pokémon" });
+      expect(links).toHaveLength(2);
+      for (const link of links) expect(link).toHaveAttribute("href", "/");
+    });
+
+    it("shows each member's dex number and names the card with a heading", () => {
+      seedTeam([{ name: "hydreigon", id: 635, sprite: null }]);
+
+      renderSlots();
+
+      expect(screen.getByText("No. 635")).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { level: 3, name: "hydreigon" }),
+      ).toBeInTheDocument();
+    });
+
+    //D49: the total travels with the member, so the card needs no fetch
+    it("shows the base stat total once the member has one", () => {
+      seedTeam([
+        { name: "hydreigon", id: 635, sprite: null, statTotal: 600 },
+        { name: "pikachu", id: 25, sprite: null },
+      ]);
+
+      const { container } = renderSlots();
+
+      const [withTotal, withoutTotal] = container.querySelectorAll(
+        ".team-slot--filled",
+      ) as NodeListOf<HTMLElement>;
+      expect(within(withTotal).getByText("Base stat total")).toBeVisible();
+      expect(within(withTotal).getByText("600")).toBeVisible();
+      //a team saved before B&W-6: no number to show until the backfill
+      //brings one, and no "0" pretending to be a total
+      expect(
+        within(withoutTotal).queryByText("Base stat total"),
+      ).not.toBeInTheDocument();
+    });
+
+    //the card has one way in, the name. "Details" is drawn like a button
+    //for the eye, but a second link to the same page would be a second
+    //tab stop that says less than the first
+    it("gives each card exactly one link, named by the Pokémon", () => {
+      seedTeam([{ name: "hydreigon", id: 635, sprite: null }]);
+
+      const { container } = renderSlots();
+
+      const card = container.querySelector(".team-slot--filled") as HTMLElement;
+      expect(within(card).getAllByRole("link")).toHaveLength(1);
+      expect(within(card).getByText("Details")).toHaveAttribute(
+        "aria-hidden",
+        "true",
+      );
     });
 
     it("shows a type badge for each saved type, in order", () => {
@@ -187,6 +253,21 @@ describe("TeamSLots", () => {
       const [first, second] = container.querySelectorAll(".team-slot--filled");
       expect(first).toHaveAttribute("data-type", "fire");
       expect(second).not.toHaveAttribute("data-type");
+    });
+
+    //the mini field's stripes are the second type's color (spec 4.1), which
+    //the type-theme engine reads from data-type2
+    it("gives a two-type member's slot its second type too", () => {
+      seedTeam([
+        { name: "charizard", id: 6, sprite: null, types: ["fire", "flying"] },
+        { name: "pikachu", id: 25, sprite: null, types: ["electric"] },
+      ]);
+
+      const { container } = renderSlots();
+
+      const [first, second] = container.querySelectorAll(".team-slot--filled");
+      expect(first).toHaveAttribute("data-type2", "flying");
+      expect(second).not.toHaveAttribute("data-type2");
     });
   });
 
@@ -291,6 +372,28 @@ describe("TeamSLots", () => {
       expect(screen.getByRole("status")).toHaveTextContent(
         "pikachu removed from your team.",
       );
+    });
+
+    //the slot-leave motion only exists while animations are on (spec 6.2,
+    //D59). with them off no animationend will ever come, so waiting for it
+    //would leave the card on screen for the whole fallback time
+    it("removes the member at once when animations are off", () => {
+      localStorage.setItem(
+        "pokemon_preferences",
+        JSON.stringify({ animations: "off", spriteMode: "pixel" }),
+      );
+      const { container } = renderSlots();
+
+      clickRemove("pikachu");
+
+      expect(
+        screen.queryByRole("link", { name: "pikachu" }),
+      ).not.toBeInTheDocument();
+      expect(container.querySelector("[data-leaving]")).not.toBeInTheDocument();
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "pikachu removed from your team.",
+      );
+      expect(screen.getByRole("list", { name: "Your party" })).toHaveFocus();
     });
 
     it("moves keyboard focus to the party list, so it is not lost with the button", () => {

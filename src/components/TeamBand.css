@@ -1,0 +1,75 @@
+/* The Team page's title band (spec 7.5): a black plate, the page name in
+   the display style, one sentence, and six big slanted pips. It is .on-dark,
+   so text and focus rings are already white; this file only lays it out.
+
+   The pips are the header counter's pips, drawn large: a 3 px white ring,
+   filled with each member's primary type color through its own data-type.
+   On black an Ink fill would vanish, so a member saved without types fills
+   white instead. Filled vs open is still told by the fill, not the color */
+@layer features {
+  .team-band {
+    --team-band-title: 3.75rem; /* 60 px, the Library and Team titles */
+    --team-band-pip-width: 22px;
+    --team-band-pip-height: 40px;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: var(--space-gutter) var(--space-gutter)
+      calc(var(--space-gutter) - var(--space-1));
+    background: var(--surface-ink);
+  }
+
+  .team-band__text {
+    min-width: 0;
+  }
+
+  .team-band__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--team-band-title);
+    font-weight: var(--weight-black);
+    font-style: italic;
+    font-stretch: var(--width-display);
+    letter-spacing: var(--tracking-display);
+    line-height: 1;
+  }
+
+  .team-band__count {
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+  }
+
+  .team-band__pips {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .team-band__pip {
+    width: var(--team-band-pip-width);
+    height: var(--team-band-pip-height);
+    box-shadow: inset 0 0 0 var(--border-width-thick) var(--border-line);
+    transform: skewX(var(--slant));
+  }
+
+  .team-band__pip[data-filled="true"] {
+    background: var(--text-primary);
+  }
+
+  .team-band__pip[data-filled="true"][data-type] {
+    background: var(--theme-accent);
+  }
+
+  @media (max-width: 1000px) {
+    .team-band {
+      --team-band-title: var(--text-display-phone);
+      --team-band-pip-width: 16px;
+      --team-band-pip-height: 30px;
+
+      padding: var(--space-6) var(--space-gutter-phone);
+    }
+  }
+}
