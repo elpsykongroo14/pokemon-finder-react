@@ -8,38 +8,26 @@
    the dark slate design used; only what they point at changed, which
    is why one file can re-skin the whole app.
 
-   Three scopes override the defaults:
+   Two scopes override the defaults:
    .on-dark        a black plate (name plates, the command plate, the
                    card dialog): text and focus ring flip to white
    .on-light       a white surface that can open INSIDE a black plate
                    (the autocomplete panel under Compare's pickers):
                    every role .on-dark flipped goes back to :root's
-   .surface-window the old light panel. On a white page it now equals
-                   the defaults; it stays until the last component
-                   that sets it is restyled (B&W-8 removes it) */
+   (B&W-8 removed .surface-window, the old light panel scope, with the
+   last component that set it) */
 
 :root {
   /* Surfaces */
   --surface-frame: var(--paper); /* the page */
-  --surface-chrome: var(--paper); /* the header */
-  --surface-window: var(--paper);
-  --surface-well: var(--mist); /* inputs, tracks, hover fills */
-  --surface-window-raised: var(--paper);
-  --surface-window-sunken: var(--mist);
+  --surface-well: var(--mist); /* inputs, tracks, hover fills, skeletons */
   --surface-ink: var(--ink); /* black plates */
   --surface-paper: var(--paper); /* white plates: never flips, unlike frame */
   --surface-overlay: var(--black-a55); /* dialog scrim */
   --surface-overlay-deep: var(--black-a92); /* card dialog scrim */
 
-  /* Elevation (D41): flat by default. The hard shadow belongs to the
-     autocomplete panel only; the soft shadow to trading cards only.
-     "0 0 0 0 transparent" instead of "none": it stays valid inside a
-     comma-separated box-shadow list, "none" would void the whole list */
-  --shadow-raised: 0 0 0 0 transparent;
-  --shadow-pressed: 0 0 0 0 transparent;
-  --drop-raised: 0 0 0 0 transparent;
-  --shadow-sunken: 0 0 0 0 transparent;
-  --bevel-highlight: 0 0 0 0 transparent;
+  /* Elevation (D41): flat. The hard shadow belongs to the autocomplete
+     panel only; the soft shadows to trading cards only */
   --shadow-hard: 6px 6px 0 var(--ink);
   --shadow-card: 0 8px 18px var(--black-a20);
 
@@ -126,7 +114,7 @@
   --z-toast: var(--z-50);
 }
 
-/* A black plate. Same pattern as .surface-window: the subtree
+/* A black plate. The subtree
    re-binds the roles it reads, so a component placed inside never
    needs to know it is on black */
 .on-dark {
@@ -164,18 +152,4 @@
   --tier-holo-ring: var(--ink);
 
   color: var(--text-primary);
-}
-
-/* The old light window. On white it is the default, so every role
-   points where :root does; kept so nothing that still sets the
-   class falls back to the slate values */
-.surface-window {
-  --text-primary: var(--ink);
-  --text-secondary: var(--graphite);
-  --text-danger: var(--red-800);
-  --text-success: var(--green-800);
-  --border-line: var(--ink);
-  --focus-ring: var(--ink);
-  --focus-halo: var(--paper);
-  --surface-window-sunken: var(--mist);
 }
