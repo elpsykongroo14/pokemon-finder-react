@@ -41,7 +41,13 @@ const TEXT_FILE = /\.(html|js|css|map|json|txt)$/;
 // with its pickers, the stat duel (+1.23 kB CSS gzip), and the command,
 // reroll, pick / swap and pending-comparison logic (+1.83 kB JS gzip).
 // B&W-8 ratchets both back down.
-const BUDGET_KB = { js: 93.5, css: 14.5 };
+// R10B (D65): JS 93.5 -> 93.75 and CSS 14.5 -> 15.25 at B&W-6 (measured
+// 93.54 / 15.00). The old party grid's CSS was replaced, not kept beside
+// the new one; the growth is the title band, the party cards with their
+// mini fields, stat bars and open slots (+0.53 kB CSS gzip), and the stat
+// total on team members, its backfill and the TransitionLink size (+0.30
+// kB JS gzip). B&W-8 ratchets both back down.
+const BUDGET_KB = { js: 93.75, css: 15.25 };
 
 if (!existsSync(DIST)) {
   console.error(`check-dist: no ${DIST}/ folder. Run "npm run build" first.`);
