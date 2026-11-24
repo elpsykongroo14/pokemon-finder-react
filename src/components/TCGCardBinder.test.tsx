@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TCGCardBinder } from "./TCGCardBinder";
 import type { TCGCard } from "../lib/type";
 import { BINDER_PAGES_LABEL, CARDS_LOADING_LABEL } from "../lib/copy";
+import { PreferencesProvider } from "../context/PreferencesContext";
 
 //n cards named "Card 1" ... "Card n"
 function makeCards(n: number): TCGCard[] {
@@ -26,7 +28,13 @@ function renderBinder(
     onSelect: () => {},
     ...overrides,
   };
-  return render(<TCGCardBinder {...props} />);
+  //the provider: the error and empty sentences sit in the battle dialog,
+  //which reads the animation preference (B&W-8)
+  return render(
+    <PreferencesProvider>
+      <TCGCardBinder {...props} />
+    </PreferencesProvider>,
+  );
 }
 
 //the card buttons only (not Previous / Next)
@@ -192,6 +200,37 @@ describe("TCGCardBinder on a phone, one page at a time", () => {
 });
 
 describe("TCGCardBinder", () => {
+  //B&W-8: Next on the last-but-one spread disables itself, and a disabled
+  //button drops keyboard focus to the top of the page. focus moves to the
+  //way back instead, so the keyboard stays in the binder
+  it("keeps focus in the binder when a turn reaches the last spread", async () => {
+    const user = userEvent.setup();
+    function Stateful() {
+      const [page, setPage] = useState(1);
+      return (
+        <PreferencesProvider>
+          <TCGCardBinder
+            cards={makeCards(40)}
+            status="success"
+            error={null}
+            emptyMessage="No cards"
+            page={page}
+            onPageChange={setPage}
+            onSelect={() => {}}
+          />
+        </PreferencesProvider>
+      );
+    }
+    //40 cards: five pages, three spreads. two turns reach the last one
+    render(<Stateful />);
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Previous" })).toHaveFocus();
+  });
+
   it("opens a card when it is clicked", async () => {
     const user = userEvent.setup();
     const handleSelect = vi.fn();
@@ -231,11 +270,14 @@ describe("TCGCardBinder", () => {
       error: "Could not load",
       cards: [],
     });
-    expect(screen.getByText("Could not load")).toBeInTheDocument();
+    //changed in B&W-8: the sentence sits in the battle dialog now (spec
+    //7.6), which needs the preferences (it types) and speaks through a live
+    //region, so it is found by its role instead of a bare paragraph
+    expect(screen.getByRole("alert")).toHaveTextContent("Could not load");
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
     failed.unmount();
 
     renderBinder({ status: "empty", emptyMessage: "Nothing here", cards: [] });
-    expect(screen.getByText("Nothing here")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Nothing here");
   });
 });

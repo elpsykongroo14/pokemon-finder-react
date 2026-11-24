@@ -2,27 +2,21 @@ import { useState } from "react";
 import "./StyleGuide.css";
 import { Button } from "../ui/Button";
 import { IconButton } from "../ui/IconButton";
-import { Panel } from "../ui/Panel";
-import { Cursor } from "../ui/Cursor";
-import { Menu } from "../ui/Menu";
-import { MenuItem } from "../ui/MenuItem";
 import { Tabs } from "../ui/Tabs";
 import { TabList } from "../ui/TabList";
 import { Tab } from "../ui/Tab";
 import { TabPanel } from "../ui/TabPanel";
 import { MessageBox } from "../ui/MessageBox";
 import { StatMeter } from "../ui/StatMeter";
-import { Toggle } from "../ui/Toggle";
 import { Select } from "../ui/Select";
-import { Input } from "../ui/Input";
 import { Dialog } from "../ui/Dialog";
 import { Spinner } from "../ui/Spinner";
 import { Skeleton } from "../ui/Skeleton";
 import { TypeBadge } from "../components/TypeBadge";
 import { Icon } from "../components/Icon";
-import { StageConsole } from "../ui/StageConsole";
 import { SegmentedControl } from "../ui/SegmentedControl";
 import { SectionHeading } from "../ui/SectionHeading";
+import { TierMark } from "../components/TierMark";
 
 const TYPES = [
   "normal",
@@ -71,8 +65,6 @@ const MATCHUPS = [
 
 export function StyleGuide() {
   const [activeType, setActiveType] = useState<(typeof TYPES)[number]>("fire");
-  const [lastSelected, setLastSelected] = useState<string | null>(null);
-  const [shinyDemo, setShinyDemo] = useState(false);
   const [sortDemo, setSortDemo] = useState("newest");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [viewDemo, setViewDemo] =
@@ -151,33 +143,6 @@ export function StyleGuide() {
       </section>
 
       <section className="styleguide__section">
-        <h2>Panel</h2>
-        <div className="primitives-row">
-          <Panel variant="raised">Raised</Panel>
-          <Panel variant="sunken">Sunken</Panel>
-          <div data-type={activeType}>
-            <Panel variant="tinted">Tinted ({activeType})</Panel>
-          </div>
-        </div>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>StageConsole</h2>
-        <p className="styleguide__note">
-          Resize the window: stacked below 1024px, side by side from 1024px.
-        </p>
-        <StageConsole
-          stage={
-            <div data-type={activeType}>
-              <Panel variant="tinted">Stage: the hero of the page</Panel>
-            </div>
-          }
-        >
-          <Panel>Console: menus, tabs and details</Panel>
-        </StageConsole>
-      </section>
-
-      <section className="styleguide__section">
         <h2>Contrast</h2>
         <p className="styleguide__note">
           Enforced by tests, not by a table: semantic.test.ts (every text role
@@ -231,39 +196,6 @@ export function StyleGuide() {
           </Button>
           <TypeBadge typeName="bug" />
         </div>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>Cursor</h2>
-        <div className="cursor-demo">
-          <Cursor offset={0} />
-          <div className="cursor-demo__row">Fight</div>
-          <div className="cursor-demo__row">Bag</div>
-        </div>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>Menu / MenuItem</h2>
-        <p className="styleguide__note">
-          Click in, then use arrow keys, Home and End.
-        </p>
-        <Menu aria-label="Battle menu demo">
-          <MenuItem index={0} onSelect={() => setLastSelected("Fight")}>
-            Fight
-          </MenuItem>
-          <MenuItem index={1} onSelect={() => setLastSelected("Bag")}>
-            Bag
-          </MenuItem>
-          <MenuItem index={2} onSelect={() => setLastSelected("Pokémon")}>
-            Pokémon
-          </MenuItem>
-          <MenuItem index={3} onSelect={() => setLastSelected("Run")}>
-            Run
-          </MenuItem>
-        </Menu>
-        <p className="styleguide__note">
-          Last selected: {lastSelected ?? "none yet"}
-        </p>
       </section>
 
       <section className="styleguide__section">
@@ -322,9 +254,8 @@ export function StyleGuide() {
       </section>
 
       <section className="styleguide__section">
-        <h2>Toggle / Select / Input</h2>
+        <h2>Select</h2>
         <div className="primitives-row">
-          <Toggle checked={shinyDemo} onChange={setShinyDemo} label="Shiny" />
           <Select
             aria-label="Sort demo"
             value={sortDemo}
@@ -334,7 +265,20 @@ export function StyleGuide() {
             <option value="oldest">Oldest</option>
             <option value="rarity">Rarity</option>
           </Select>
-          <Input aria-label="Text input demo" placeholder="Type here" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>TierMark</h2>
+        <p className="styleguide__note">
+          One mark in four strengths (spec 7.4); the words are the card's own
+          rarity
+        </p>
+        <div className="primitives-row">
+          <TierMark rarity="Common" />
+          <TierMark rarity="Rare" />
+          <TierMark rarity="Rare Holo" />
+          <TierMark rarity="Special Illustration Rare" />
         </div>
       </section>
 

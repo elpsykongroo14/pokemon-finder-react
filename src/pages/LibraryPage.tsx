@@ -27,7 +27,7 @@ export function LibraryPage() {
   const { search } = useLocation();
   const { view, setView } = useLibraryView();
   const { page, setPage } = useBinderPage();
-  const { title, cards, status, error, sortMode, setSortMode } =
+  const { title, cards, status, error, sortMode, setSortMode, retry } =
     useTCGLibrary(name);
 
   //the hero's dex number and colors. usePokemon keeps its last answer
@@ -66,6 +66,7 @@ export function LibraryPage() {
       ? `No TCG cards found for "${name}".`
       : "No cards loaded.",
     onSelect: setSelectedCard,
+    onRetry: retry,
   };
 
   function handleSearch(query: string) {

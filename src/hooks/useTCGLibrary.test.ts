@@ -73,6 +73,26 @@ describe("useTCGLibrary", () => {
     expect(result.current.error).toBe('Failed to load cards for "pikachu".');
   });
 
+  //B&W-8 (spec 7.6): a failed load offers Retry, which asks again
+  it("loads again when asked to retry after a failure", async () => {
+    const cards = [makeCard("1", "2020-01-01", "Rare")];
+    fetchTCGCards
+      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
+      .mockResolvedValueOnce(cards);
+
+    const { result } = renderHook(() => useTCGLibrary("pikachu"));
+    await waitFor(() => expect(result.current.status).toBe("error"));
+
+    act(() => {
+      result.current.retry();
+    });
+
+    expect(result.current.status).toBe("loading");
+    await waitFor(() => expect(result.current.status).toBe("success"));
+    expect(result.current.cards).toEqual(cards);
+    expect(fetchTCGCards).toHaveBeenCalledTimes(2);
+  });
+
   it("builds the featured view from a random batch of pokemon names", async () => {
     const allNames = Array.from({ length: 100 }, (_, i) => `pokemon-${i}`);
     fetchAllpokemonNames.mockResolvedValue(allNames);

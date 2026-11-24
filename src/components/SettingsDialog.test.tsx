@@ -33,6 +33,15 @@ function renderDialog() {
 beforeEach(() => localStorage.clear());
 
 describe("SettingsDialog", () => {
+  //B&W-8 (found by axe in a real browser): the dialog renders through a
+  //portal into <body>, outside <main>, so a <header> in it became a second
+  //page banner while the dialog was open
+  it("adds no banner landmark to the page", () => {
+    renderDialog();
+
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+  });
+
   it("is a dialog named  Settings with a matching visible heading", () => {
     renderDialog();
 

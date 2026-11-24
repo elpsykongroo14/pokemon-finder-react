@@ -107,3 +107,14 @@ export function spriteUrlFromId(id: number): string | null {
   if (!Number.isInteger(id) || id < 1) return null;
   return `${SPRITE_BY_ID_BASE}/${id}.png`;
 }
+
+//the picture for a saved Pokémon in a list: the favorites rail and the
+//team cards (B&W-8). the sprite setting decides, as it does on the
+//Pokémon page: pixel sprites come from the dex number, so even a summary
+//saved without one has a picture; artwork is the image saved with it
+export function listSpriteUrl(
+  mode: SpriteMode,
+  saved: { id: number; sprite: string | null },
+): string | null {
+  return mode === "pixel" ? spriteUrlFromId(saved.id) : saved.sprite;
+}

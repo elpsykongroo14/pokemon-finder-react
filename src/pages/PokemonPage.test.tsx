@@ -91,6 +91,25 @@ describe("PokemonPage", () => {
     ).toBeInTheDocument();
   });
 
+  //B&W-8, spec 7.6: while loading, the battle dialog says it too. the
+  //skeleton above already announces it, so the dialog is for the eye: one
+  //announcement, not two
+  it("shows the loading line in the battle dialog, without a second announcement", () => {
+    vi.mocked(usePokemon).mockReturnValue({
+      data: null,
+      loading: true,
+      error: null,
+      retry,
+    });
+
+    const { container } = renderPokemonPage("/pokemon/pikachu");
+
+    const dialog = container.querySelector(".encounter-field__message");
+    expect(dialog).toHaveTextContent("Searching the tall grass…");
+    expect(dialog).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getAllByRole("status")).toHaveLength(1);
+  });
+
   it("offers Retry when the pokeex is unreachable, and only then", () => {
     vi.mocked(usePokemon).mockReturnValue({
       data: null,

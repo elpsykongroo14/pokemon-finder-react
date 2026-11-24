@@ -1,5 +1,5 @@
 import "./TCGCardBinder.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TCGCard } from "../lib/type";
 import type { libraryStatus } from "../lib/tcgLibraryReducer";
 import { getPageCount, paginate } from "../lib/pagination";
@@ -31,6 +31,8 @@ interface TCGCardBinderProps {
   page: number;
   onPageChange: (page: number) => void;
   onSelect: (card: TCGCard) => void;
+  //asks for the cards again after a failure (B&W-8)
+  onRetry?: () => void;
 }
 
 //the binder (spec 7.4, D54, D55): a black binder with two sleeve pages and
@@ -44,6 +46,7 @@ export function TCGCardBinder({
   page,
   onPageChange,
   onSelect,
+  onRetry,
 }: TCGCardBinderProps) {
   //D55: phones show one page at a time. this is a question about the
   //screen, which only the browser can answer, so it comes from a media
@@ -58,6 +61,31 @@ export function TCGCardBinder({
     direction: TurnDirection;
     to: number;
   } | null>(null);
+  const previousRef = useRef<HTMLButtonElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
+
+  //the spread is worked out on every render from 'cards' + the url's page,
+  //nothing about pages is stored in this component
+  const pageCount = getPageCount(cards.length, BINDER_PAGE_SIZE);
+  const spread = getBinderSpread(page, pageCount, onePage ? 1 : 2);
+  const turnShown =
+    turn !== null && turn.to === spread.pages[0] ? turn.direction : undefined;
+  const atEnd =
+    (turnShown === "next" && spread.next === null) ||
+    (turnShown === "previous" && spread.previous === null);
+
+  //B&W-8: a turn that reaches either end disables the button that was
+  //just pressed, and a disabled button lets keyboard focus fall to the top
+  //of the page. the way back is still there, so focus goes to it.
+  //only when focus really was lost, so a mouse user's focus is left alone
+  useEffect(() => {
+    if (!atEnd) return;
+    const lost =
+      document.activeElement === document.body ||
+      document.activeElement ===
+        (turnShown === "next" ? nextRef : previousRef).current;
+    if (lost) (turnShown === "next" ? previousRef : nextRef).current?.focus();
+  }, [atEnd, turnShown]);
 
   if (status === "loading") {
     return (
@@ -78,16 +106,10 @@ export function TCGCardBinder({
         status={status}
         error={error}
         emptyMessage={emptyMessage}
+        onRetry={onRetry}
       />
     );
   }
-
-  //the spread is worked out on every render from 'cards' + the url's page,
-  //nothing about pages is stored in this component
-  const pageCount = getPageCount(cards.length, BINDER_PAGE_SIZE);
-  const spread = getBinderSpread(page, pageCount, onePage ? 1 : 2);
-  const turnShown =
-    turn !== null && turn.to === spread.pages[0] ? turn.direction : undefined;
 
   function goTo(target: number | null, direction: TurnDirection) {
     if (target === null) return;
@@ -128,6 +150,7 @@ export function TCGCardBinder({
 
       <nav className="binder__nav" aria-label={BINDER_PAGES_LABEL}>
         <Button
+          ref={previousRef}
           variant="line"
           disabled={spread.previous === null}
           onClick={() => goTo(spread.previous, "previous")}
@@ -139,6 +162,7 @@ export function TCGCardBinder({
           {binderPagesText(spread.pages, pageCount)}
         </p>
         <Button
+          ref={nextRef}
           variant="line"
           disabled={spread.next === null}
           onClick={() => goTo(spread.next, "next")}

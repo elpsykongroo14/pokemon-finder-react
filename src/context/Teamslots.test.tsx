@@ -210,13 +210,45 @@ describe("TeamSLots", () => {
       expect(container.querySelector("img")).toHaveAttribute("alt", "");
     });
 
-    it("draws no image and does not crash, for a member with no sprite", () => {
+    //changed in B&W-8: the card follows the sprite setting now (D65 left it
+    //for B&W-8). only ARTWORK depends on the saved sprite; pixel sprites
+    //come from the dex number, so this case is about artwork mode
+    it("draws no image and does not crash, for a member with no saved artwork", () => {
+      localStorage.setItem(
+        "pokemon_preferences",
+        JSON.stringify({ animations: "auto", spriteMode: "artwork" }),
+      );
       seedTeam([{ name: "pikachu", id: 25, sprite: null }]);
 
       const { container } = renderSlots();
 
       expect(container.querySelector("img")).not.toBeInTheDocument();
       expect(screen.getByRole("link", { name: "pikachu" })).toBeInTheDocument();
+    });
+
+    //B&W-8: the setting the Pokémon page's sprites follow, cards follow too
+    it("draws the pixel sprite from the dex number in pixel mode", () => {
+      seedTeam([{ name: "pikachu", id: 25, sprite: "art.png" }]);
+
+      const { container } = renderSlots();
+
+      const img = container.querySelector("img");
+      expect(img?.getAttribute("src")).toMatch(/\/pokemon\/25\.png$/);
+      expect(img).toHaveAttribute("data-mode", "pixel");
+    });
+
+    it("draws the saved artwork in artwork mode", () => {
+      localStorage.setItem(
+        "pokemon_preferences",
+        JSON.stringify({ animations: "auto", spriteMode: "artwork" }),
+      );
+      seedTeam([{ name: "pikachu", id: 25, sprite: "art.png" }]);
+
+      const { container } = renderSlots();
+
+      const img = container.querySelector("img");
+      expect(img).toHaveAttribute("src", "art.png");
+      expect(img).toHaveAttribute("data-mode", "artwork");
     });
 
     it("marks only the first slot as the lead, and says so in words", () => {

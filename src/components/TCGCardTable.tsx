@@ -12,6 +12,7 @@ import {
 } from "../lib/tcgTable";
 import { Skeleton } from "../ui/Skeleton";
 import { TierMark } from "./TierMark";
+import { LibraryNotice } from "./LibraryNotice";
 import {
   CARDS_LOADING_LABEL,
   NOT_LISTED,
@@ -60,6 +61,8 @@ interface TCGCardTableProps {
   onSelect: (card: TCGCard) => void;
   //the view or the sort just changed: the rows rise in (spec 6.2)
   entering?: boolean;
+  //asks for the cards again after a failure (B&W-8)
+  onRetry?: () => void;
 }
 
 function sortArrow(sort: TableSort, column: TableColumn): string {
@@ -77,6 +80,7 @@ export function TCGCardTable({
   caption,
   onSelect,
   entering = false,
+  onRetry,
 }: TCGCardTableProps) {
   //the only state here: which column is sorted. the rows themselves are
   //never stored, they are worked out from `cards` + `sort` on every render
@@ -95,11 +99,16 @@ export function TCGCardTable({
       </div>
     );
   }
-  if (status === "error") {
-    return <p className="library-empty">{error}</p>;
-  }
-  if (status === "empty") {
-    return <p className="library-empty">{emptyMessage}</p>;
+  //B&W-8: the same battle-dialog notice as the grid and the binder
+  if (status === "error" || status === "empty") {
+    return (
+      <LibraryNotice
+        status={status}
+        error={error}
+        emptyMessage={emptyMessage}
+        onRetry={onRetry}
+      />
+    );
   }
 
   const rows = sortTableRows(cards, sort);

@@ -13,6 +13,7 @@ import { getPokemonPageState } from "../lib/pokemonPageState";
 import { FailureMessage } from "../components/FailureMessage";
 import "./PokemonPage.css";
 import { PageTitle } from "../ui/PageTitle";
+import { LOADING_LABEL } from "../lib/copy";
 
 export function PokemonPage() {
   const { name } = useParams<{ name: string }>(); //this line reads the dynamic segment straight off the current URL.
@@ -56,7 +57,17 @@ export function PokemonPage() {
           </div>
         );
       case "loading":
-        return <PokemonSkeleton />;
+        //spec 7.6: the empty platform and silhouette, and the battle
+        //dialog with the loading line. the skeleton is the one live
+        //announcement; the dialog repeats it for the eye only
+        return (
+          <>
+            <PokemonSkeleton />
+            <div className="encounter-field__message" aria-hidden="true">
+              <MessageBox text={LOADING_LABEL} />
+            </div>
+          </>
+        );
       case "failed":
         return (
           <div className="encounter-field__message">

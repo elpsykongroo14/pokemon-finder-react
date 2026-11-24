@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
+import { useState } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TCGCardModal } from "./TCGCardModal";
@@ -246,6 +247,35 @@ describe("TCGCardModal, flipping through", () => {
       <TCGCardModal card={THREE[2]!} cards={THREE} onClose={() => {}} />,
     );
     expect(screen.getByRole("button", { name: "Next card" })).toBeDisabled();
+  });
+
+  //B&W-8: "Next card" onto the last card disables itself; a disabled
+  //button drops focus out of the dialog. focus moves to the way back
+  it("keeps focus in the dialog when a step reaches either end", async () => {
+    const user = userEvent.setup();
+    function Stateful() {
+      const [card, setCard] = useState(THREE[1]!);
+      return (
+        <TCGCardModal
+          card={card}
+          cards={THREE}
+          onSelect={setCard}
+          onClose={() => {}}
+        />
+      );
+    }
+    render(<Stateful />);
+
+    await user.click(screen.getByRole("button", { name: "Next card" }));
+    expect(screen.getByRole("button", { name: "Next card" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Previous card" })).toHaveFocus();
+
+    await user.click(screen.getByRole("button", { name: "Previous card" }));
+    await user.click(screen.getByRole("button", { name: "Previous card" }));
+    expect(
+      screen.getByRole("button", { name: "Previous card" }),
+    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Next card" })).toHaveFocus();
   });
 
   //a new card is a new element, so its flip plays from the start

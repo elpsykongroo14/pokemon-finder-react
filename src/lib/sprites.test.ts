@@ -4,6 +4,7 @@ import {
   integerScale,
   resolveSprite,
   spriteUrlFromId,
+  listSpriteUrl,
 } from "./sprites";
 import type { PokemonSprites } from "./sprites";
 
@@ -184,5 +185,26 @@ describe("spriteUrlFromId", () => {
     expect(spriteUrlFromId(0)).toBeNull();
     expect(spriteUrlFromId(-1)).toBeNull();
     expect(spriteUrlFromId(2.5)).toBeNull();
+  });
+});
+
+//B&W-8: the picture for a saved Pokémon in a list (favorites rail, team
+//cards). pixel sprites come from the dex number; artwork is what was
+//saved with it. one rule, so the two lists cannot disagree
+describe("listSpriteUrl", () => {
+  it("draws the dex-number pixel sprite in pixel mode, saved or not", () => {
+    expect(listSpriteUrl("pixel", { id: 25, sprite: "art.png" })).toMatch(
+      /\/pokemon\/25\.png$/,
+    );
+    expect(listSpriteUrl("pixel", { id: 25, sprite: null })).toMatch(
+      /\/pokemon\/25\.png$/,
+    );
+  });
+
+  it("draws the saved artwork in artwork mode, or nothing without one", () => {
+    expect(listSpriteUrl("artwork", { id: 25, sprite: "art.png" })).toBe(
+      "art.png",
+    );
+    expect(listSpriteUrl("artwork", { id: 25, sprite: null })).toBeNull();
   });
 });

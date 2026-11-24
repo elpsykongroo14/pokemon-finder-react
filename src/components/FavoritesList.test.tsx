@@ -91,6 +91,31 @@ describe("FavoritesList", () => {
     expect(tile(/pikachu/i).querySelector("img")).toHaveAttribute("alt", "");
   });
 
+  //B&W-8: the rail drew the saved ARTWORK with pixelated scaling, so a
+  //475 px painting shrank to 96 px in hard steps and looked broken. it
+  //follows the sprite setting now, like every other sprite on the page
+  it("draws the crisp pixel sprite from the dex number in pixel mode", () => {
+    seed(storedPikachu);
+    renderWithProviders(<FavoritesList />);
+
+    const img = tile(/pikachu/i).querySelector("img");
+    expect(img?.getAttribute("src")).toMatch(/\/pokemon\/25\.png$/);
+    expect(img).toHaveAttribute("data-mode", "pixel");
+  });
+
+  it("draws the saved artwork, smoothly, in artwork mode", () => {
+    localStorage.setItem(
+      "pokemon_preferences",
+      JSON.stringify({ animations: "auto", spriteMode: "artwork" }),
+    );
+    seed(storedPikachu);
+    renderWithProviders(<FavoritesList />);
+
+    const img = tile(/pikachu/i).querySelector("img");
+    expect(img).toHaveAttribute("src", "https://img.example/pikachu.png");
+    expect(img).toHaveAttribute("data-mode", "artwork");
+  });
+
   it("marks the tile of the Pokémon whose page this is", () => {
     seed(storedPikachu, storedOldEevee);
     renderWithProviders(<FavoritesList current="eevee" />);

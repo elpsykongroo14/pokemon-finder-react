@@ -9,21 +9,25 @@ export const LOST_ROUTE_WIDTH = 48;
 export const LOST_ROUTE_HEIGHT = 26;
 
 //colors are part of the artwork (like a sprite's palette), so they are
-//written here as literals, not design tokens
+//written here as literals, not design tokens.
+//B&W-8 (spec 7.6): re-colored to the Graphite theme. the same values as
+//the app's neutrals (Ink, Paper, Mist, Line, Graphite and the two greys
+//the binder uses), so the scene sits on the Graphite field like a
+//Pokémon with no type: Mist sign, dark grass, an Ink "!"
 export const LOST_ROUTE_PALETTE = {
-  o: "#2b1d14", //outline
-  k: "#2b1d14", //sign lettering
-  w: "#b07a45", //wood
-  W: "#8f5f33", //plank seam
-  h: "#d39b5f", //wood highlight
-  n: "#3a2a1d", //nails
-  p: "#7a4e2a", //post
-  P: "#5c3a1f", //post shadow
-  g: "#2f7d4a", //grass, dark
-  G: "#4fae5a", //grass, mid
-  L: "#7fd36a", //grass, light
-  B: "#f4f1e6", //bubble
-  r: "#d6453c", //"!"
+  o: "#000000", //outline: Ink
+  k: "#000000", //sign lettering: Ink
+  w: "#eceef1", //wood: Mist
+  W: "#c9cdd4", //plank seam: Line
+  h: "#ffffff", //wood highlight: Paper
+  n: "#4a4e57", //nails: Graphite
+  p: "#a3a8b3", //post
+  P: "#6b7080", //post shadow
+  g: "#1d1f23", //grass, dark
+  G: "#2a2c31", //grass, mid
+  L: "#6b7080", //grass, light
+  B: "#ffffff", //bubble: Paper
+  r: "#000000", //"!": Ink
 } as const;
 
 export const LOST_ROUTE_LAYERS: readonly PixelLayer[] = [
