@@ -10,6 +10,8 @@ import {
   teamCommandHint,
   compareVerdict,
   statLeadText,
+  teamBandText,
+  emptySlotLabel,
   FIRST_FAVORITE,
 } from "./copy";
 
@@ -65,6 +67,31 @@ describe("multiplierSpoken", () => {
     [0, "no damage"],
   ])("says %s as %s", (multiplier, words) => {
     expect(multiplierSpoken(multiplier)).toBe(words);
+  });
+});
+
+//the Team page's title band (spec 7.5): how full the party is, and the
+//reassurance that it is kept; a full party gets its own line
+describe("teamBandText", () => {
+  it("counts the filled slots and says where the team is saved", () => {
+    expect(teamBandText(4)).toBe(
+      "4 of 6 slots filled. Your team is saved in this browser.",
+    );
+    expect(teamBandText(0)).toBe(
+      "0 of 6 slots filled. Your team is saved in this browser.",
+    );
+  });
+
+  it("says the party is ready when all six slots are filled", () => {
+    expect(teamBandText(6)).toBe("Six of six. Your party is ready.");
+  });
+});
+
+//changed in B&W-6: this used to be a hidden "Empty slot 5". the slot now
+//says it on screen (spec 7.5), so the eye and the ear get the same words
+describe("emptySlotLabel", () => {
+  it("names the open slot by its position", () => {
+    expect(emptySlotLabel(5)).toBe("Slot 5 is open");
   });
 });
 

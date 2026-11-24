@@ -2,7 +2,7 @@
 //  1. a classic skip link: Tab once, Enter, and you are past the header
 //  2. a page change announcer: when the URL's path changes, focus moves here
 //   and the link is named after the new page, so a screen reader says
-//   "Your Team: Skip to content, link" and a keyboard user starts here
+//   "Your team: Skip to content, link" and a keyboard user starts here
 import "./SkipLink.css";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useLocation } from "react-router-dom";

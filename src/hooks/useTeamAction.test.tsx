@@ -9,6 +9,9 @@ const hydreigon = {
   id: 635,
   sprites: {},
   types: [],
+  //B&W-6 (D49): adding a member now sums its stats, so the fixture needs
+  //the field a real Pokémon always has
+  stats: [],
 } as unknown as PokemonDetails;
 
 function seedTeam(names: string[]) {

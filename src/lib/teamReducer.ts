@@ -1,5 +1,5 @@
 import type { PokemonDetails, TeamMember } from "./type";
-import { toTeamMember } from "./teamMember";
+import { isIncompleteMember, toTeamMember } from "./teamMember";
 
 export const MAX_TEAM = 6;
 
@@ -41,15 +41,19 @@ export function TeamReducer(state: TeamState, action: TeamAction): TeamState {
       const fresh = toTeamMember(action.payload);
 
       const needsBackfill = state.members.some(
-        (m) => m.name === fresh.name && m.types === undefined,
+        (m) => m.name === fresh.name && isIncompleteMember(m),
       );
       //returning the same object tells react (and our persistence effect) that nothing changed
       if (!needsBackfill) return state;
 
+      //both fields come from the fresh fetch: the API is the source of
+      //truth, and the saved name, id and sprite stay as they were
       return {
         ...state,
         members: state.members.map((m) =>
-          m.name === fresh.name ? { ...m, types: fresh.types } : m,
+          m.name === fresh.name
+            ? { ...m, types: fresh.types, statTotal: fresh.statTotal }
+            : m,
         ),
       };
     }

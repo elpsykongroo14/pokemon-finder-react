@@ -86,4 +86,44 @@ describe("TransitionLink", () => {
     expect(link).toHaveClass("btn");
     expect(link).toHaveAttribute("data-variant", "line");
   });
+
+  //the same two sizes as Button (spec 5.2), read by Button.css from
+  //data-size. B&W-6's team cards use the small one
+  it("is the regular size unless told otherwise", () => {
+    renderLink();
+
+    expect(screen.getByRole("link", { name: "Compare" })).toHaveAttribute(
+      "data-size",
+      "md",
+    );
+  });
+
+  it("can be the small size", () => {
+    render(
+      <MemoryRouter>
+        <TransitionLink to="/" variant="line" size="sm">
+          Details
+        </TransitionLink>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("link", { name: "Details" })).toHaveAttribute(
+      "data-size",
+      "sm",
+    );
+  });
+
+  it("has no size when it is not drawn like a button", () => {
+    render(
+      <MemoryRouter>
+        <TransitionLink to="/" className="tile">
+          Pikachu
+        </TransitionLink>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("link", { name: "Pikachu" })).not.toHaveAttribute(
+      "data-size",
+    );
+  });
 });
