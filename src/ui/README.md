@@ -2,9 +2,11 @@
 
 # src/ui/
 
-Generic, reusable UI primitives — Button, Panel, Tabs, StatMeter,
-and so on (see the R3 primitives table in
-docs/UI-REHAUL-ROADMAP.md).
+Generic, reusable UI primitives — Button, Dialog, Tabs, StatMeter,
+SegmentedControl and so on (see the R3 primitives table in
+docs/UI-REHAUL-ROADMAP.md). B&W-8 deleted the ones the Black & White
+redesign left unused (Panel, StageConsole, Menu, MenuItem, Cursor, Toggle,
+Input); git history keeps them if a later screen needs one back.
 
 Rules for anything that lives in this folder:
 

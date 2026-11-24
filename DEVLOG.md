@@ -261,3 +261,33 @@ Logic, tests first:
 - HeaderSearch, a disclosure with aria-expanded and aria-controls, which focuses the field from an effect once it's visible.
 - spriteUrlFromId, which replaced a details fetch on every arrow key.
 - "No. 025" everywhere.
+
+11-23-2026: UI rehaul, Pokémon page
+The big one. Every Pokémon now appears in an encounter field: a sky in its type color, a darker ground, stripes in its second type, and a battle platform. A black slab wipes across, the sprite drops in as a silhouette and flashes into color, and a black name plate slides in with the dex number, the name, the chips, the base stat total and the four actions. Favorites became a rail of tiles under the field. On desktop the details are all visible at once; on phones they're tabs.
+Logic, tests first:
+
+- useMediaQuery with useSyncExternalStore, my first external-store hook.
+- Toggles that return what they did, so the page can say it in one live line.
+- evolutionCondition, which shows "Level 50" and "Dusk Stone".
+- groupMatchups and formatSlug.
+  What I learned: the encounter restarts by itself through one key on the inner layer, and the field must not have one, or its sky would be born with the new color and skip the swap under the slab. A test checks that the field is the same DOM node across Pokémon.
+
+  11-23-2026: UI rehaul, Home & Compare
+  Home is one encounter field: the Stage and the wipe are keyed by name, the field, the dialog and the command plate are not. A keyed plate would throw "Look for another" away mid-click and drop focus; an unkeyed live region is what makes the new greeting get announced. The dialog types line by line in CSS (clip-path in steps of the line's length), and only the keyframe covers the text.
+  Logic, tests first: pickNextEncounterId (never the same Pokémon; steps to the next number instead of rolling again), rolled in the click handler because React may run updaters twice; pickForSide / swapPair (picking the other side's Pokémon swaps); useComparePageState, which remembers what was on screen so a pick or a Swap keeps the comparison up (pending, aria-busy) and keeps focus in the picker.
+  Compare: two halves wearing their own data-type, each bar in the duel wearing its side's type, "+n" leads instead of arrows, a total row, a verdict live line. SearchBar ids come from useId (three on one page; this also fixes Library's duplicate ids). New .on-light scope for the white autocomplete panel inside the black band.
+
+11-24-2026: UI rehaul, Team
+The Team page is a black title band and six party cards. Each card is a small encounter field (FieldSky reused; data-type and data-type2 on the card pick its colors), then dex number, Lead tag, name, chips, base stat total and Remove.
+Logic, tests first: team members save their stat total (D49); favorites don't. One rule, isIncompleteMember, decides both what the reducer may backfill and whom the backfill hook fetches next. Removing with animations off is immediate, because an animation that never runs never ends.
+The card has one link, the name, stretched over the card; "Details" is decoration, so a keyboard user gets one stop per card, not two.
+
+11-24-2026: UI rehaul, Library
+The Library is a hero (the hand of three, dealt in), a sticky toolbar, and three views of the same cards: a series timeline, a six-column table, and binder spreads. One card face, HoloCard, everywhere; the button around it owns the pointer and the tilt variables inherit down.
+Logic, tests first: card numbers, stages and dates; grouping by series or tier; the hand; a summary that both the hero's sentence and the Pokémon page's teaser read; card stepping by id; binder spreads that keep ?page= meaning one page (D54).
+Keys did the motion again: the flipper per card, binder pages per page number, the hand per Pokémon, the grid per view and sort. The page turn stores where it was going, so Back never replays it.
+
+11-24-2026: UI rehaul, pass and polish
+Audited in a real browser, not just jsdom: 18 routes and states at three widths with axe (contrast on), a focus-ring walk, overflow and console checks; forced loading and offline states; a motion pass in three modes; 320 px, the 1000 px edge and long names.
+Found and fixed: a misspelled class (lost-rout) that kept the 404's styles from ever applying; focus dropping to <body> when Next disabled itself at the end of the binder or dialog; a second banner landmark from the settings dialog's <header>; pixelated artwork in the favorites rail; 1x Compare sprites on phones; cramped Home commands at 1001-1279 px.
+Finished the spec's states: loading dialog, Library Retry, dark Retry, Graphite 404, display PageHeader. Deleted seven unused primitives and the old scope and tokens.

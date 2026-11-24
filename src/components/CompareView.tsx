@@ -43,8 +43,11 @@ interface CompareViewProps {
 }
 
 //each half of the field is smaller than a whole field: a 3x sprite still
-//fits on desktop, phones get a 1x or 2x one (integerScale picks)
-const VERSUS_SPRITE_BOX: SpriteBox = { wide: 300, stacked: 150 };
+//fits on desktop. on phones 192 is exactly 2x a 96 px sprite (B&W-8: at
+//150 every phone sprite fell back to 1x and Pikachu was a speck). a half
+//is about 187 px at 375, and a sprite's own transparent margin covers
+//the difference
+const VERSUS_SPRITE_BOX: SpriteBox = { wide: 300, stacked: 192 };
 
 //the attributes that re-skin one side. the type themes are attribute
 //selectors (type-themes.css), so ANY element can wear one, and everything

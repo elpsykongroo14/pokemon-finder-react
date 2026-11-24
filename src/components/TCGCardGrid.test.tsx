@@ -4,6 +4,7 @@ import { TCGCardGrid } from "./TCGCardGrid";
 import userEvent from "@testing-library/user-event";
 import type { TCGCard } from "../lib/type";
 import { CARDS_LOADING_LABEL } from "../lib/copy";
+import { PreferencesProvider } from "../context/PreferencesContext";
 
 function makeCard(id: string, name: string): TCGCard {
   return { id, name };
@@ -29,17 +30,22 @@ describe("TCGCardGrid", () => {
   });
 
   it("shows the empty message when statu is empty", () => {
+    //changed in B&W-8: the sentence sits in the battle dialog now (spec
+    //7.6), which needs the preferences (it types) and speaks through a live
+    //region, so it is found by its role instead of a bare paragraph
     render(
-      <TCGCardGrid
-        cards={[]}
-        status="empty"
-        error={null}
-        emptyMessage="No cards found"
-        onSelect={() => {}}
-      />,
+      <PreferencesProvider>
+        <TCGCardGrid
+          cards={[]}
+          status="empty"
+          error={null}
+          emptyMessage="No cards found"
+          onSelect={() => {}}
+        />
+      </PreferencesProvider>,
     );
 
-    expect(screen.getByText("No cards found")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("No cards found");
   });
 
   it("renders one grid item per card when status is succes", () => {

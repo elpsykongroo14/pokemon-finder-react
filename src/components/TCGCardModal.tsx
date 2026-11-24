@@ -48,6 +48,26 @@ export function TCGCardModal({
   const faceRef = useRef<HTMLDivElement>(null);
   const holoHandlers = useHoloPointer(faceRef, true);
 
+  //B&W-8: a step that reaches either end disables the button that was
+  //just pressed, and focus would fall out of the dialog. move it to the
+  //way back instead, only when focus really was lost
+  const previousRef = useRef<HTMLButtonElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const active = document.activeElement;
+    if (
+      next === null &&
+      (active === document.body || active === nextRef.current)
+    ) {
+      previousRef.current?.focus();
+    } else if (
+      previous === null &&
+      (active === document.body || active === previousRef.current)
+    ) {
+      nextRef.current?.focus();
+    }
+  }, [card.id, next, previous]);
+
   //← and → anywhere in the dialog, like Esc (which Dialog already owns).
   //the newest previous/next are read through the effect's dependencies,
   //so the listener is replaced whenever the card changes
@@ -124,6 +144,7 @@ export function TCGCardModal({
           {cards.length > 1 && (
             <div className="card-dialog__nav">
               <Button
+                ref={previousRef}
                 variant="ghost"
                 disabled={previous === null}
                 onClick={() => previous && onSelect?.(previous)}
@@ -132,6 +153,7 @@ export function TCGCardModal({
                 {PREVIOUS_CARD}
               </Button>
               <Button
+                ref={nextRef}
                 variant="light"
                 disabled={next === null}
                 onClick={() => next && onSelect?.(next)}

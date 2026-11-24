@@ -17,7 +17,6 @@
     0.96,
     1
   ); /* celebrations, spring like */
-  --ease-tick: steps(6, end); /* HP bar chunky fill */
   /* R10B: fast start, long soft landing. Plates, bars, hover wipes */
   --ease-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* R10B: overshoots and springs back. Brand mark, VS slam, hop */

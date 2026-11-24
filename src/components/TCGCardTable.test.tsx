@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { TCGCardTable } from "./TCGCardTable";
 import type { TCGCard } from "../lib/type";
 import { CARDS_LOADING_LABEL } from "../lib/copy";
+import { PreferencesProvider } from "../context/PreferencesContext";
 
 const CARDS: TCGCard[] = [
   {
@@ -38,7 +39,13 @@ function renderTable(
     onSelect: () => {},
     ...overrides,
   };
-  return render(<TCGCardTable {...props} />);
+  //the provider: the error and empty sentences sit in the battle dialog,
+  //which reads the animation preference (B&W-8)
+  return render(
+    <PreferencesProvider>
+      <TCGCardTable {...props} />
+    </PreferencesProvider>,
+  );
 }
 
 //the card names in the order the rows are currently shown.
@@ -222,12 +229,15 @@ describe("TCGCardTable", () => {
       error: "Could not load cards",
       cards: [],
     });
-    expect(screen.getByText("Could not load cards")).toBeInTheDocument();
+    //changed in B&W-8: the sentence sits in the battle dialog now (spec
+    //7.6), which needs the preferences (it types) and speaks through a live
+    //region, so it is found by its role instead of a bare paragraph
+    expect(screen.getByRole("alert")).toHaveTextContent("Could not load cards");
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
     unmount();
 
     renderTable({ status: "empty", cards: [], emptyMessage: "Nothing here" });
-    expect(screen.getByText("Nothing here")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Nothing here");
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 });

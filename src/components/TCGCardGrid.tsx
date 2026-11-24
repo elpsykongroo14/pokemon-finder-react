@@ -20,6 +20,8 @@ interface TCGCardGridprops {
   sortMode?: SortMode;
   //the view or the sort just changed: the tiles rise in (spec 6.2)
   entering?: boolean;
+  //asks for the cards again after a failure (B&W-8)
+  onRetry?: () => void;
 }
 
 //the grid as a timeline (spec 7.4): one group per series (or per tier,
@@ -34,6 +36,7 @@ export function TCGCardGrid({
   onSelect,
   sortMode = "newest",
   entering = false,
+  onRetry,
 }: TCGCardGridprops) {
   if (status === "loading") {
     return (
@@ -54,6 +57,7 @@ export function TCGCardGrid({
         status={status}
         error={error}
         emptyMessage={emptyMessage}
+        onRetry={onRetry}
       />
     );
   }

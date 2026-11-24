@@ -170,3 +170,79 @@ describe("the field and its plate", () => {
     ).toBeGreaterThanOrEqual(AA_TEXT);
   });
 });
+
+//B&W-8, the contrast pass (spec 10, B&W-8): every pair the Team and
+//Library slices added. a mark is text, so its words need 4.5:1 on its own
+//fill; a ring or an outline is a UI boundary, 3:1
+describe("the rarity tier marks (B&W-7)", () => {
+  it.each(["common", "rare", "holo"])(
+    "the %s mark's words are readable on its fill",
+    (tier) => {
+      expect(
+        contrastRatio(
+          resolveHex(`tier-${tier}-ink`),
+          resolveHex(`tier-${tier}-fill`),
+        ),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    },
+  );
+
+  //the ultra fill is a gradient through four foil colors: the Ink words
+  //must read on every one of them, wherever the word happens to sit
+  it.each(["foil-pink", "foil-yellow", "foil-mint", "foil-blue"])(
+    "the ultra mark's words are readable on %s",
+    (stop) => {
+      expect(
+        contrastRatio(resolveHex("tier-ultra-ink"), resolveHex(stop)),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    },
+  );
+
+  //a holo mark is Ink: on a black plate its ring turns white to exist
+  it("keeps the holo mark's ring visible on a black plate", () => {
+    expect(
+      contrastRatio(
+        resolveHex("tier-holo-ring", block(semantic, ".on-dark")),
+        resolveHex("surface-ink"),
+      ),
+    ).toBeGreaterThanOrEqual(AA_UI);
+  });
+});
+
+describe("the binder (B&W-7)", () => {
+  it("writes its closing line readably on the page grey", () => {
+    expect(
+      contrastRatio(
+        resolveHex("text-end-note"),
+        resolveHex("surface-binder-page"),
+      ),
+    ).toBeGreaterThanOrEqual(AA_TEXT);
+  });
+
+  it("draws its rings so they show on the black binder", () => {
+    expect(
+      contrastRatio(resolveHex("binder-ring"), resolveHex("surface-ink")),
+    ).toBeGreaterThanOrEqual(AA_UI);
+  });
+});
+
+describe("the card dialog's black stage (B&W-7)", () => {
+  //the scrim is 92 % black over the page: over white that is #141414, the
+  //lightest the stage can get, so it is the case to check
+  const STAGE = "#141414";
+
+  it.each(["text-primary", "text-secondary", "text-tertiary"])(
+    "--%s is readable on the stage",
+    (text) => {
+      expect(
+        contrastRatio(resolveHex(text, block(semantic, ".on-dark")), STAGE),
+      ).toBeGreaterThanOrEqual(AA_TEXT);
+    },
+  );
+
+  it("outlines the keyboard hint's keys visibly", () => {
+    expect(
+      contrastRatio(resolveHex("border-key"), STAGE),
+    ).toBeGreaterThanOrEqual(AA_UI);
+  });
+});

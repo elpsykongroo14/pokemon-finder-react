@@ -64,13 +64,6 @@
     min-width: 0;
   }
 
-  .library-loading,
-  .library-empty {
-    color: var(--text-secondary);
-    text-align: center;
-    padding: var(--space-7) 0;
-  }
-
   @media (max-width: 1000px) {
     .card-group {
       grid-template-columns: minmax(0, 1fr);

@@ -1,8 +1,14 @@
 /* Title + purpose on the left, page-wide actions on the right; they wrap
-   onto two rows on narrow screens. A short gold bar under the title is the
-   app's "you are here" mark, the same gold as the nav cursor. */
+   onto two rows on narrow screens. B&W-8: the title is the display style
+   every Black & White page title uses (Archivo 900 italic, wide), at the
+   46 px the spec gives Compare, and a 2 px Ink rule closes the header.
+   The old "you are here" bar under the title is gone: the nav's Ink
+   plate already says where you are. Used by the states that have no
+   field or band of their own (Compare before both sides load, the 404). */
 @layer features {
   .page-header {
+    --page-title-size: 2.875rem; /* 46 px */
+
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -10,7 +16,7 @@
     gap: var(--space-3) var(--space-5);
     margin-bottom: var(--space-5);
     padding-bottom: var(--space-4);
-    border-bottom: var(--border-width-line) solid var(--border-hairline);
+    border-bottom: var(--border-width-line) solid var(--border-line);
   }
 
   .page-header__text {
@@ -20,24 +26,19 @@
   .page-header__title {
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 400;
-    font-size: var(--text-2xl);
-    line-height: 1;
+    font-size: var(--page-title-size);
+    font-weight: var(--weight-black);
+    font-style: italic;
+    font-stretch: var(--width-display);
+    letter-spacing: var(--tracking-display);
+    line-height: var(--leading-display);
     color: var(--text-primary);
   }
 
-  .page-header__title::after {
-    content: "";
-    display: block;
-    width: 2.5rem;
-    height: 4px;
-    margin-top: var(--space-2);
-    background: var(--accent-select);
-  }
-
   .page-header__subtitle {
-    margin: var(--space-2) 0 0;
     max-width: 60ch;
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-lg);
     color: var(--text-secondary);
   }
 
@@ -45,5 +46,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+  }
+
+  @media (max-width: 1000px) {
+    .page-header {
+      --page-title-size: var(--text-display-phone);
+    }
   }
 }

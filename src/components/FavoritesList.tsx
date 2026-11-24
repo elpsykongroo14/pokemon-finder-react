@@ -1,6 +1,8 @@
 import "./FavoritesList.css";
 import { useId, useState } from "react";
 import { useFavorites } from "../hooks/useFavorites";
+import { usePreferences } from "../hooks/usePreferences";
+import { listSpriteUrl } from "../lib/sprites";
 import { TransitionLink } from "./TransitionLink";
 import { EMPTY_FAVORITES, FAVORITES_LABEL } from "../lib/copy";
 
@@ -19,6 +21,9 @@ interface FavoritesListProps {
 //readout sections and wrongly "own" them in the outline
 export function FavoritesList({ current }: FavoritesListProps) {
   const { favorites } = useFavorites();
+  //the sprite setting every other sprite follows (B&W-8): pixel sprites
+  //come from the dex number, artwork is the image saved with the favorite
+  const { spriteMode } = usePreferences();
   const captionId = useId();
 
   //the favorites that were there when the rail first rendered. they did
@@ -53,10 +58,11 @@ export function FavoritesList({ current }: FavoritesListProps) {
                 data-type={f.types?.[0]}
                 data-new={!namesAtStart.has(f.name) || undefined}
               >
-                {f.sprite && (
+                {listSpriteUrl(spriteMode, f) && (
                   <img
                     className="favorite-tile__sprite"
-                    src={f.sprite}
+                    data-mode={spriteMode}
+                    src={listSpriteUrl(spriteMode, f) ?? undefined}
                     alt=""
                     width={96}
                     height={96}

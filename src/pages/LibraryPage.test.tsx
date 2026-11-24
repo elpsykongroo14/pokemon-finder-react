@@ -39,11 +39,13 @@ vi.mock("../components/TCGCardGrid", () => ({
     emptyMessage,
     onSelect,
     entering,
+    onRetry,
   }: {
     status: string;
     emptyMessage: string;
     onSelect: (card: { id: string; name: string }) => void;
     entering?: boolean;
+    onRetry?: () => void;
   }) => (
     <div
       data-testid="tcg-card-grid"
@@ -54,6 +56,7 @@ vi.mock("../components/TCGCardGrid", () => ({
       <button onClick={() => onSelect({ id: "1", name: "Pikachu Card" })}>
         fake-select-card
       </button>
+      <button onClick={onRetry}>fake-retry</button>
     </div>
   ),
 }));
@@ -94,6 +97,7 @@ function makeLibraryState(
     error: null,
     sortMode: "newest" as const,
     setSortMode: vi.fn(),
+    retry: vi.fn(),
     ...overrides,
   };
 }
@@ -320,6 +324,20 @@ describe("LibraryPage", () => {
 
     await user.click(screen.getByRole("button", { name: "fake-close-modal" }));
     expect(screen.queryByTestId("tcg-card-modal")).not.toBeInTheDocument();
+  });
+
+  //B&W-8 (spec 7.6): a failed load's Retry is the hook's retry
+  it("hands the views the hook's retry", async () => {
+    const retry = vi.fn();
+    vi.mocked(useTCGLibrary).mockReturnValue(
+      makeLibraryState({ status: "error", retry }),
+    );
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library");
+    await user.click(screen.getByRole("button", { name: "fake-retry" }));
+
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 
   //tile in (spec 6.2): when the view or the sort changes, never on load

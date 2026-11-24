@@ -1,7 +1,8 @@
+/* The Library's sentence when there are no cards to draw (B&W-8): the
+   battle dialog, centered in the view, no wider than a short line reads */
 @layer features {
-  .library-empty {
-    color: var(--text-secondary);
-    text-align: center;
-    padding: var(--space-7) 0;
+  .library-notice {
+    width: min(100%, 640px);
+    margin: var(--space-7) auto;
   }
 }

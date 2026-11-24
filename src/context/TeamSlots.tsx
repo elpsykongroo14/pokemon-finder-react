@@ -21,6 +21,7 @@ import { usePreferences } from "../hooks/usePreferences";
 import { MAX_TEAM } from "../lib/teamReducer";
 import { formatDexNumber } from "../lib/dex";
 import { MAX_STAT_TOTAL, percentOf } from "../lib/stats";
+import { listSpriteUrl } from "../lib/sprites";
 import {
   BASE_STAT_TOTAL_LABEL,
   DETAILS_LABEL,
@@ -164,16 +165,23 @@ interface PartyCardProps {
 //and the actions. the <li> around it owns the theme (data-type) and the
 //exit animation; this only draws
 function PartyCard({ member, isLead, onRemove }: PartyCardProps) {
+  //the sprite setting the Pokémon page follows (B&W-8, left open by D65):
+  //pixel sprites come from the dex number, so even a member saved
+  //without one has a picture; artwork is the image saved with the member
+  const { spriteMode } = usePreferences();
+  const sprite = listSpriteUrl(spriteMode, member);
+
   return (
     <>
       {/* scenery only: the name below already says who this is */}
       <div className="team-slot__field" aria-hidden="true">
         <FieldSky />
         <span className="team-slot__platform" />
-        {member.sprite && (
+        {sprite && (
           <img
             className="team-slot__sprite"
-            src={member.sprite}
+            data-mode={spriteMode}
+            src={sprite}
             alt=""
             width={96}
             height={96}

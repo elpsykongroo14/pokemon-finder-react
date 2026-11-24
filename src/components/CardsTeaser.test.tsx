@@ -38,6 +38,7 @@ function libraryState(
     error: null,
     sortMode: "newest" as const,
     setSortMode: vi.fn(),
+    retry: vi.fn(),
     ...overrides,
   };
 }

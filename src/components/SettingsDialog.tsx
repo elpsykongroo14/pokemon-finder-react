@@ -41,10 +41,12 @@ export function SettingsDialog({ onClose }: SettingsDialogProps) {
   return (
     <Dialog aria-label={SETTINGS_LABEL} onClose={onClose}>
       <div className="settings">
-        <header className="settings__header">
+        {/* a div, not a <header>: the dialog lives outside <main>, where a
+            <header> is the page's banner landmark (a second one, while open) */}
+        <div className="settings__header">
           <h2 className="settings__title">{SETTINGS_LABEL}</h2>
           <p className="settings__note">{SETTINGS_NOTE}</p>
-        </header>
+        </div>
 
         <div className="settings__rows">
           <SegmentedControl

@@ -41,10 +41,6 @@
   --foil-yellow: #fff3b0;
   --foil-mint: #c6f7e9;
   --foil-blue: #cdd8ff;
-  --foil-pink-a50: rgba(255, 214, 232, 0.5);
-  --foil-yellow-a50: rgba(255, 243, 176, 0.5);
-  --foil-mint-a50: rgba(198, 247, 233, 0.5);
-  --foil-blue-a50: rgba(205, 216, 255, 0.5);
   /* the light that runs across a holo card (B&W-7): the same four hues,
      saturated, so color-dodge has something to brighten with */
   --foil-band-pink: rgba(255, 60, 160, 0.5);

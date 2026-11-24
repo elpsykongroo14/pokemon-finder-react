@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ReactNode, type Ref } from "react";
 import "./Button.css";
 import { Spinner } from "./Spinner";
 
@@ -19,6 +19,9 @@ interface ButtonProps
   size?: ButtonSize;
   pressed?: boolean;
   loading?: boolean;
+  //React 19 passes ref as an ordinary prop; ...rest hands it to <button>.
+  //declared so a caller can move focus to a Button (B&W-8)
+  ref?: Ref<HTMLButtonElement>;
   children: ReactNode;
 }
 
