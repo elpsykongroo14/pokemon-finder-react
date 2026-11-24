@@ -74,8 +74,14 @@
     width: var(--tile-sprite);
     height: var(--tile-sprite);
     translate: -50% -54%;
-    image-rendering: pixelated;
+    object-fit: contain;
     transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  /* a pixel sprite at its own 96 px: crisp. Artwork scales smoothly
+     (B&W-8: pixelated artwork shrank in hard steps and looked broken) */
+  .favorite-tile__sprite[data-mode="pixel"] {
+    image-rendering: pixelated;
   }
 
   /* the ring follows the slant, like the buttons: a skewed ::after 6 px

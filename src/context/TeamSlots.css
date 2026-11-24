@@ -100,6 +100,11 @@
     transition: transform var(--dur-base) var(--ease-spring);
   }
 
+  /* a 96 px pixel sprite in the 192 px box: exactly 2x, kept crisp */
+  .team-slot__sprite[data-mode="pixel"] {
+    image-rendering: pixelated;
+  }
+
   /* hop (spec 6.2): the sprite answers a pointer on the card, or keyboard
      focus on its link. A token transition: still with motion off */
   .team-slot--filled:hover .team-slot__sprite,
@@ -262,11 +267,6 @@
   .team-slot__remove {
     position: relative;
     z-index: 1;
-  }
-
-  .team-slot__remove .icon-btn {
-    font-size: var(--text-xl);
-    line-height: 1;
   }
 
   /* ---- an open slot ---- */

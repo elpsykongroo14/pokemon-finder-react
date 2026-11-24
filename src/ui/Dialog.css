@@ -67,10 +67,6 @@
     background: none;
   }
 
-  .dialog[data-variant="stage"] .dialog__close .icon-btn {
-    font-size: var(--text-2xl);
-  }
-
   .dialog[data-variant="stage"] .dialog__close {
     top: calc(var(--space-2) * -1);
     right: calc(var(--space-2) * -1);

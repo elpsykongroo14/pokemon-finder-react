@@ -83,6 +83,30 @@
       calc(var(--command-edge) + var(--space-6));
   }
 
+  /* B&W-8: between the phone breakpoint and 1280 px the 46 % plate left
+     its commands about 216 px, and every title broke onto two lines. A
+     little wider, with a shorter slant and less padding, they fit */
+  @media (min-width: 1001px) and (max-width: 1279px) {
+    .home-page {
+      --command-edge: 96px;
+    }
+
+    .home-page .battle-menu {
+      width: 50%;
+    }
+
+    /* the stage slot (and the dialog in it) ends where the plate begins,
+       or the plate's slant would cover the dialog's right edge */
+    .home-stage {
+      width: 50%;
+    }
+
+    .home-page .battle-menu__inner {
+      padding-right: var(--space-5);
+      padding-left: calc(var(--command-edge) + var(--space-5));
+    }
+  }
+
   @media (max-width: 1000px) {
     .home-stage {
       position: relative;
