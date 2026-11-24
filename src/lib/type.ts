@@ -134,12 +134,22 @@ export interface TCGCard {
   artist?: string;
   flavorText?: string;
   supertypes?: string[];
+  //B&W-7 (spec 7.4): fields the API already sent that we now read.
+  //number is a string because promos print codes ("SWSH037");
+  //subtypes holds the stage ("Basic", "Stage 1", ...) among other tags
+  number?: string;
+  subtypes?: string[];
+  types?: string[];
   images?: {
     small?: string;
     large?: string;
   };
   set?: {
     name?: string;
+    //the era the set belongs to ("Scarlet & Violet"): the grid's groups
+    series?: string;
+    //the number printed after the slash on the card: 240/191
+    printedTotal?: number;
     releaseDate?: string;
   };
 }

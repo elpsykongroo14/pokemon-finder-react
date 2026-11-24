@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { TCGCardGrid } from "./TCGCardGrid";
 import userEvent from "@testing-library/user-event";
 import type { TCGCard } from "../lib/type";
@@ -78,6 +78,88 @@ describe("TCGCardGrid", () => {
     await user.click(screen.getByRole("button", { name: /Charizard/ }));
 
     expect(handleSelect).toHaveBeenCalledWith(cards[0]);
+  });
+});
+
+//B&W-7 (spec 7.4): the grid is a timeline, grouped by series with a date
+//sort and by tier with the rarity sort; each group is headed by its name,
+//its years and its count
+describe("TCGCardGrid as a timeline", () => {
+  const cards: TCGCard[] = [
+    {
+      id: "a",
+      name: "Hydreigon",
+      rarity: "Common",
+      set: { series: "Mega Evolution", releaseDate: "2026/09/16" },
+    },
+    {
+      id: "b",
+      name: "Hydreigon ex",
+      rarity: "Ultra Rare",
+      set: { series: "Scarlet & Violet", releaseDate: "2025/07/18" },
+    },
+    {
+      id: "c",
+      name: "Hydreigon ex",
+      rarity: "Double Rare",
+      set: { series: "Scarlet & Violet", releaseDate: "2023/06/09" },
+    },
+  ];
+
+  function renderGrid(sortMode: "newest" | "rarity") {
+    return render(
+      <TCGCardGrid
+        cards={cards}
+        status="success"
+        error={null}
+        emptyMessage="No cards"
+        onSelect={() => {}}
+        sortMode={sortMode}
+      />,
+    );
+  }
+
+  it("heads a group per series, in the order the cards come", () => {
+    renderGrid("newest");
+
+    expect(
+      screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent),
+    ).toEqual(["Mega Evolution", "Scarlet & Violet"]);
+  });
+
+  it("names each group as a region, with its years and its count", () => {
+    renderGrid("newest");
+
+    const group = screen.getByRole("region", { name: "Scarlet & Violet" });
+    expect(group).toHaveTextContent("2023 to 2025");
+    expect(group).toHaveTextContent("2 cards");
+    expect(within(group).getAllByRole("button")).toHaveLength(2);
+  });
+
+  it("groups by tier when sorted by rarity", () => {
+    renderGrid("rarity");
+
+    expect(
+      screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent),
+    ).toEqual(["Ultra rare and up", "Holo", "Common"]);
+  });
+
+  //tile in plays when the page says the arrangement changed, not on load
+  it("marks itself as entering only when asked", () => {
+    const { container, rerender } = renderGrid("newest");
+    expect(container.querySelector("[data-entering]")).toBeNull();
+
+    rerender(
+      <TCGCardGrid
+        cards={cards}
+        status="success"
+        error={null}
+        emptyMessage="No cards"
+        onSelect={() => {}}
+        entering
+      />,
+    );
+    expect(container.querySelector("[data-entering]")).toBeInTheDocument();
   });
 });
 

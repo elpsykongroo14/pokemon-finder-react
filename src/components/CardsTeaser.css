@@ -1,0 +1,95 @@
+/* The cards teaser (spec 7.2): a section under the readout, in the same
+   1240 px measure. On the left three of the rarest cards in a fan (170 px
+   wide, turned 12deg either way, 112 px apart, the middle one raised
+   10 px), spreading further on hover; on the right one sentence and a
+   dark button. Phones: the fan above the words, a little smaller. */
+@layer features {
+  .cards-teaser {
+    --fan-card: 170px;
+    --fan-spread: 112px;
+    --fan-spread-open: 136px;
+    --fan-turn: 12deg;
+    --fan-turn-open: 16deg;
+    --fan-height: 300px;
+
+    width: min(100%, var(--measure-page));
+    margin-inline: auto;
+    padding: 0 var(--space-7) calc(var(--space-7) + var(--space-2));
+  }
+
+  .cards-teaser__body {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-6) calc(var(--space-8) + var(--space-2));
+    align-items: center;
+  }
+
+  .cards-teaser__fan {
+    position: relative;
+    height: var(--fan-height);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cards-teaser__card {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: var(--fan-card);
+    margin-left: calc(var(--fan-card) / -2);
+    transform-origin: 50% 100%;
+    transition: transform var(--dur-slow) var(--ease-settle);
+  }
+
+  .cards-teaser__card[data-slot="center"] {
+    z-index: 1;
+    transform: translateY(calc(var(--space-2) * -1 - var(--border-width-line)));
+  }
+
+  .cards-teaser__card[data-slot="left"] {
+    transform: translateX(calc(var(--fan-spread) * -1))
+      rotate(calc(var(--fan-turn) * -1));
+  }
+
+  .cards-teaser__card[data-slot="right"] {
+    transform: translateX(var(--fan-spread)) rotate(var(--fan-turn));
+  }
+
+  /* the fan opens when the pointer is anywhere over the section */
+  .cards-teaser:hover [data-slot="left"] {
+    transform: translateX(calc(var(--fan-spread-open) * -1))
+      rotate(calc(var(--fan-turn-open) * -1));
+  }
+
+  .cards-teaser:hover [data-slot="right"] {
+    transform: translateX(var(--fan-spread-open)) rotate(var(--fan-turn-open));
+  }
+
+  .cards-teaser__text {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .cards-teaser__sentence {
+    margin: 0;
+    font-size: var(--text-lg);
+    line-height: var(--leading-body);
+  }
+
+  @media (max-width: 1000px) {
+    .cards-teaser {
+      --fan-card: 120px;
+      --fan-spread: 80px;
+      --fan-spread-open: 92px;
+      --fan-height: 210px;
+
+      padding: 0 var(--space-gutter-phone) var(--space-7);
+    }
+
+    .cards-teaser__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

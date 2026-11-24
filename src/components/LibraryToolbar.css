@@ -1,0 +1,136 @@
+/* The Library's sticky toolbar (spec 7.4): white, a 2 px Ink rule under
+   it, held at the top of the window while the cards scroll. Its height is
+   the page's --library-toolbar-height, which the grid's sticky era
+   headings read to stop just below it.
+
+   Phones: the count and legend step aside; the view switch and the sort
+   (label hidden) share one row. */
+@layer features {
+  .library-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    min-height: var(--library-toolbar-height);
+    border-bottom: var(--border-width-line) solid var(--border-line);
+    background: var(--surface-paper);
+  }
+
+  .library-toolbar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--space-4) - var(--space-1) / 2)
+      calc(var(--space-6) - var(--space-1));
+    max-width: var(--measure-library);
+    margin: 0 auto;
+    padding: calc(var(--space-4) - var(--space-1) / 2) var(--space-gutter);
+  }
+
+  .library-toolbar__count {
+    min-width: 5ch;
+    margin: 0;
+    font-size: var(--text-title);
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+  }
+
+  .library-toolbar__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--space-1) + var(--border-width-line))
+      calc(var(--space-4) + var(--border-width-line));
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-chip);
+    color: var(--text-secondary);
+    list-style: none;
+  }
+
+  .library-toolbar__legend li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .library-toolbar__end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    margin-left: auto;
+  }
+
+  .library-toolbar__sort {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-2) + var(--border-width-line));
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+  }
+
+  .library-toolbar .segmented__icon {
+    display: inline-grid;
+    margin-right: var(--space-2);
+    vertical-align: middle;
+  }
+
+  @media (max-width: 1000px) {
+    .library-toolbar__inner {
+      flex-wrap: nowrap;
+      padding: var(--space-3) var(--space-gutter-phone);
+    }
+
+    .library-toolbar__count,
+    .library-toolbar__legend {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .library-toolbar__end {
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      width: 100%;
+      margin-left: 0;
+    }
+
+    /* three views and a sort in 335 px: the words carry the views, the
+       icons step aside, and the options tighten */
+    .library-toolbar .segmented__icon {
+      display: none;
+    }
+
+    .library-toolbar .segmented__options {
+      flex-wrap: nowrap;
+    }
+
+    .library-toolbar .segmented__option {
+      flex: none;
+    }
+
+    .library-toolbar .segmented__label {
+      padding: 0 var(--space-3);
+    }
+
+    .library-toolbar__sort {
+      flex: none;
+    }
+
+    .library-toolbar__sort .select {
+      width: auto;
+    }
+
+    /* the word "Sort" stays for screen readers; the select says it */
+    .library-toolbar__sort label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+}

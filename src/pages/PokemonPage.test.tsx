@@ -24,6 +24,14 @@ vi.mock("../components/PokemonReadout", () => ({
     <div data-testid="pokemon-readout">{pokemon.name}</div>
   ),
 }));
+//B&W-7: the cards teaser has its own tests and fetches from the card
+//proxy; this page only places it
+vi.mock("../components/CardsTeaser", () => ({
+  CardsTeaser: ({ name }: { name: string }) => (
+    <div data-testid="cards-teaser">{name}</div>
+  ),
+}));
+
 vi.mock("../components/FavoritesList", () => ({
   FavoritesList: ({ current }: { current?: string }) => (
     <nav data-testid="favorites-rail">{current ?? "none"}</nav>
@@ -167,6 +175,8 @@ describe("PokemonPage", () => {
 
     expect(screen.getByTestId("pokemon-card")).toHaveTextContent("pikachu");
     expect(screen.getByTestId("pokemon-readout")).toHaveTextContent("pikachu");
+    //B&W-7: and the cards teaser under it, for the same Pokémon
+    expect(screen.getByTestId("cards-teaser")).toHaveTextContent("pikachu");
   });
 
   //the rail marks the tile of the Pokémon on screen; while loading there

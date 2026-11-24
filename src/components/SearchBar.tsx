@@ -33,6 +33,9 @@ interface SearchBarProps {
   //true: the field empties after a submit. for pickers whose choice shows
   //up elsewhere on the page (the identity band shows the picked name)
   clearOnSubmit?: boolean;
+  //true: the submit button shows its word ("Search") instead of the
+  //magnifier (the Library hero, spec 7.4)
+  submitText?: boolean;
 }
 
 export function SearchBar({
@@ -43,6 +46,7 @@ export function SearchBar({
   labelVisible = false,
   inputId,
   clearOnSubmit = false,
+  submitText = false,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -154,9 +158,11 @@ export function SearchBar({
         <button
           type="submit"
           className="search-bar__submit"
-          aria-label={SEARCH_TOGGLE_LABEL}
+          data-text={submitText || undefined}
+          //the word, when shown, IS the name; the magnifier needs one
+          aria-label={submitText ? undefined : SEARCH_TOGGLE_LABEL}
         >
-          <Icon name="search" />
+          {submitText ? SEARCH_TOGGLE_LABEL : <Icon name="search" />}
         </button>
       </form>
 

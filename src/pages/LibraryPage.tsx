@@ -1,48 +1,57 @@
-//the file reads :name from the URL, hands it to the hook
-//and owns exactly one piece of local UI state that the hook correctly does not own: which card is currently selected in the modal
+//the file reads :name from the URL, hands it to the hooks, and owns the
+//few pieces of UI state no hook owns: which card the dialog shows, and
+//whether the view or sort has changed since the page opened (tile in)
 
 import "./LibraryPage.css";
-import { useState } from "react";
-import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
+import { useRef, useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useTCGLibrary } from "../hooks/useTCGLibrary";
 import { useLibraryView } from "../hooks/useLibraryView";
 import { useBinderPage } from "../hooks/useBinderPage";
-import { SegmentedControl } from "../ui/SegmentedControl";
-import { Select } from "../ui/Select";
-import { SearchBar } from "../components/SearchBar";
+import { usePokemon } from "../hooks/usePokemon";
+import { LibraryHero } from "../components/LibraryHero";
+import { LibraryToolbar } from "../components/LibraryToolbar";
 import { TCGCardGrid } from "../components/TCGCardGrid";
 import { TCGCardTable } from "../components/TCGCardTable";
 import { TCGCardBinder } from "../components/TCGCardBinder";
 import { TCGCardModal } from "../components/TCGCardModal";
 import type { TCGCard } from "../lib/type";
-import type { SortMode } from "../lib/tcg";
-import type { LibraryView } from "../lib/libraryView";
 import { withoutPage } from "../lib/pagination";
-import { PageHeader } from "../ui/PageHeader";
-import {
-  LIBRARY_VIEW_LABEL,
-  SORT_CARDS_LABEL,
-  LIBRARY_HEADING,
-  LIBRARY_SUBTITLE,
-} from "../lib/copy";
-
-const VIEW_OPTIONS: { value: LibraryView; label: string }[] = [
-  { value: "grid", label: "Grid" },
-  { value: "table", label: "Table" },
-  { value: "binder", label: "Binder" },
-];
+import { animationsAreOff } from "../lib/motion";
 
 export function LibraryPage() {
   const { name } = useParams<{ name?: string }>();
   const navigate = useNavigate();
-  //everything after the ? (the view, later mayber more) has to survive a new
-  //search and the way back to Featured. or the page would forget the view
+  //everything after the ? (the view, the page) has to survive a new search
+  //and the way back to Featured, or the page would forget the view
   const { search } = useLocation();
   const { view, setView } = useLibraryView();
   const { page, setPage } = useBinderPage();
   const { title, cards, status, error, sortMode, setSortMode } =
     useTCGLibrary(name);
+
+  //the hero's dex number and colors. usePokemon keeps its last answer
+  //while a new one loads (and on the featured page, where there is no
+  //name), so only a finished lookup for THIS name is shown: otherwise the
+  //previous Pokémon's number would sit over the new one's cards
+  const lookup = usePokemon(name ?? "");
+  const pokemon = name && !lookup.loading && !lookup.error ? lookup.data : null;
+
   const [selectedCard, setSelectedCard] = useState<TCGCard | null>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  //tile in (spec 6.2) plays when the view or the sort CHANGES, never on
+  //load (the hand's deal is the Library's entrance). "has it changed?" is
+  //worked out during render, the same "adjust state while rendering"
+  //pattern as useComparePageState: remember the arrangement seen last,
+  //and the first render that sees a different one flips the flag
+  const arrangement = `${view}|${sortMode}`;
+  const [seenArrangement, setSeenArrangement] = useState(arrangement);
+  const [rearranged, setRearranged] = useState(false);
+  if (arrangement !== seenArrangement) {
+    setSeenArrangement(arrangement);
+    setRearranged(true);
+  }
 
   //a new set of results (a new search, or back to featured) keeps the view
   //but drops the page: "page 3" of the old results means nothing for the new ones
@@ -66,71 +75,75 @@ export function LibraryPage() {
     });
   }
 
+  //"Open the binder" (spec 7.4): switch the view, and bring the cards up
+  //to the top of the window. no smooth scroll with motion off
+  function openBinder() {
+    setView("binder");
+    cardsRef.current?.scrollIntoView?.({
+      behavior: animationsAreOff() ? "auto" : "smooth",
+      block: "start",
+    });
+  }
+
   //one branch per LibraryView. the switch lists all three, so adding a
   //fourth view LIBRARY_VIEWS makes TypeScript flag this function
   function renderCards() {
     switch (view) {
       case "table":
-        return <TCGCardTable {...viewProps} caption={title} />;
+        return (
+          <TCGCardTable {...viewProps} caption={title} entering={rearranged} />
+        );
       case "binder":
         return (
           <TCGCardBinder {...viewProps} page={page} onPageChange={setPage} />
         );
       case "grid":
-        return <TCGCardGrid {...viewProps} />;
+        return (
+          <TCGCardGrid
+            {...viewProps}
+            sortMode={sortMode}
+            entering={rearranged}
+            //a new key per arrangement: the tiles are new elements, so
+            //their rise-in plays from the start
+            key={arrangement}
+          />
+        );
     }
   }
 
   return (
-    <section className="library-view">
-      <PageHeader
-        title={LIBRARY_HEADING}
-        documentTitle={name ? `${LIBRARY_HEADING}: ${name}` : undefined}
-        subtitle={LIBRARY_SUBTITLE}
-        actions={
-          <Link
-            to={{ pathname: "/library", search: searchForNewResults }}
-            className="library-back"
-          >
-            {/* the arrow is decoration; the name is "Featured" */}
-            <span aria-hidden="true">←</span> Featured
-          </Link>
-        }
-      />
-      <SearchBar
-        onSubmit={handleSearch}
-        placeholder="Search cards by Pokémon  name"
+    <div className="library-page page--bleed">
+      <LibraryHero
+        name={name}
+        pokemon={pokemon}
+        cards={cards}
+        status={status}
+        featuredHref={`/library${searchForNewResults}`}
+        onSearch={handleSearch}
+        onSelect={setSelectedCard}
+        onOpenBinder={openBinder}
       />
 
-      <div className="card-panel-header">
-        <h3 className="card-panel-title">{title}</h3>
-        <div className="card-panel-controls">
-          <SegmentedControl
-            label={LIBRARY_VIEW_LABEL}
-            options={VIEW_OPTIONS}
-            value={view}
-            onChange={setView}
-          />
-          <Select
-            value={sortMode}
-            onChange={(e) => setSortMode(e.target.value as SortMode)}
-            aria-label={SORT_CARDS_LABEL}
-          >
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="rarity">Rarity</option>
-          </Select>
-        </div>
+      <div ref={cardsRef} className="library-page__cards">
+        <LibraryToolbar
+          cards={cards}
+          status={status}
+          view={view}
+          onViewChange={setView}
+          sortMode={sortMode}
+          onSortChange={setSortMode}
+        />
+        <div className="library-page__body">{renderCards()}</div>
       </div>
-
-      {renderCards()}
 
       {selectedCard && (
         <TCGCardModal
           card={selectedCard}
+          cards={cards}
+          onSelect={setSelectedCard}
           onClose={() => setSelectedCard(null)}
         />
       )}
-    </section>
+    </div>
   );
 }

@@ -3,7 +3,8 @@ import "./SegmentedControl.css";
 
 interface SegmentedControlProps<T extends string> {
   label: string;
-  options: readonly { value: T; label: string }[];
+  //icon: optional decoration before the word (the Library's views, B&W-7)
+  options: readonly { value: T; label: string; icon?: ReactNode }[];
   value: T;
   onChange: (value: T) => void;
   //both new props are optional and default to the old behavior, so every
@@ -46,7 +47,14 @@ export function SegmentedControl<T extends string>({
               checked={option.value === value}
               onChange={() => onChange(option.value)}
             />
-            <span className="segmented__label">{option.label}</span>
+            <span className="segmented__label">
+              {option.icon && (
+                <span className="segmented__icon" aria-hidden="true">
+                  {option.icon}
+                </span>
+              )}
+              {option.label}
+            </span>
           </label>
         ))}
       </div>

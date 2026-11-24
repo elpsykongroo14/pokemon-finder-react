@@ -63,8 +63,11 @@ describe("useHoloPointer", () => {
     flushFrame();
     expect(card.style.getPropertyValue("--mx")).toBe("75%");
     expect(card.style.getPropertyValue("--my")).toBe("25%");
-    expect(card.style.getPropertyValue("--ry")).toBe("4deg");
-    expect(card.style.getPropertyValue("--rx")).toBe("4deg");
+    //changed in B&W-7 (spec 7.4): 10deg sideways and 8deg up and down at
+    //most, and a card under 300 px wide (this one is 200) tips 70 % as far:
+    //ry = 0.25 * 20 * 0.7 = 3.5, rx = 0.25 * 16 * 0.7 = 2.8
+    expect(card.style.getPropertyValue("--ry")).toBe("3.5deg");
+    expect(card.style.getPropertyValue("--rx")).toBe("2.8deg");
   });
 
   it("many moves within one frame cost one frame, and the LAST position wins", () => {

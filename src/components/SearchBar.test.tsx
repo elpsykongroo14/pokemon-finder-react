@@ -175,6 +175,16 @@ describe("SearchBar", () => {
     expect(field).not.toHaveAttribute("aria-label");
   });
 
+  //B&W-7: the Library hero's search has a visible "Search" button (spec
+  //7.4); the name stays the same, so it is still the "Search" button
+  it("can show its submit button's word instead of the magnifier", () => {
+    render(<SearchBar onSubmit={() => {}} submitText />);
+
+    const submit = screen.getByRole("button", { name: "Search" });
+    expect(submit).toHaveTextContent("Search");
+    expect(submit.querySelector("svg")).toBeNull();
+  });
+
   it("empties the field after a pick when asked to (the Compare pickers)", async () => {
     const user = userEvent.setup();
     const handleSubmit = vi.fn();

@@ -61,6 +61,21 @@
   <symbol id="arrow-icon" viewBox="0 0 56 14">
     <g fill="none" stroke="currentColor" stroke-width="2.4"><path d="M2 7h48"/><path d="M44 1l8 6-8 6"/></g>
   </symbol>
+  <symbol id="chevron-left-icon" viewBox="0 0 24 24">
+    <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/>
+  </symbol>
+  <symbol id="chevron-right-icon" viewBox="0 0 24 24">
+    <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/>
+  </symbol>
+  <symbol id="grid-icon" viewBox="0 0 24 24">
+    <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="currentColor"/>
+  </symbol>
+  <symbol id="list-icon" viewBox="0 0 24 24">
+    <path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2.4"/>
+  </symbol>
+  <symbol id="binder-icon" viewBox="0 0 24 24">
+    <path d="M3 5h18v14H3zM12 5v14M6.5 9h2.5M6.5 13h2.5M15 9h2.5M15 13h2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
   <symbol id="shuffle-icon" viewBox="0 0 24 24">
     <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/>
   </symbol>

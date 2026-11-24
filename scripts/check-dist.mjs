@@ -47,7 +47,16 @@ const TEXT_FILE = /\.(html|js|css|map|json|txt)$/;
 // mini fields, stat bars and open slots (+0.53 kB CSS gzip), and the stat
 // total on team members, its backfill and the TransitionLink size (+0.30
 // kB JS gzip). B&W-8 ratchets both back down.
-const BUDGET_KB = { js: 93.75, css: 15.25 };
+// R10B (D66): JS 93.75 -> 97.25 and CSS 15.25 -> 18.5 at B&W-7 (measured
+// 96.98 / 18.31). The Library is the largest screen and was rebuilt, not
+// restyled: the hero with the hand and its deal, the sticky toolbar and
+// legend, four tier marks, the shared tilting card face, the timeline
+// grid, the six-column table, binder spreads with the page turn, the card
+// dialog with its flip and the phone sheet, and the Pokémon page's cards
+// teaser (+3.26 kB CSS gzip; the old Library CSS and CardChip are gone),
+// plus the card helpers, spreads, card stepping and lazy loading (+3.44 kB
+// JS gzip). B&W-8 ratchets both back down.
+const BUDGET_KB = { js: 97.25, css: 18.5 };
 
 if (!existsSync(DIST)) {
   console.error(`check-dist: no ${DIST}/ folder. Run "npm run build" first.`);

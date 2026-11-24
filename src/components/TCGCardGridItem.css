@@ -1,78 +1,105 @@
+/* A tile in the Library grid (spec 7.4): the card, then the set and its
+   number on one row, then the tier mark. The card face, its tilt and its
+   light are styles/holo.css; this file only lays the tile out and lifts
+   the card on hover or focus.
+
+   min-width: 0 everywhere a long rarity ("Special Illustration Rare") or
+   set name could push: the prototype's grid blew out on exactly that */
 @layer features {
   .tcg-card {
-    /* a <button> arrives with browser styling; reset it so the card keeps its look */
-    display: block;
-    width: 100%;
-    padding: 0;
-    font: inherit;
-    color: inherit;
-    text-align: left;
-    background: var(--surface-chrome);
-    border: 1px solid var(--tier-color, var(--border-hairline));
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    cursor: pointer;
-    transition:
-      border-color var(--dur-fast) var(--ease-standard),
-      transform var(--dur-fast) var(--ease-standard);
-  }
-
-  /* --tier-color is set once, for every view, in styles/rarity-tiers.css;
-        this file only READS it, with a quiet fallback for common cards.
-        the shine itself lives in styles/holo.css, shared with the card dialog */
-
-  .tcg-card-img-wrap {
-    aspect-ratio: 5 / 7;
-    background: var(--surface-well);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-2);
-  }
-
-  .tcg-card-info {
-    padding: var(--space-2) var(--space-3) var(--space-3);
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
-  }
-
-  .tcg-card-name {
-    font-weight: 600;
-    font-size: 0.95rem;
+    gap: var(--space-3);
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
     color: var(--text-primary);
-    margin-bottom: 2px;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
   }
 
-  .tcg-card-set,
-  .tcg-card-rarity {
-    font-size: var(--text-xs);
+  /* the lift: the card rises 10 px and its shadow deepens. A token
+     transition, so with motion off it is a jump, not a glide */
+  .tcg-card__lift {
+    display: block;
+    transition: transform var(--dur-base) var(--ease-settle);
+  }
+
+  .tcg-card:hover .tcg-card__lift,
+  .tcg-card:focus-visible .tcg-card__lift {
+    transform: translateY(
+      calc((var(--space-2) + var(--border-width-line)) * -1)
+    );
+  }
+
+  .tcg-card:hover .holo-card,
+  .tcg-card:focus-visible .holo-card {
+    box-shadow: var(--shadow-card-lifted);
+  }
+
+  /* the ring goes round the card, not round the whole tile */
+  .tcg-card:focus-visible {
+    outline: none;
+  }
+
+  .tcg-card:focus-visible .holo-card {
+    outline: var(--border-width-thick) solid var(--focus-ring);
+    outline-offset: var(--space-1);
+  }
+
+  .tcg-card__meta {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+    min-width: 0;
+  }
+
+  .tcg-card__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    width: 100%;
+    min-width: 0;
+    font-size: var(--text-meta);
     color: var(--text-secondary);
   }
 
-  .tcg-card-rarity {
-    color: var(--tier-color, var(--text-secondary));
+  .tcg-card__set {
+    min-width: 0;
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    line-height: 1.25;
+    color: var(--text-primary);
   }
 
-  .tcg-card:focus-visible {
-    outline: var(--border-width-line) solid var(--focus-ring);
-    outline-offset: 2px;
+  .tcg-card__number {
+    flex: none;
+    font-variant-numeric: tabular-nums;
   }
 
-  /* hover effects only for a real mouse. on a touch screen a tap leaves
-     :hover "stuck" on, so the lift and tilt stay out of it.
-     will-change is set on the ONE hovered card, never on the whole grid */
-  @media (hover: hover) and (pointer: fine) {
-    .tcg-card:hover {
-      border-color: var(--tier-color, var(--border-hairline));
-      transform: perspective(600px) translateY(-2px) rotateX(var(--rx, 0deg))
-        rotateY(var(--ry, 0deg));
-      will-change: transform;
-    }
-  }
-
-  .tcg-card-img-wrap img {
+  /* a long rarity wraps instead of widening its column */
+  .tcg-card .tier-mark {
     max-width: 100%;
-    max-height: 100%;
+    white-space: normal;
+  }
+
+  /* tile in (spec 6.2): when the view or the sort changes, tiles rise 18 px
+     and fade in, 35 ms apart (the slot is capped at 14 in the component).
+     Only inside [data-entering], which the page sets after a change, never
+     on the first load: the hand's deal is the Library's one entrance */
+  :root[data-motion="on"] [data-entering] .tcg-card {
+    animation: tcg-tile-in 450ms var(--ease-settle) both;
+    animation-delay: calc(var(--tile-index, 0) * 35ms);
+  }
+
+  @keyframes tcg-tile-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
   }
 }

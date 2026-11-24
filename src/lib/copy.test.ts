@@ -12,6 +12,16 @@ import {
   statLeadText,
   teamBandText,
   emptySlotLabel,
+  cardCountText,
+  libraryTitle,
+  libraryEntryText,
+  libraryLead,
+  cardsTeaserText,
+  seeAllCardsText,
+  yearSpanText,
+  binderPagesText,
+  endOfBinderText,
+  cardPositionText,
   FIRST_FAVORITE,
 } from "./copy";
 
@@ -211,5 +221,122 @@ describe("compareVerdict", () => {
 describe("statLeadText", () => {
   it("writes the winning margin with a plus sign", () => {
     expect(statLeadText(23)).toBe("+23");
+  });
+});
+
+//---- B&W-7, the Library (spec 7.4, 9) ----
+
+const SUMMARY = {
+  count: 25,
+  firstYear: 2011,
+  lastYear: 2026,
+  firstSeries: "Black & White",
+  lastSeries: "Mega Evolution",
+  firstSet: "Noble Victories",
+  lastSet: "30th Celebration",
+};
+
+describe("cardCountText", () => {
+  it("counts cards, with a singular for one", () => {
+    expect(cardCountText(25)).toBe("25 cards");
+    expect(cardCountText(1)).toBe("1 card");
+  });
+});
+
+describe("libraryTitle and libraryEntryText", () => {
+  it("names the hero after the Pokémon", () => {
+    expect(libraryTitle("hydreigon")).toBe("Hydreigon cards");
+    expect(libraryEntryText("hydreigon")).toBe("Hydreigon's entry");
+  });
+});
+
+//the hero's lead sentence: built from the cards, so it is always true
+describe("libraryLead", () => {
+  it("says how many, over which years, from which series to which", () => {
+    expect(libraryLead(SUMMARY)).toBe(
+      "25 cards printed between 2011 and 2026, from Black & White to Mega Evolution.",
+    );
+  });
+
+  it("says one year and one series once", () => {
+    expect(
+      libraryLead({
+        ...SUMMARY,
+        count: 1,
+        firstYear: 2024,
+        lastYear: 2024,
+        firstSeries: "Scarlet & Violet",
+        lastSeries: "Scarlet & Violet",
+      }),
+    ).toBe("1 card printed in 2024, from Scarlet & Violet.");
+  });
+
+  it("leaves out what the cards do not say", () => {
+    expect(
+      libraryLead({
+        ...SUMMARY,
+        firstYear: null,
+        lastYear: null,
+        firstSeries: null,
+        lastSeries: null,
+      }),
+    ).toBe("25 cards.");
+  });
+});
+
+//the Pokémon page's cards teaser (spec 7.2)
+describe("cardsTeaserText", () => {
+  it("tells the Pokémon's card history in one sentence", () => {
+    expect(cardsTeaserText("hydreigon", SUMMARY)).toBe(
+      "Hydreigon has appeared on 25 cards since 2011, from Noble Victories to the 30th Celebration set. Browse them by era, by rarity, or flip through them in a binder.",
+    );
+  });
+
+  it("names one set once", () => {
+    expect(
+      cardsTeaserText("pikachu", {
+        ...SUMMARY,
+        count: 1,
+        firstSet: "Jungle",
+        lastSet: "Jungle",
+      }),
+    ).toBe(
+      "Pikachu has appeared on 1 card since 2011, in the Jungle set. Browse them by era, by rarity, or flip through them in a binder.",
+    );
+  });
+
+  it("counts the link's cards", () => {
+    expect(seeAllCardsText(25)).toBe("See all 25 cards");
+    expect(seeAllCardsText(1)).toBe("See the card");
+  });
+});
+
+describe("yearSpanText", () => {
+  it("is one year, or the first and last", () => {
+    expect(yearSpanText({ first: 2026, last: 2026 })).toBe("2026");
+    expect(yearSpanText({ first: 2023, last: 2025 })).toBe("2023 to 2025");
+  });
+});
+
+//D54: the binder names the pages it shows
+describe("binderPagesText", () => {
+  it("names both pages of a spread", () => {
+    expect(binderPagesText([1, 2], 3)).toBe("Pages 1 and 2 of 3");
+  });
+
+  it("names one page when the other is past the last card, or on a phone", () => {
+    expect(binderPagesText([3, 4], 3)).toBe("Page 3 of 3");
+    expect(binderPagesText([2], 3)).toBe("Page 2 of 3");
+  });
+
+  it("closes the binder with the count", () => {
+    expect(endOfBinderText(25)).toBe("That's all 25 cards.");
+    expect(endOfBinderText(1)).toBe("That's the only card.");
+  });
+});
+
+describe("cardPositionText", () => {
+  it("says where the dialog's card sits in the current order", () => {
+    expect(cardPositionText(7, 25)).toBe("Card 7 of 25");
   });
 });

@@ -5,6 +5,7 @@ import type { FavoriteOutcome, TeamOutcome } from "./type";
 import { formatSlug } from "./text";
 import { MAX_TEAM } from "./teamReducer";
 import type { SpriteMode } from "./sprites";
+import type { CardsSummary, RarityTier, YearSpan } from "./tcg";
 
 //every sentence the user reads when something goes wrong lives here
 //components pick a massage by kind,
@@ -17,9 +18,6 @@ import type { SpriteMode } from "./sprites";
 export const LOADING_LABEL = "Searching the tall grass…";
 export const CARDS_LOADING_LABEL = "Flipping through the binder…";
 export const BINDER_PAGES_LABEL = "Binder pages";
-
-export const SORT_CARDS_LABEL = "Sort cards";
-export const CARD_ZOOM_LABEL = "Zoom card";
 
 //the dialog's accessible name: a screen reader says "Charizard card details, dialog"
 export function cardDialogLabel(name: string): string {
@@ -311,3 +309,120 @@ export function multiplierText(multiplier: number): string {
 export function multiplierSpoken(multiplier: number): string {
   return MULTIPLIER_WORDS[multiplier] ?? `${multiplier} times damage`;
 }
+
+//---- B&W-7: the Library (spec 7.4, 9) ----
+
+//the four rarity tiers, as the legend, the grid's groups and the tier
+//marks' spoken names say them
+export const TIER_LABELS: Record<RarityTier, string> = {
+  ultra: "Ultra rare and up",
+  holo: "Holo",
+  rare: "Rare",
+  common: "Common",
+};
+//a date-sorted group for cards whose set names no series
+export const OTHER_CARDS_LABEL = "Other cards";
+
+export function cardCountText(count: number): string {
+  return count === 1 ? "1 card" : `${count} cards`;
+}
+export function libraryTitle(name: string): string {
+  return `${formatSlug(name)} cards`;
+}
+export function libraryEntryText(name: string): string {
+  return `${formatSlug(name)}'s entry`;
+}
+
+//"25 cards printed between 2011 and 2026, from Black & White to Mega
+//Evolution." every part comes from the cards; a part they do not have is
+//left out rather than guessed
+export function libraryLead(summary: CardsSummary): string {
+  const { firstYear, lastYear, firstSeries, lastSeries } = summary;
+  let sentence = cardCountText(summary.count);
+  if (firstYear !== null && lastYear !== null) {
+    sentence +=
+      firstYear === lastYear
+        ? ` printed in ${firstYear}`
+        : ` printed between ${firstYear} and ${lastYear}`;
+  }
+  if (firstSeries && lastSeries) {
+    sentence +=
+      firstSeries === lastSeries
+        ? `, from ${firstSeries}`
+        : `, from ${firstSeries} to ${lastSeries}`;
+  }
+  return `${sentence}.`;
+}
+
+//the Pokémon page's cards teaser (spec 7.2)
+export function cardsTeaserText(name: string, summary: CardsSummary): string {
+  const { firstYear, firstSet, lastSet } = summary;
+  let sentence = `${formatSlug(name)} has appeared on ${cardCountText(summary.count)}`;
+  if (firstYear !== null) sentence += ` since ${firstYear}`;
+  if (firstSet && lastSet) {
+    sentence +=
+      firstSet === lastSet
+        ? `, in the ${firstSet} set`
+        : `, from ${firstSet} to the ${lastSet} set`;
+  }
+  return `${sentence}. Browse them by era, by rarity, or flip through them in a binder.`;
+}
+export function seeAllCardsText(count: number): string {
+  return count === 1 ? "See the card" : `See all ${count} cards`;
+}
+
+//a group's years: "2023 to 2025", or one year
+export function yearSpanText({ first, last }: YearSpan): string {
+  return first === last ? String(first) : `${first} to ${last}`;
+}
+
+//the hero plate
+export const LIBRARY_SEARCH_LABEL = "Find another Pokémon's cards";
+export const LIBRARY_SEARCH_PLACEHOLDER = "Pokémon name";
+export const OPEN_BINDER_TEXT = "Open the binder";
+export const LIBRARY_HAND_LABEL = "Three of the rarest cards";
+//back from a search to the featured cards (the arrow before it is decoration)
+export const FEATURED_CARDS_LINK = "Featured cards";
+
+//the toolbar
+export const SORT_LABEL = "Sort";
+export const SORT_OPTION_LABELS = {
+  newest: "Newest first",
+  oldest: "Oldest first",
+  rarity: "Rarest first",
+} as const;
+export const RARITY_LEGEND_LABEL = "Cards by rarity";
+
+//the table
+export const TABLE_PICTURE_HEADER = "Picture";
+export const TABLE_CARD_HEADER = "Card";
+export const TABLE_NUMBER_HEADER = "Number";
+export const TABLE_RELEASED_HEADER = "Released";
+export const TABLE_RARITY_HEADER = "Rarity";
+export const TABLE_ARTIST_HEADER = "Artist";
+export const NOT_LISTED = "Not listed";
+
+//the binder (D54): the pages on show, and the page past the last card
+export function binderPagesText(pages: number[], pageCount: number): string {
+  const shown = pages.filter((page) => page <= pageCount);
+  if (shown.length === 2) {
+    return `Pages ${shown[0]} and ${shown[1]} of ${pageCount}`;
+  }
+  return `Page ${shown[0]} of ${pageCount}`;
+}
+export function endOfBinderText(count: number): string {
+  return count === 1 ? "That's the only card." : `That's all ${count} cards.`;
+}
+
+//the card dialog (D53)
+export function cardPositionText(position: number, count: number): string {
+  return `Card ${position} of ${count}`;
+}
+export const PREVIOUS_CARD = "Previous card";
+export const NEXT_CARD = "Next card";
+//"Use ← → to flip through, Esc to close." in three pieces around the keys
+export const CARD_KEYS_HINT = {
+  before: "Use",
+  between: "to flip through,",
+  after: "to close.",
+} as const;

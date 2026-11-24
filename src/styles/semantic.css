@@ -59,29 +59,60 @@
   /* Disabled controls: faded, still readable as "there but not now" */
   --opacity-disabled: 0.35;
 
-  /* Rarity tiers. "common" has no token on purpose: no effect.
-     B&W-7 turns these into the four tier marks */
-  --rarity-rare: var(--line);
-  --rarity-holo: var(--ink);
-  --rarity-ultra: var(--ink);
-  --rarity-ultra-fill: linear-gradient(
+  /* Rarity tiers (B&W-7, spec 7.4): one mark in four strengths. Each
+     tier is a fill, an ink and a ring; rarity-tiers.css hands the right
+     three to whatever carries data-rarity. These never flip on a black
+     plate: a mark is a printed label, the same on any surface */
+  --tier-common-fill: var(--mist);
+  --tier-common-ink: var(--graphite);
+  --tier-common-ring: var(--line);
+  --tier-rare-fill: var(--paper);
+  --tier-rare-ink: var(--ink);
+  --tier-rare-ring: var(--ink);
+  --tier-holo-fill: var(--ink);
+  --tier-holo-ink: var(--paper);
+  --tier-holo-ring: var(--ink);
+  --tier-ultra-fill: linear-gradient(
     100deg,
     var(--foil-pink),
     var(--foil-yellow) 30%,
     var(--foil-mint) 60%,
     var(--foil-blue)
   );
+  --tier-ultra-ink: var(--ink);
+  --tier-ultra-ring: var(--ink);
 
-  /* Holo effect on trading cards: glare + foil band */
+  /* Holo light on trading cards (spec 7.4): a glare that follows the
+     pointer, and a rainbow foil band */
   --gloss-highlight: var(--white-a55);
   --holo-foil: linear-gradient(
     115deg,
-    var(--foil-pink-a50),
-    var(--foil-yellow-a50),
-    var(--foil-mint-a50),
-    var(--foil-blue-a50),
-    var(--foil-pink-a50)
+    transparent 22%,
+    var(--foil-band-pink) 36%,
+    var(--foil-band-yellow) 46%,
+    var(--foil-band-mint) 56%,
+    var(--foil-band-blue) 66%,
+    transparent 80%
   );
+
+  /* Cards are physical objects: the one place soft shadows live */
+  --shadow-card-lifted: 0 22px 34px var(--black-a28);
+  --shadow-card-thumb: 0 2px 6px var(--black-a28);
+  --shadow-card-pocket: 0 3px 8px var(--black-a50);
+  --shadow-card-pocket-lifted: 0 14px 24px var(--black-a60);
+  --shadow-card-dialog: 0 30px 60px var(--black-a60);
+  --shadow-hand: var(--black-a28); /* the ellipse under the hero's hand */
+
+  /* the binder */
+  --surface-binder-page: var(--binder-page);
+  --surface-binder-pocket: var(--binder-pocket);
+  --binder-ring: var(--line);
+  --binder-sleeve-edge: var(--white-a18);
+  --binder-sleeve-sheen: var(--white-a14);
+  --binder-pocket-edge: var(--white-a08);
+  --border-key: var(--key-outline);
+  /* quiet text on the black binder, which is not an .on-dark scope */
+  --text-end-note: var(--on-dark-400);
 
   /* Stat rows: label, value, bar. One definition, so the scale line under
      the chart (and Compare's rows later) line up with the meters */
@@ -109,6 +140,8 @@
   --accent-select: var(--paper);
   --focus-ring: var(--paper);
   --focus-halo: var(--ink);
+  /* a holo mark is Ink: on Ink it needs a white ring to exist */
+  --tier-holo-ring: var(--paper);
 
   color: var(--text-primary);
 }
@@ -128,6 +161,7 @@
   --accent-select: var(--ink);
   --focus-ring: var(--ink);
   --focus-halo: var(--paper);
+  --tier-holo-ring: var(--ink);
 
   color: var(--text-primary);
 }

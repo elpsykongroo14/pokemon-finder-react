@@ -8,8 +8,16 @@ function makeCard(overrides: Partial<TCGCard> = {}): TCGCard {
   return { id: "base1-4", name: "Charizard", ...overrides };
 }
 
+const THREE: TCGCard[] = [
+  makeCard({ id: "a", name: "Hydreigon" }),
+  makeCard({ id: "b", name: "Hydreigon ex" }),
+  makeCard({ id: "c", name: "Hydreigon BREAK" }),
+];
+
 describe("TCGCardModal", () => {
-  it("prefers the large image, falling back to small, falling back to empty", () => {
+  //changed in B&W-7: with no picture at all the dialog draws none (it used
+  //to draw an <img> with no src, which browsers show as a broken image)
+  it("prefers the large image, falling back to small, and draws none without one", () => {
     const { rerender } = render(
       <TCGCardModal
         card={makeCard({ images: { small: "small.png", large: "large.png" } })}
@@ -38,7 +46,7 @@ describe("TCGCardModal", () => {
         onClose={() => {}}
       />,
     );
-    expect(screen.getByAltText("Charizard")).not.toHaveAttribute("src");
+    expect(screen.queryByAltText("Charizard")).not.toBeInTheDocument();
   });
 
   it("renders the cardname and its real meta rows", () => {
@@ -54,7 +62,7 @@ describe("TCGCardModal", () => {
       screen.getByRole("heading", { name: "Charizard" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Base set")).toBeInTheDocument();
-    expect(screen.getByText("Rare Holo")).toBeInTheDocument();
+    expect(screen.getAllByText("Rare Holo").length).toBeGreaterThan(0);
     expect(screen.getByText("120 HP")).toBeInTheDocument(); //this line is doing double duty, its not just checking that meta row rendered,
     //its implicitly relying on getCardMetaRows's real ${card.hp} HP formatting
   });
@@ -79,7 +87,7 @@ describe("TCGCardModal", () => {
       />,
     );
     expect(
-      screen.queryByText("Spites fire hot enough to melt boulders."),
+      screen.queryByText("Spits fire hot enough to melt boulders."),
     ).not.toBeInTheDocument();
   });
 
@@ -112,56 +120,153 @@ describe("TCGCardModal as dialog", () => {
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
-  it("zooms in and out with the card button, and says which state it is in", async () => {
-    const user = userEvent.setup();
+  //spec 7.4: focus goes to Close when the dialog opens
+  it("puts focus on Close when it opens", () => {
     render(<TCGCardModal card={makeCard()} onClose={() => {}} />);
-    const zoom = screen.getByRole("button", { name: "Zoom card" });
 
-    expect(zoom).toHaveAttribute("aria-pressed", "false");
-    await user.click(zoom);
-    expect(zoom).toHaveAttribute("aria-pressed", "true");
-    await user.click(zoom);
-    expect(zoom).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
+  });
+
+  //D53 retired the zoom: the card flips in instead, and is not a button
+  it("has no zoom button any more", () => {
+    render(<TCGCardModal card={makeCard()} onClose={() => {}} />);
+
+    expect(
+      screen.queryByRole("button", { name: "Zoom card" }),
+    ).not.toBeInTheDocument();
   });
 });
 
-describe("TCGCardModal chips", () => {
-  it("shows the set and the rarity as chips, the rarity carrying its tier", () => {
-    render(
-      <TCGCardModal
-        card={makeCard({ set: { name: "Base Set" }, rarity: "Rare Holo" })}
-        onClose={() => {}}
-      />,
-    );
-
-    expect(screen.getByText("Base Set")).not.toHaveAttribute("data-rarity");
-    expect(screen.getByText("Rare Holo")).toHaveAttribute(
-      "data-rarity",
-      "holo",
-    );
-  });
-
-  it("does not repeat the set and rarity as rows under the chips", () => {
+//changed in B&W-7: the chips became the spec's subtitle ("Surging Sparks,
+//240/191") and a tier mark, and the list is the spec's (it includes Rarity)
+describe("TCGCardModal facts (spec 7.4)", () => {
+  it("writes the set and number under the name", () => {
     render(
       <TCGCardModal
         card={makeCard({
-          set: { name: "Base Set" },
-          rarity: "Rare Holo",
-          artist: "Mitsuhiro Arita",
+          number: "240",
+          set: { name: "Surging Sparks", printedTotal: 191 },
         })}
         onClose={() => {}}
       />,
     );
 
-    expect(screen.getByText("Artist")).toBeInTheDocument();
-    expect(screen.queryByText("Set")).not.toBeInTheDocument();
-    expect(screen.queryByText("Rarity")).not.toBeInTheDocument();
+    expect(screen.getByText("Surging Sparks, 240/191")).toBeInTheDocument();
   });
 
-  it("shows no chip for a fact the card does not have", () => {
+  it("shows the rarity as a tier mark carrying its tier", () => {
+    const { container } = render(
+      <TCGCardModal
+        card={makeCard({ rarity: "Special Illustration Rare" })}
+        onClose={() => {}}
+      />,
+    );
+
+    expect(container.ownerDocument.querySelector(".tier-mark")).toHaveAttribute(
+      "data-rarity",
+      "ultra",
+    );
+  });
+
+  it("lists the facts as a description list, leaving out what the card lacks", () => {
+    render(
+      <TCGCardModal
+        card={makeCard({
+          set: { series: "Scarlet & Violet", releaseDate: "2024/11/08" },
+          artist: "Akira Egawa",
+        })}
+        onClose={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("Series").tagName).toBe("DT");
+    expect(screen.getByText("8 Nov 2024").tagName).toBe("DD");
+    expect(screen.getByText("Akira Egawa")).toBeInTheDocument();
+    expect(screen.queryByText("HP")).not.toBeInTheDocument();
+  });
+});
+
+//D53: Previous / Next and the arrow keys move through the cards in the
+//order the page shows them
+describe("TCGCardModal, flipping through", () => {
+  it("says where this card sits in the current order", () => {
+    render(<TCGCardModal card={THREE[1]!} cards={THREE} onClose={() => {}} />);
+
+    expect(screen.getByText("Card 2 of 3")).toBeInTheDocument();
+  });
+
+  it("asks for the card before or after with the buttons", async () => {
+    const user = userEvent.setup();
+    const handleSelect = vi.fn();
+    render(
+      <TCGCardModal
+        card={THREE[1]!}
+        cards={THREE}
+        onSelect={handleSelect}
+        onClose={() => {}}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Next card" }));
+    expect(handleSelect).toHaveBeenLastCalledWith(THREE[2]);
+
+    await user.click(screen.getByRole("button", { name: "Previous card" }));
+    expect(handleSelect).toHaveBeenLastCalledWith(THREE[0]);
+  });
+
+  it("does the same with the arrow keys", async () => {
+    const user = userEvent.setup();
+    const handleSelect = vi.fn();
+    render(
+      <TCGCardModal
+        card={THREE[1]!}
+        cards={THREE}
+        onSelect={handleSelect}
+        onClose={() => {}}
+      />,
+    );
+
+    await user.keyboard("{ArrowRight}");
+    expect(handleSelect).toHaveBeenLastCalledWith(THREE[2]);
+
+    await user.keyboard("{ArrowLeft}");
+    expect(handleSelect).toHaveBeenLastCalledWith(THREE[0]);
+  });
+
+  it("disables the way past either end", () => {
+    const { rerender } = render(
+      <TCGCardModal card={THREE[0]!} cards={THREE} onClose={() => {}} />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Previous card" }),
+    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Next card" })).toBeEnabled();
+
+    rerender(
+      <TCGCardModal card={THREE[2]!} cards={THREE} onClose={() => {}} />,
+    );
+    expect(screen.getByRole("button", { name: "Next card" })).toBeDisabled();
+  });
+
+  //a new card is a new element, so its flip plays from the start
+  it("draws a fresh card for each new card, so the flip plays again", () => {
+    const { rerender } = render(
+      <TCGCardModal card={THREE[0]!} cards={THREE} onClose={() => {}} />,
+    );
+    const before = document.querySelector(".card-dialog__flipper");
+
+    rerender(
+      <TCGCardModal card={THREE[1]!} cards={THREE} onClose={() => {}} />,
+    );
+    expect(document.querySelector(".card-dialog__flipper")).not.toBe(before);
+  });
+
+  it("tells keyboard users how to flip through", () => {
     render(<TCGCardModal card={makeCard()} onClose={() => {}} />);
 
-    expect(document.querySelector(".card-chip")).toBeNull();
+    expect(document.querySelector(".card-dialog__keys")).toHaveTextContent(
+      "Use ← → to flip through, Esc to close.",
+    );
   });
 });
 
@@ -177,37 +282,37 @@ describe("TCGCardModal holo tilt", () => {
     });
     vi.stubGlobal("cancelAnimationFrame", () => {});
     render(<TCGCardModal card={makeCard({ rarity })} onClose={() => {}} />);
-    const stage = screen.getByRole("button", { name: "Zoom card" });
-    stage.getBoundingClientRect = () =>
-      ({ left: 0, top: 0, width: 200, height: 100 }) as DOMRect;
-    return stage;
+    //B&W-7: the card is no longer a zoom button; its face takes the pointer
+    const face = document.querySelector(".card-dialog__face") as HTMLElement;
+    face.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 400, height: 200 }) as DOMRect;
+    return face;
   }
 
   it("a holo card tilts toward the mouse", () => {
-    const stage = renderTilting("Rare Holo");
+    const face = renderTilting("Rare Holo");
 
-    fireEvent.pointerMove(stage, {
-      clientX: 150,
-      clientY: 25,
+    fireEvent.pointerMove(face, {
+      clientX: 300,
+      clientY: 50,
       pointerType: "mouse",
     });
 
-    expect(stage.style.getPropertyValue("--ry")).toBe("4deg");
+    //0.25 of the way right of center: 0.25 * 20 = 5deg (spec 7.4)
+    expect(face.style.getPropertyValue("--ry")).toBe("5deg");
   });
 
-  it("a common card does not tilt", () => {
-    const stage = renderTilting("Common");
+  //changed in B&W-7: every card tilts (spec 6.2); a common card only
+  //lacks the light
+  it("a common card tilts too", () => {
+    const face = renderTilting("Common");
 
-    fireEvent.pointerMove(stage, {
-      clientX: 150,
-      clientY: 25,
+    fireEvent.pointerMove(face, {
+      clientX: 300,
+      clientY: 50,
       pointerType: "mouse",
     });
 
-    expect(stage.style.getPropertyValue("--ry")).toBe("");
+    expect(face.style.getPropertyValue("--ry")).toBe("5deg");
   });
 });
-
-//this file protects the two level image fallback and falvor text branch
-//the logic is genuinely TCGCardModal's own, while relying on real already tested Modal and getCardMetaRows
-//rather than re-verifying either one's internal rules from scratch

@@ -241,3 +241,23 @@ Motion: every loop uses one opt-in gate (:root[data-motion="on"]); motion-gate.t
 Close-out: one page-load intro (header, main, tray; 580 ms; tokens only; once per load).
 Testing Library calls every <header> a banner while Chromium and the spec don't; vi.mock fakes aren't type-checked, so incomplete fakes broke when a hook read one more field (now typed as the real context value); a "stage-idle isn't gated" claim that a browser measurement disproved; and Prettier isn't a dependency of the project at all.
 Deferred to R10: pin Prettier and add a format check to CI; a Firefox, Safari and real-touch-device pass; profile the width-animated stat bars if they ever stutter.
+
+11-21-2026: UI rehaul, B&W-1 Foundation
+the vanilla port copies the final design. The class contract had gone stale (.stat-row and friends no longer exist), so it was regenerated from the tests.
+Rarity: Double Rare, Rare BREAK and Promo were missing from RARITY_RANK and fell to rank 0. Tests written first (4 red), then the table.
+Fonts: Archivo variable (weight and width) replaces Nunito; Jersey 10 is now --font-game, used only for game text. The two preloaded latin files are 90 + 102 kB against Nunito's 39 kB, because both axes live in one file. Preloading the italic gets re-checked with Lighthouse in B&W-8.
+Tokens: the same semantic roles were rebound to five neutrals, and .on-dark uses the .surface-window pattern. Field variables are declared on :root, [data-type], because a var() inside a custom property is resolved where it is declared, so a themed half on Compare would otherwise inherit the page's sky. Flat shadows are 0 0 0 0 transparent, because none voids a comma-separated box-shadow list.
+
+11-21-2026: UI rehaul, Primitives
+Restyled every primitive in the B&W language: Button (dark / line / light / ghost plus a small size), SegmentedControl, Tabs, Toggle, Input, Select, TypeBadge (sizes, matchup multiplier), StatMeter, MessageBox as the battle dialog with a ▼ caret, and Dialog. New: SectionHeading. IconButton became its own square utility.
+Pattern: the plate leans, the content doesn't. Every slanted part skews a ::before, and the focus ring is a skewed ::after. Button variants set three local variables and hover only swaps them.
+Logic, tests first: multiplierText and multiplierSpoken (one fact, two forms: a glyph for eyes, words for ears); the caret is derived from "nothing left to type" instead of a state flag; SectionHeading renders <Tag> from a variable.
+
+11-22-2026: UI rehaul, Shell
+A white header: the new half-black brand mark, nav links on slanted plates (Mist wipe on hover, Ink plate for the current page), a Mist search field, party pips filled in each member's type color, and an outline gear. On phones the same nav becomes the bottom bar, and the search hides behind a disclosure button. The Backdrop and the page-load intro are gone.
+Logic, tests first:
+
+- usePartyArrival, my first "adjust state during render" hook: it pops only the pip of a member who just joined, never the party loaded with the page.
+- HeaderSearch, a disclosure with aria-expanded and aria-controls, which focuses the field from an effect once it's visible.
+- spriteUrlFromId, which replaced a details fetch on every arrow key.
+- "No. 025" everywhere.

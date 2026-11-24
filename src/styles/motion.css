@@ -28,6 +28,8 @@
   --ease-wipe: cubic-bezier(0.7, 0, 0.3, 1);
   /* B&W-6: starts slow and speeds away. A party card leaving */
   --ease-leave: cubic-bezier(0.6, 0, 0.8, 0.4);
+  /* B&W-7: a little past flat, then settles. The card dialog's flip */
+  --ease-flip: cubic-bezier(0.3, 1.2, 0.4, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
