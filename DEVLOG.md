@@ -291,3 +291,22 @@ Keys did the motion again: the flipper per card, binder pages per page number, t
 Audited in a real browser, not just jsdom: 18 routes and states at three widths with axe (contrast on), a focus-ring walk, overflow and console checks; forced loading and offline states; a motion pass in three modes; 320 px, the 1000 px edge and long names.
 Found and fixed: a misspelled class (lost-rout) that kept the 404's styles from ever applying; focus dropping to <body> when Next disabled itself at the end of the binder or dialog; a second banner landmark from the settings dialog's <header>; pixelated artwork in the favorites rail; 1x Compare sprites on phones; cramped Home commands at 1001-1279 px.
 Finished the spec's states: loading dialog, Library Retry, dark Retry, Graphite 404, display PageHeader. Deleted seven unused primitives and the old scope and tokens.
+
+11-24-2026: fixes after B&W-8
+11-24-2026: fixes after B&W-8
+Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
+A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
+Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
+The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a
+
+11-24-2026: fixes after B&W-8
+Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
+A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
+Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
+The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a cache.
+
+11-25-2026: fixes after B&W-8
+Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
+A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
+Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
+The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a cache.
