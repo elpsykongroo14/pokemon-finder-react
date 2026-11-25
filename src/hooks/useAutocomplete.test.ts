@@ -56,6 +56,27 @@ describe("useAutocomplete", () => {
     );
   });
 
+  //B&W-8 follow-up (reported): the matches are worked out from the query
+  //as it was 250 ms ago. until they catch up they belong to the OLD text,
+  //and the hook says so, so Enter does not pick an old suggestion
+  it("says when its matches still belong to older text", async () => {
+    const { result, rerender } = renderHook(
+      ({ query }) => useAutocomplete(query),
+      { initialProps: { query: "" } },
+    );
+
+    rerender({ query: "char" });
+    await waitFor(() => expect(result.current.matches).toHaveLength(3));
+    expect(result.current.settled).toBe(true);
+
+    rerender({ query: "pika" });
+    expect(result.current.settled).toBe(false);
+    expect(result.current.matches[0]?.name).toBe("charmander");
+
+    await waitFor(() => expect(result.current.settled).toBe(true));
+    expect(result.current.matches).toEqual([{ name: "pikachu", id: 25 }]);
+  });
+
   it("finds a Pokemon by its pokedex number", async () => {
     const { result, rerender } = renderHook(
       ({ query }) => useAutocomplete(query),
