@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { PokemonPage } from "./PokemonPage";
 import { usePokemon } from "../hooks/usePokemon";
 import type { PokemonDetails } from "../lib/type";
@@ -196,6 +196,45 @@ describe("PokemonPage", () => {
     expect(screen.getByTestId("pokemon-readout")).toHaveTextContent("pikachu");
     //B&W-7: and the cards teaser under it, for the same Pokémon
     expect(screen.getByTestId("cards-teaser")).toHaveTextContent("pikachu");
+  });
+
+  //reported after B&W-8: searching one Pokémon and then another left the
+  //old readout (and its evolution chain) on the page, piling up. the
+  //readout and the teaser were siblings keyed by the SAME name; React needs
+  //sibling keys to be unique, and with a duplicate it lost track of the old
+  //element and never removed it
+  it("shows only the new Pokémon's readout and teaser after another search", async () => {
+    const user = userEvent.setup();
+    //usePokemon answers for whichever name the URL holds, like the real one
+    vi.mocked(usePokemon).mockImplementation((name: string) => ({
+      data: makePokemon({ name }),
+      loading: false,
+      error: null,
+      retry,
+    }));
+    //a stand-in for the header search: it navigates, as a search does
+    function Search({ to }: { to: string }) {
+      const navigate = useNavigate();
+      return <button onClick={() => navigate(`/pokemon/${to}`)}>{to}</button>;
+    }
+    render(
+      <PreferencesProvider>
+        <MemoryRouter initialEntries={["/pokemon/pikachu"]}>
+          <Search to="charmander" />
+          <Search to="eevee" />
+          <Routes>
+            <Route path="/pokemon/:name" element={<PokemonPage />} />
+          </Routes>
+        </MemoryRouter>
+      </PreferencesProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "charmander" }));
+    await user.click(screen.getByRole("button", { name: "eevee" }));
+
+    expect(screen.getAllByTestId("pokemon-readout")).toHaveLength(1);
+    expect(screen.getByTestId("pokemon-readout")).toHaveTextContent("eevee");
+    expect(screen.getAllByTestId("cards-teaser")).toHaveLength(1);
   });
 
   //the rail marks the tile of the Pokémon on screen; while loading there

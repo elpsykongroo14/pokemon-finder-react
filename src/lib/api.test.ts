@@ -117,6 +117,66 @@ describe("fetchTCGCards", () => {
     expect(calledUrl).toContain("pikachu%26pageSize%3D1");
   });
 
+  //reported after B&W-8: the card proxy answers 500 now and then (the API
+  //behind it sends an empty body), and the Pokémon page's teaser simply
+  //hid. one quiet second try, after a short pause, usually gets the cards
+  it("tries once more after a server error, and returns the second answer", async () => {
+    vi.useFakeTimers();
+    mockFetch
+      .mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) })
+      .mockResolvedValueOnce(fakeResponse(true, { data: [{ id: "card-1" }] }));
+
+    const pending = fetchTCGCards("eevee");
+    await vi.runAllTimersAsync();
+
+    await expect(pending).resolves.toEqual([{ id: "card-1" }]);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
+  it("gives up after the second server error", async () => {
+    vi.useFakeTimers();
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 502,
+      json: async () => ({}),
+    });
+
+    const pending = fetchTCGCards("eevee");
+    const check = expect(pending).rejects.toBeInstanceOf(HttpError);
+    await vi.runAllTimersAsync();
+
+    await check;
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
+  //a 404 or 429 will not change by asking again at once
+  it("does not retry an answer that is not a server error", async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: async () => ({}),
+    });
+
+    await expect(fetchTCGCards("eevee")).rejects.toBeInstanceOf(HttpError);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  //the Pokémon page's teaser and the Library ask for the same cards: the
+  //second asks the memory, not the proxy (which limits requests per minute)
+  it("does not call the proxy twice for the same search (cache hit)", async () => {
+    mockFetch.mockResolvedValue(
+      fakeResponse(true, { data: [{ id: "card-1" }] }),
+    );
+
+    await fetchTCGCards("pikachu");
+    const again = await fetchTCGCards("pikachu");
+
+    expect(again).toEqual([{ id: "card-1" }]);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
   it("throws a clear, actionable error when VITE_TCG_PROXY is not configured", async () => {
     //TCG_PROXY is captured once at module import time into a module-level const -
     //stubbing the env after api.ts is already loaded wouldnt do anything,

@@ -66,6 +66,7 @@ export function SearchBar({
     highlightedIndex,
     setHighlightedIndex,
     isOpen,
+    settled,
     dismiss,
     notifyQueryEdited,
   } = useAutocomplete(query);
@@ -93,7 +94,10 @@ export function SearchBar({
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
-      if (isOpen && highlightedIndex >= 0) {
+      //only a highlighted match of the text as it is NOW: for 250 ms after a
+      //keystroke the list still holds the previous text's matches, and
+      //Enter would send you to one of those (reported after B&W-8)
+      if (isOpen && settled && highlightedIndex >= 0) {
         e.preventDefault();
         selectMatch(highlightedIndex);
       }

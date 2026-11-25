@@ -9,6 +9,10 @@ interface UseAutocompleteResults {
   highlightedIndex: number;
   setHighlightedIndex: (index: number) => void;
   isOpen: boolean;
+  //true when the matches were worked out from the text as it is now.
+  //false for the 250 ms after a keystroke, while they still belong to the
+  //previous text (SearchBar then lets Enter search for what was typed)
+  settled: boolean;
   dismiss: () => void;
   notifyQueryEdited: () => void;
 }
@@ -51,6 +55,7 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
   }
 
   const isOpen = matches.length > 0 && !dismissed;
+  const settled = query === debouncedQuery;
   //D51: there used to be a preview here, the full details of the
   //highlighted match fetched on every arrow key. each row now shows its own
   //sprite built from the dex number, so that request is gone
@@ -73,6 +78,7 @@ export function useAutocomplete(query: string): UseAutocompleteResults {
     highlightedIndex,
     setHighlightedIndex,
     isOpen,
+    settled,
     dismiss,
     notifyQueryEdited,
   };

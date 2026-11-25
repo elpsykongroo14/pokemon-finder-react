@@ -29,6 +29,7 @@ function setAutocomplete(
     highlightedIndex: -1,
     setHighlightedIndex,
     isOpen: false,
+    settled: true,
     dismiss,
     notifyQueryEdited,
     ...overrides,
@@ -41,6 +42,28 @@ beforeEach(() => {
 });
 
 describe("SearchBar", () => {
+  //B&W-8 follow-up (reported): after one search, typing the next name and
+  //pressing Enter quickly sent you to the OLD name. the list still held the
+  //previous text's matches (they lag the typing by 250 ms), its first row
+  //was highlighted, and Enter picked it. while the list is behind, Enter
+  //searches for what was typed
+  it("searches for the typed text when Enter comes before the list catches up", async () => {
+    const user = userEvent.setup();
+    const handleSubmit = vi.fn();
+    setAutocomplete({
+      matches: [{ name: "charmander", id: 4 }],
+      highlightedIndex: 0,
+      isOpen: true,
+      settled: false,
+    });
+    render(<SearchBar onSubmit={handleSubmit} />);
+
+    await user.type(screen.getByRole("combobox"), "eevee{Enter}");
+
+    expect(handleSubmit).toHaveBeenCalledWith("eevee");
+    expect(handleSubmit).not.toHaveBeenCalledWith("charmander");
+  });
+
   it("leaves its search landmark unnamed by default, and names it when given a label", () => {
     const { unmount } = render(<SearchBar onSubmit={vi.fn()} />);
     expect(screen.getByRole("search")).not.toHaveAttribute("aria-label");
