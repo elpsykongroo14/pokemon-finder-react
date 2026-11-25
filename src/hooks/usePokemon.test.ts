@@ -72,6 +72,32 @@ describe("usePokemon", () => {
     expect(result.current.error).toBe("unreachable");
   });
 
+  //the API module answers from its cache without looking at the abort
+  //signal, so a cancelled lookup can still resolve. it must not write over
+  //the newer one (found while fixing the stale evolution chain)
+  it("ignores a cancelled lookup that resolves after the new name's", async () => {
+    let releaseOld!: (value: PokemonDetails) => void;
+    fetchPokemon.mockImplementation((name: string) =>
+      name === "pikachu"
+        ? new Promise<PokemonDetails>((resolve) => {
+            releaseOld = resolve;
+          })
+        : Promise.resolve({ ...mockPokemon, name }),
+    );
+
+    const { result, rerender } = renderHook(({ name }) => usePokemon(name), {
+      initialProps: { name: "pikachu" },
+    });
+    rerender({ name: "eevee" });
+    await waitFor(() => expect(result.current.data?.name).toBe("eevee"));
+
+    await act(async () => {
+      releaseOld(mockPokemon);
+    });
+
+    expect(result.current.data?.name).toBe("eevee");
+  });
+
   it("does not treat an aborted request as an error", async () => {
     fetchPokemon.mockRejectedValue(new DOMException("Aborte", "AbortError"));
 

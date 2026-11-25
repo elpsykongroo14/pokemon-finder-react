@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { useEvolutionChain } from "./useEvolutionChain";
 import type {
   PokemonDetails,
@@ -173,5 +173,54 @@ describe("useEvolutionChain", () => {
 
     expect(capturedSignal[0].aborted).toBe(true);
     expect(capturedSignal[1].aborted).toBe(false);
+  });
+
+  //reported after B&W-8: the API module answers from its cache without
+  //looking at the abort signal, so a cancelled run can still finish. it
+  //must not write its old chain over the new Pokémon's
+  it("ignores a cancelled run that finishes after the new one", async () => {
+    const eevee = makePokemon("eevee", "https://pokeapi.co/species/133/");
+    const eeveeChain: EvolutionChain = {
+      id: 67,
+      chain: {
+        species: { name: "eevee", url: "" },
+        evolves_to: [
+          { species: { name: "vaporeon", url: "" }, evolves_to: [] },
+        ],
+      },
+    };
+    //charmander's species answer is held back until after eevee's run is done
+    let releaseCharmander!: (value: PokemonSpecies) => void;
+    fetchSpecies.mockImplementation((url: string) =>
+      url.includes("/4/")
+        ? new Promise<PokemonSpecies>((resolve) => {
+            releaseCharmander = resolve;
+          })
+        : Promise.resolve({
+            evolution_chain: { url: "https://pokeapi.co/evolution-chain/67/" },
+            flavor_text_entries: [],
+          }),
+    );
+    fetchEvolutionChain.mockImplementation((url: string) =>
+      Promise.resolve(url.includes("/67/") ? eeveeChain : chain),
+    );
+    fetchPokemon.mockImplementation((name: string) =>
+      Promise.resolve(makePokemon(name, "")),
+    );
+
+    const { result, rerender } = renderHook(
+      ({ pokemon }) => useEvolutionChain(pokemon),
+      { initialProps: { pokemon: charmander } },
+    );
+    rerender({ pokemon: eevee });
+    await waitFor(() => expect(result.current.tree?.name).toBe("eevee"));
+
+    //now the old, cancelled charmander run finishes
+    await act(async () => {
+      releaseCharmander(species);
+    });
+
+    expect(result.current.tree?.name).toBe("eevee");
+    expect(result.current.loading).toBe(false);
   });
 });

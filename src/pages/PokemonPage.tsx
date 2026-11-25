@@ -109,10 +109,18 @@ export function PokemonPage() {
 
       {/* keyed like the encounter: a new Pokémon's bars grow again, and on
           phones its tabs start on Stats */}
-      {pokemon && <PokemonReadout key={pokemon.name} pokemon={pokemon} />}
+      {/* sibling keys must be unique: the readout and the teaser below are
+          both keyed by the Pokémon, so each key says which one it is. with
+          the bare name twice, React lost track of the old readout and left
+          it on the page after the next search (reported after B&W-8) */}
+      {pokemon && (
+        <PokemonReadout key={`readout-${pokemon.name}`} pokemon={pokemon} />
+      )}
 
       {/* keyed: a new Pokémon starts its own lazy card lookup (B&W-7) */}
-      {pokemon && <CardsTeaser key={pokemon.name} name={pokemon.name} />}
+      {pokemon && (
+        <CardsTeaser key={`teaser-${pokemon.name}`} name={pokemon.name} />
+      )}
     </div>
   );
 }
