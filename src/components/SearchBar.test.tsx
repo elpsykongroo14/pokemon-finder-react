@@ -28,8 +28,8 @@ function setAutocomplete(
     matches: [],
     highlightedIndex: -1,
     setHighlightedIndex,
-    preview: null,
     isOpen: false,
+    settled: true,
     dismiss,
     notifyQueryEdited,
     ...overrides,
@@ -42,6 +42,28 @@ beforeEach(() => {
 });
 
 describe("SearchBar", () => {
+  //B&W-8 follow-up (reported): after one search, typing the next name and
+  //pressing Enter quickly sent you to the OLD name. the list still held the
+  //previous text's matches (they lag the typing by 250 ms), its first row
+  //was highlighted, and Enter picked it. while the list is behind, Enter
+  //searches for what was typed
+  it("searches for the typed text when Enter comes before the list catches up", async () => {
+    const user = userEvent.setup();
+    const handleSubmit = vi.fn();
+    setAutocomplete({
+      matches: [{ name: "charmander", id: 4 }],
+      highlightedIndex: 0,
+      isOpen: true,
+      settled: false,
+    });
+    render(<SearchBar onSubmit={handleSubmit} />);
+
+    await user.type(screen.getByRole("combobox"), "eevee{Enter}");
+
+    expect(handleSubmit).toHaveBeenCalledWith("eevee");
+    expect(handleSubmit).not.toHaveBeenCalledWith("charmander");
+  });
+
   it("leaves its search landmark unnamed by default, and names it when given a label", () => {
     const { unmount } = render(<SearchBar onSubmit={vi.fn()} />);
     expect(screen.getByRole("search")).not.toHaveAttribute("aria-label");
@@ -108,9 +130,9 @@ describe("SearchBar", () => {
     render(<SearchBar onSubmit={() => {}} />);
 
     const first = screen.getByRole("option", { name: "pikachu" });
-    expect(first).toHaveTextContent("#025");
+    expect(first).toHaveTextContent("No. 025");
     expect(screen.getByRole("option", { name: "pichu" })).toHaveTextContent(
-      "#172",
+      "No. 172",
     );
   });
 
@@ -128,11 +150,75 @@ describe("SearchBar", () => {
 
     expect(input).toHaveAttribute("aria-expanded", "true");
     expect(input).toHaveAttribute("aria-controls", listbox.id);
-    expect(options.map((o) => o.id)).toEqual([
-      "autocomplete-option-0",
-      "autocomplete-option-1",
-    ]);
+    //B&W-5: the ids are no longer the fixed "autocomplete-option-0": they
+    //come from useId, because Compare now shows three of these at once.
+    //what matters is that they exist, differ, and are what the input points at
+    expect(listbox.id).not.toBe("");
+    expect(new Set(options.map((o) => o.id)).size).toBe(2);
     expect(input).toHaveAttribute("aria-activedescendant", options[1].id);
+  });
+
+  //B&W-5: Compare shows the header search and two pickers on one page. two
+  //elements sharing an id is invalid HTML, and aria-controls pointing at a
+  //duplicated id can lead a screen reader into the wrong list
+  it("gives every search bar its own ids, so several can share a page", () => {
+    setAutocomplete({ matches: [PIKACHU], isOpen: true, highlightedIndex: 0 });
+    render(
+      <>
+        <SearchBar onSubmit={() => {}} inputLabel="First" />
+        <SearchBar onSubmit={() => {}} inputLabel="Second" />
+      </>,
+    );
+
+    const [one, two] = screen.getAllByRole("combobox");
+    const [listOne, listTwo] = screen.getAllByRole("listbox");
+    const [optionOne, optionTwo] = screen.getAllByRole("option");
+
+    expect(one.id).not.toBe(two.id);
+    expect(listOne.id).not.toBe(listTwo.id);
+    expect(optionOne.id).not.toBe(optionTwo.id);
+    expect(one).toHaveAttribute("aria-controls", listOne.id);
+    expect(two).toHaveAttribute("aria-controls", listTwo.id);
+  });
+
+  it("uses the input id it is given (the header search, which others focus by id)", () => {
+    render(<SearchBar onSubmit={() => {}} inputId="pokemon-search" />);
+
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "id",
+      "pokemon-search",
+    );
+  });
+
+  it("can show its label on screen, and then the label names the field", () => {
+    render(<SearchBar onSubmit={() => {}} inputLabel="Second" labelVisible />);
+
+    const field = screen.getByRole("combobox", { name: "Second" });
+    expect(screen.getByText("Second").tagName).toBe("LABEL");
+    expect(field).not.toHaveAttribute("aria-label");
+  });
+
+  //B&W-7: the Library hero's search has a visible "Search" button (spec
+  //7.4); the name stays the same, so it is still the "Search" button
+  it("can show its submit button's word instead of the magnifier", () => {
+    render(<SearchBar onSubmit={() => {}} submitText />);
+
+    const submit = screen.getByRole("button", { name: "Search" });
+    expect(submit).toHaveTextContent("Search");
+    expect(submit.querySelector("svg")).toBeNull();
+  });
+
+  it("empties the field after a pick when asked to (the Compare pickers)", async () => {
+    const user = userEvent.setup();
+    const handleSubmit = vi.fn();
+    setAutocomplete({ matches: [PIKACHU], isOpen: true, highlightedIndex: 0 });
+    render(<SearchBar onSubmit={handleSubmit} clearOnSubmit />);
+
+    await user.type(screen.getByRole("combobox"), "pika");
+    await user.click(screen.getByRole("option", { name: "pikachu" }));
+
+    expect(handleSubmit).toHaveBeenCalledWith("pikachu");
+    expect(screen.getByRole("combobox")).toHaveValue("");
   });
 
   it("hides the listbox when the hook reports its closed", () => {
@@ -198,6 +284,42 @@ describe("SearchBar", () => {
     await user.click(screen.getByRole("option", { name: "pikachu" }));
 
     expect(handleSubmit).toHaveBeenCalledWith("pikachu");
+  });
+
+  //D51: every row shows its sprite, built from the dex number alone. the
+  //picture is decoration (alt=""): the option is already named by its name
+  it("shows each option's sprite as decoration, built from its dex number", () => {
+    setAutocomplete({
+      matches: PIKACHU_AND_PICHU,
+      isOpen: true,
+      highlightedIndex: 0,
+    });
+    const { container } = render(<SearchBar onSubmit={() => {}} />);
+
+    const sprites = container.querySelectorAll<HTMLImageElement>(
+      ".autocomplete-item img",
+    );
+    expect(sprites).toHaveLength(2);
+    expect(sprites[0]).toHaveAttribute("alt", "");
+    expect(sprites[0].src.endsWith("/25.png")).toBe(true);
+    expect(sprites[0]).toHaveAttribute("loading", "lazy");
+    expect(screen.getByRole("option", { name: "pikachu" })).toBeInTheDocument();
+  });
+
+  it("no longer draws a ▶ cursor in the rows", () => {
+    setAutocomplete({ matches: [PIKACHU], isOpen: true, highlightedIndex: 0 });
+    render(<SearchBar onSubmit={() => {}} />);
+
+    expect(screen.queryByText("▶")).not.toBeInTheDocument();
+  });
+
+  it("asks for a name or a number", () => {
+    render(<SearchBar onSubmit={() => {}} />);
+
+    expect(screen.getByRole("combobox")).toHaveAttribute(
+      "placeholder",
+      "Search by name or number",
+    );
   });
 });
 

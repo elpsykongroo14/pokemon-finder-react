@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { StrictMode } from "react";
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useEncounter } from "./useEncounter";
 import { usePokemon } from "./usePokemon";
 import { ENCOUNTER_KEY } from "../lib/encounter";
@@ -82,5 +82,47 @@ describe("useEncounter", () => {
     renderHook(() => useEncounter());
 
     expect(sessionStorage.getItem(ENCOUNTER_KEY)).toBe("1");
+  });
+
+  //"Look for another" (spec 7.1)
+  describe("reroll", () => {
+    it("looks up a new wild Pokémon", () => {
+      vi.spyOn(Math, "random").mockReturnValueOnce(0.5).mockReturnValue(0);
+      const { result } = renderHook(() => useEncounter());
+
+      act(() => result.current.reroll());
+
+      expect(result.current.id).toBe(1);
+      expect(usePokemon).toHaveBeenLastCalledWith("1");
+    });
+
+    it("never brings back the same Pokémon, even when the dice repeat", () => {
+      vi.spyOn(Math, "random").mockReturnValue(0.5);
+      const { result } = renderHook(() => useEncounter());
+
+      act(() => result.current.reroll());
+
+      expect(result.current.id).not.toBe(513);
+    });
+
+    it("saves the new encounter, so a refresh keeps it", () => {
+      vi.spyOn(Math, "random").mockReturnValueOnce(0.5).mockReturnValue(0);
+      const { result } = renderHook(() => useEncounter());
+
+      act(() => result.current.reroll());
+
+      expect(sessionStorage.getItem(ENCOUNTER_KEY)).toBe("1");
+    });
+
+    it("rolls the dice once per reroll, even under StrictMode", () => {
+      const random = vi.spyOn(Math, "random").mockReturnValue(0.5);
+      const { result } = renderHook(() => useEncounter(), {
+        wrapper: StrictMode,
+      });
+
+      act(() => result.current.reroll());
+
+      expect(random).toHaveBeenCalledTimes(2); //the first roll, then the reroll
+    });
   });
 });

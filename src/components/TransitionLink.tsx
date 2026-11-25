@@ -2,13 +2,18 @@ import "../ui/Button.css";
 import { Link, type LinkProps } from "react-router-dom";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 import { isPlainLeftClick } from "../lib/clicks";
-import type { ButtonVariant } from "../ui/Button";
+import type { ButtonSize, ButtonVariant } from "../ui/Button";
 
 interface TransitionLinkProps extends Omit<LinkProps, "to" | "className"> {
   to: string;
   //give it a variant and the link is drawn like a Button, it is still a
   //real <a href>, because it takes you somewhere
   variant?: ButtonVariant;
+  //the Button's size, too; only means something with a variant
+  size?: ButtonSize;
+  //a link drawn some other way (a favorites tile, an evolution stage)
+  //brings its own class instead of a variant
+  className?: string;
 }
 
 //a real link that animates plain clicks through the View Transitions
@@ -17,6 +22,8 @@ interface TransitionLinkProps extends Omit<LinkProps, "to" | "className"> {
 export function TransitionLink({
   to,
   variant,
+  size = "md",
+  className,
   onClick,
   children,
   ...rest
@@ -27,8 +34,9 @@ export function TransitionLink({
     <Link
       {...rest}
       to={to}
-      className={variant ? "btn" : undefined}
+      className={variant ? "btn" : className}
       data-variant={variant}
+      data-size={variant ? size : undefined}
       onClick={(event) => {
         onClick?.(event);
         if (event.defaultPrevented || !isPlainLeftClick(event)) return;

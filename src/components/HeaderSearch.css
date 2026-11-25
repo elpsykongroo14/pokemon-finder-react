@@ -1,0 +1,40 @@
+/* Desktop: just the field, 360 px at most. Phones: the field drops below
+   the 56 px top bar as a full-width row when the toggle opens it. The
+   closed field is display: none, which also takes it out of the Tab order
+   and the accessibility tree, exactly what "collapsed" should mean */
+@layer features {
+  .header-search {
+    display: flex;
+    align-items: center;
+  }
+
+  .header-search__field {
+    width: min(360px, 30vw);
+  }
+
+  .header-search__toggle {
+    display: none;
+  }
+
+  @media (max-width: 1000px) {
+    .header-search__toggle {
+      display: inline-flex;
+    }
+
+    .header-search__field {
+      display: none;
+    }
+
+    .header-search__field[data-open] {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      display: block;
+      width: auto;
+      padding: var(--space-3) var(--space-gutter-phone);
+      border-bottom: var(--border-width-line) solid var(--border-line);
+      background: var(--surface-paper);
+    }
+  }
+}

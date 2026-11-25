@@ -17,7 +17,18 @@
     0.96,
     1
   ); /* celebrations, spring like */
-  --ease-tick: steps(6, end); /* HP bar chunky fill */
+  /* R10B: fast start, long soft landing. Plates, bars, hover wipes */
+  --ease-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* R10B: overshoots and springs back. Brand mark, VS slam, hop */
+  --ease-spring: cubic-bezier(0.3, 1.6, 0.5, 1);
+  /* R10B: a bigger overshoot for a one-off pop. Party pips */
+  --ease-pop: cubic-bezier(0.3, 1.7, 0.5, 1);
+  /* R10B: slow, fast, slow. The encounter slabs crossing the field */
+  --ease-wipe: cubic-bezier(0.7, 0, 0.3, 1);
+  /* B&W-6: starts slow and speeds away. A party card leaving */
+  --ease-leave: cubic-bezier(0.6, 0, 0.8, 0.4);
+  /* B&W-7: a little past flat, then settles. The card dialog's flip */
+  --ease-flip: cubic-bezier(0.3, 1.2, 0.4, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

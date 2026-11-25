@@ -1,14 +1,94 @@
+/* The grid as a timeline (spec 7.4). Each group is a 2 px Ink rule and a
+   two-column row: a sticky heading (the era, its years, its count) and the
+   cards. The heading sticks just under the Library's sticky toolbar, whose
+   height the page hands down as --library-toolbar-height.
+
+   Phones: one column, the heading in a row with the year on the right. */
 @layer features {
-  .card-grid {
+  .card-timeline {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: var(--space-4);
   }
 
-  .library-loading,
-  .library-empty {
+  .card-group {
+    --group-head-width: 230px;
+
+    display: grid;
+    grid-template-columns: var(--group-head-width) minmax(0, 1fr);
+    gap: var(--space-5) calc(var(--space-6) + var(--space-2));
+    padding: calc(var(--space-6) - var(--space-1)) 0
+      calc(var(--space-7) - var(--space-1));
+    border-top: var(--border-width-line) solid var(--border-line);
+  }
+
+  .card-group__head {
+    position: sticky;
+    top: calc(var(--library-toolbar-height, 0px) + var(--space-5));
+    align-self: start;
+    display: grid;
+    gap: calc(var(--space-1) + var(--space-1) / 2);
+  }
+
+  .card-group__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.75rem; /* 28 px, the era name */
+    font-weight: var(--weight-black);
+    font-style: italic;
+    font-stretch: var(--width-era);
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
+
+  .card-group__years,
+  .card-group__count {
+    margin: 0;
+    font-size: var(--text-md);
     color: var(--text-secondary);
-    text-align: center;
-    padding: var(--space-7) 0;
+  }
+
+  .card-group__years {
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(172px, 100%), 1fr));
+    gap: calc(var(--space-6) + var(--space-1)) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card-grid > li {
+    min-width: 0;
+  }
+
+  @media (max-width: 1000px) {
+    .card-group {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+
+    /* the era name, then the years pushed right; the count rides along */
+    .card-group__head {
+      position: static;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+    }
+
+    .card-group__title {
+      font-size: var(--text-xl);
+    }
+
+    .card-group__count {
+      display: none;
+    }
+
+    .card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: calc(var(--space-5) - var(--border-width-line))
+        calc(var(--space-4) - var(--border-width-line));
+    }
   }
 }

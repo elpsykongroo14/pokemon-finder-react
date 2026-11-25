@@ -1,91 +1,174 @@
+/* The stat duel (spec 7.3). Five columns: value, bar, label, bar, value.
+   The value and label columns have FIXED widths, so every row's center
+   line sits at the same x and the bars line up from one row to the next.
+
+   Both bars are measured on the same ruler (255) and grow outward from
+   the label, so their lengths compare honestly. The left bar grows from
+   its RIGHT end, so its track leans the other way (+13°), and the two
+   tracks open out like a pair of wings.
+
+   The winning side: its bar in its own Pokémon's type color (each bar
+   wears its side's data-type), its value bold Ink, plus the "+23" lead.
+   The losing side: a Line bar, a Graphite value. A tie draws both sides
+   like winners, without a lead: nobody lost. */
 @layer features {
-  /* The value and label columns have FIXED widths, so every row's centre
-     line sits at the same x and the bars line up from one row to the next. */
   .compare-stat-row {
+    --stat-row-height: 50px;
+    --stat-track-height: 14px;
+    --stat-value-size: 20px;
+
     display: grid;
-    grid-template-columns: 3.25rem minmax(0, 1fr) 4.5rem minmax(0, 1fr) 3.25rem;
+    grid-template-columns: 96px minmax(0, 1fr) 112px minmax(0, 1fr) 96px;
     grid-template-areas: "lval lbar label rbar rval";
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) 0;
-    border-bottom: var(--border-width-hairline) solid var(--border-hairline);
-  }
-
-  .compare-stat-row:last-child {
-    border-bottom: none;
+    column-gap: var(--space-4);
+    min-height: var(--stat-row-height);
   }
 
   .compare-stat-label {
     grid-area: label;
     color: var(--text-secondary);
-    font-size: var(--text-xs);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
   }
 
   .compare-stat-value {
-    font-weight: 600;
-    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--stat-value-size);
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
     font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
   }
 
   .compare-stat-value[data-side="left"] {
     grid-area: lval;
-    text-align: right;
   }
 
   .compare-stat-value[data-side="right"] {
     grid-area: rval;
-    text-align: left;
-  }
-
-  .stat-win {
-    color: var(--focus-ring);
+    justify-content: flex-end;
   }
 
   .stat-lose {
+    font-weight: var(--weight-semibold);
     color: var(--text-secondary);
   }
 
-  .compare-stat-mark {
-    margin-inline-start: var(--space-1);
+  /* the lead: a small slanted Ink chip. The chip leans, the number does
+     not (spec 4.3: skew a ::before, never the element) */
+  .compare-stat-lead {
+    position: relative;
+    isolation: isolate;
+    padding: 0 var(--space-2);
     font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--surface-paper);
   }
 
-  /* the tug-of-war: both bars are anchored at the centre (next to the label)
-     and grow outward, on the same ruler, so their lengths compare honestly */
+  .compare-stat-lead::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    background: var(--surface-ink);
+  }
+
+  /* a track leans like every stat track; it holds no text, so it skews
+     itself (the one exception to the ::before rule) */
   .compare-stat-bar {
-    display: flex;
-    height: var(--space-2);
-    border-radius: var(--radius-pill);
-    background: var(--surface-window-sunken);
+    position: relative;
+    height: var(--stat-track-height);
     overflow: hidden;
+    background: var(--surface-well);
+    transform: skewX(var(--slant));
   }
 
   .compare-stat-bar[data-side="left"] {
     grid-area: lbar;
-    justify-content: flex-end;
+    transform: skewX(calc(var(--slant) * -1));
   }
 
   .compare-stat-bar[data-side="right"] {
     grid-area: rbar;
-    justify-content: flex-start;
   }
 
+  /* the width is set once (no layout animation); the grow-in below only
+     scales it */
   .compare-stat-bar__fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
     width: var(--stat-bar-percent, 0%);
-    background: var(--text-secondary);
-    animation: compare-stat-grow var(--dur-slow) var(--ease-tick) both;
+    background: var(--theme-accent);
+    transform-origin: left center;
   }
 
-  .compare-stat-bar[data-outcome="win"] .compare-stat-bar__fill {
-    background: var(--accent-select);
+  .compare-stat-bar[data-side="left"] .compare-stat-bar__fill {
+    right: 0;
+    left: auto;
+    transform-origin: right center;
+  }
+
+  .compare-stat-bar[data-outcome="lose"] .compare-stat-bar__fill {
+    background: var(--border-hairline);
+  }
+
+  /* the total row: a 2 px rule above, bigger values, no bars */
+  .compare-stat-row[data-variant="total"] {
+    --stat-row-height: 66px;
+    --stat-value-size: 28px;
+
+    margin-top: var(--space-2);
+    border-top: var(--border-width-line) solid var(--border-line);
+  }
+
+  .compare-stat-row[data-variant="total"] .compare-stat-label {
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+  }
+
+  /* the encounter (spec 6.1): the bars grow from 0 a beat after the
+     pairing appears, 50 ms apart row by row. only with motion on, so with
+     motion off the bars are simply full */
+  :root[data-motion="on"] .compare-stat-bar__fill {
+    animation: compare-stat-grow 600ms var(--ease-settle) both;
+    animation-delay: calc(380ms + var(--stat-index, 0) * 50ms);
   }
 
   @keyframes compare-stat-grow {
     from {
-      width: 0;
+      transform: scaleX(0);
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .compare-stat-row {
+      --stat-value-size: var(--text-base);
+
+      grid-template-columns: 52px minmax(0, 1fr) 64px minmax(0, 1fr) 52px;
+      column-gap: var(--space-2);
+    }
+
+    .compare-stat-row[data-variant="total"] {
+      --stat-value-size: var(--text-xl);
+    }
+
+    /* no room for the lead badge beside the number: the bold value and
+       the colored bar still mark the winner, and the words are unchanged */
+    .compare-stat-lead {
+      display: none;
+    }
+
+    .compare-stat-label {
+      font-size: var(--text-meta);
     }
   }
 }

@@ -1,13 +1,16 @@
-/* Two quiet lines of fine print: small, secondary, tight. The credits sit on
-   one line separated by dots and wrap only when the screen is too narrow. */
+/* Footer (spec 5.7): a 2 px Ink rule, 14 px Graphite text, links in Ink.
+   The disclaimer on the left, the credits on the right; they wrap onto
+   two lines when there is no room */
 @layer features {
   .app-footer {
-    grid-area: footer;
-    display: grid;
-    gap: var(--space-1);
-    padding: var(--space-3) var(--shell-gutter) var(--space-4);
-    font-size: var(--text-xs);
-    line-height: 1.4;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-7);
+    padding: var(--space-5) var(--shell-gutter) var(--space-6);
+    border-top: var(--border-width-line) solid var(--border-line);
+    font-size: var(--text-chip);
+    line-height: 1.6;
     color: var(--text-secondary);
   }
 
@@ -38,6 +41,6 @@
   }
 
   .app-footer a:hover {
-    color: var(--accent-select);
+    color: var(--text-secondary);
   }
 }

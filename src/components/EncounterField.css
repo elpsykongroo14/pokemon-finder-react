@@ -1,0 +1,156 @@
+/* The encounter field (spec 4.1, 7.2). Every color is a field token from
+   type-themes.css; this file only places them.
+
+   Painting order inside the sky: the sky color, the ground over its lower
+   31 % (black at 16 %, with a 3 px horizon line), then the stripes, which
+   run over the ground too. isolation keeps the sky's z-index: -1 inside
+   the field instead of sliding under the page.
+
+   Desktop: a 580 px field, the stage on the left 56 %, the name plate on
+   the right half. Phones: a 370 px stage, the plate stacked underneath. */
+@layer features {
+  .encounter-field {
+    --field-height: 580px;
+    --field-ground-height: 31%;
+    --field-stage-height: 100%;
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    height: var(--field-height);
+  }
+
+  /* Home (spec 7.1): taller, with the horizon higher, so the battle dialog
+     stands on the ground under the sprite */
+  .encounter-field[data-variant="home"] {
+    --field-height: 660px;
+    --field-ground-height: 44%;
+  }
+
+  .encounter-field__sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    height: var(--field-stage-height);
+    overflow: hidden;
+    background: var(--field-sky);
+  }
+
+  .encounter-field__ground {
+    position: absolute;
+    inset: auto 0 0;
+    height: var(--field-ground-height);
+    background: var(--field-ground);
+  }
+
+  .encounter-field__ground::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: var(--border-width-thick);
+    background: var(--field-horizon);
+  }
+
+  /* wider and taller than the sky, so the drift never shows an edge */
+  .encounter-field__stripes {
+    position: absolute;
+    inset: -10% -20%;
+  }
+
+  .encounter-field__stripe {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 12%;
+    width: 15%;
+    transform: skewX(var(--slant));
+    background: var(--field-stripe);
+    opacity: var(--field-stripe-opacity);
+  }
+
+  .encounter-field__stripe[data-thin] {
+    left: 30%;
+    width: 3.5%;
+  }
+
+  /* where the stage stands: also used by the loading state, which draws
+     an empty stage in the same place */
+  .encounter-field .stage {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 56%;
+    z-index: 1;
+  }
+
+  /* a message in the field (loading, not found, offline): the battle
+     dialog at the bottom of the stage */
+  .encounter-field__message {
+    position: absolute;
+    left: var(--space-gutter);
+    bottom: var(--space-gutter);
+    z-index: 1;
+    width: min(
+      calc(100% - 2 * var(--space-gutter)),
+      calc(var(--measure-page) / 2)
+    );
+  }
+
+  /* ---- motion, all of it under data-motion="on" (D59) ---- */
+
+  /* the color swap (spec 6.1): the new sky and stripes arrive 300 ms in,
+     while the black slab covers the field. 1 ms, not a fade: a cut */
+  :root[data-motion="on"] .encounter-field__sky,
+  :root[data-motion="on"] .encounter-field__stripe {
+    transition:
+      background-color 1ms linear 300ms,
+      opacity 1ms linear 300ms;
+  }
+
+  /* the one ambient motion (D42): the stripes drift 3 % each way over 26 s */
+  :root[data-motion="on"] .encounter-field__stripes {
+    animation: field-drift 26s linear infinite alternate;
+  }
+
+  @keyframes field-drift {
+    from {
+      transform: translateX(-3%);
+    }
+
+    to {
+      transform: translateX(3%);
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .encounter-field {
+      --field-stage-height: 370px;
+      --field-ground-height: 30%;
+
+      height: auto;
+      min-height: var(--field-stage-height);
+    }
+
+    .encounter-field[data-variant="home"] {
+      --field-stage-height: 540px;
+      --field-ground-height: 44%;
+    }
+
+    .encounter-field__sky {
+      bottom: auto;
+    }
+
+    .encounter-field .stage {
+      position: relative;
+      width: 100%;
+      height: var(--field-stage-height);
+    }
+
+    .encounter-field__message {
+      left: var(--space-gutter-phone);
+      bottom: var(--space-gutter-phone);
+      width: calc(100% - 2 * var(--space-gutter-phone));
+    }
+  }
+}

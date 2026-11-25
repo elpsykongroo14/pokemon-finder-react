@@ -241,3 +241,72 @@ Motion: every loop uses one opt-in gate (:root[data-motion="on"]); motion-gate.t
 Close-out: one page-load intro (header, main, tray; 580 ms; tokens only; once per load).
 Testing Library calls every <header> a banner while Chromium and the spec don't; vi.mock fakes aren't type-checked, so incomplete fakes broke when a hook read one more field (now typed as the real context value); a "stage-idle isn't gated" claim that a browser measurement disproved; and Prettier isn't a dependency of the project at all.
 Deferred to R10: pin Prettier and add a format check to CI; a Firefox, Safari and real-touch-device pass; profile the width-animated stat bars if they ever stutter.
+
+11-21-2026: UI rehaul, B&W-1 Foundation
+the vanilla port copies the final design. The class contract had gone stale (.stat-row and friends no longer exist), so it was regenerated from the tests.
+Rarity: Double Rare, Rare BREAK and Promo were missing from RARITY_RANK and fell to rank 0. Tests written first (4 red), then the table.
+Fonts: Archivo variable (weight and width) replaces Nunito; Jersey 10 is now --font-game, used only for game text. The two preloaded latin files are 90 + 102 kB against Nunito's 39 kB, because both axes live in one file. Preloading the italic gets re-checked with Lighthouse in B&W-8.
+Tokens: the same semantic roles were rebound to five neutrals, and .on-dark uses the .surface-window pattern. Field variables are declared on :root, [data-type], because a var() inside a custom property is resolved where it is declared, so a themed half on Compare would otherwise inherit the page's sky. Flat shadows are 0 0 0 0 transparent, because none voids a comma-separated box-shadow list.
+
+11-21-2026: UI rehaul, Primitives
+Restyled every primitive in the B&W language: Button (dark / line / light / ghost plus a small size), SegmentedControl, Tabs, Toggle, Input, Select, TypeBadge (sizes, matchup multiplier), StatMeter, MessageBox as the battle dialog with a ▼ caret, and Dialog. New: SectionHeading. IconButton became its own square utility.
+Pattern: the plate leans, the content doesn't. Every slanted part skews a ::before, and the focus ring is a skewed ::after. Button variants set three local variables and hover only swaps them.
+Logic, tests first: multiplierText and multiplierSpoken (one fact, two forms: a glyph for eyes, words for ears); the caret is derived from "nothing left to type" instead of a state flag; SectionHeading renders <Tag> from a variable.
+
+11-22-2026: UI rehaul, Shell
+A white header: the new half-black brand mark, nav links on slanted plates (Mist wipe on hover, Ink plate for the current page), a Mist search field, party pips filled in each member's type color, and an outline gear. On phones the same nav becomes the bottom bar, and the search hides behind a disclosure button. The Backdrop and the page-load intro are gone.
+Logic, tests first:
+
+- usePartyArrival, my first "adjust state during render" hook: it pops only the pip of a member who just joined, never the party loaded with the page.
+- HeaderSearch, a disclosure with aria-expanded and aria-controls, which focuses the field from an effect once it's visible.
+- spriteUrlFromId, which replaced a details fetch on every arrow key.
+- "No. 025" everywhere.
+
+11-23-2026: UI rehaul, Pokémon page
+The big one. Every Pokémon now appears in an encounter field: a sky in its type color, a darker ground, stripes in its second type, and a battle platform. A black slab wipes across, the sprite drops in as a silhouette and flashes into color, and a black name plate slides in with the dex number, the name, the chips, the base stat total and the four actions. Favorites became a rail of tiles under the field. On desktop the details are all visible at once; on phones they're tabs.
+Logic, tests first:
+
+- useMediaQuery with useSyncExternalStore, my first external-store hook.
+- Toggles that return what they did, so the page can say it in one live line.
+- evolutionCondition, which shows "Level 50" and "Dusk Stone".
+- groupMatchups and formatSlug.
+  What I learned: the encounter restarts by itself through one key on the inner layer, and the field must not have one, or its sky would be born with the new color and skip the swap under the slab. A test checks that the field is the same DOM node across Pokémon.
+
+  11-23-2026: UI rehaul, Home & Compare
+  Home is one encounter field: the Stage and the wipe are keyed by name, the field, the dialog and the command plate are not. A keyed plate would throw "Look for another" away mid-click and drop focus; an unkeyed live region is what makes the new greeting get announced. The dialog types line by line in CSS (clip-path in steps of the line's length), and only the keyframe covers the text.
+  Logic, tests first: pickNextEncounterId (never the same Pokémon; steps to the next number instead of rolling again), rolled in the click handler because React may run updaters twice; pickForSide / swapPair (picking the other side's Pokémon swaps); useComparePageState, which remembers what was on screen so a pick or a Swap keeps the comparison up (pending, aria-busy) and keeps focus in the picker.
+  Compare: two halves wearing their own data-type, each bar in the duel wearing its side's type, "+n" leads instead of arrows, a total row, a verdict live line. SearchBar ids come from useId (three on one page; this also fixes Library's duplicate ids). New .on-light scope for the white autocomplete panel inside the black band.
+
+11-24-2026: UI rehaul, Team
+The Team page is a black title band and six party cards. Each card is a small encounter field (FieldSky reused; data-type and data-type2 on the card pick its colors), then dex number, Lead tag, name, chips, base stat total and Remove.
+Logic, tests first: team members save their stat total (D49); favorites don't. One rule, isIncompleteMember, decides both what the reducer may backfill and whom the backfill hook fetches next. Removing with animations off is immediate, because an animation that never runs never ends.
+The card has one link, the name, stretched over the card; "Details" is decoration, so a keyboard user gets one stop per card, not two.
+
+11-24-2026: UI rehaul, Library
+The Library is a hero (the hand of three, dealt in), a sticky toolbar, and three views of the same cards: a series timeline, a six-column table, and binder spreads. One card face, HoloCard, everywhere; the button around it owns the pointer and the tilt variables inherit down.
+Logic, tests first: card numbers, stages and dates; grouping by series or tier; the hand; a summary that both the hero's sentence and the Pokémon page's teaser read; card stepping by id; binder spreads that keep ?page= meaning one page (D54).
+Keys did the motion again: the flipper per card, binder pages per page number, the hand per Pokémon, the grid per view and sort. The page turn stores where it was going, so Back never replays it.
+
+11-24-2026: UI rehaul, pass and polish
+Audited in a real browser, not just jsdom: 18 routes and states at three widths with axe (contrast on), a focus-ring walk, overflow and console checks; forced loading and offline states; a motion pass in three modes; 320 px, the 1000 px edge and long names.
+Found and fixed: a misspelled class (lost-rout) that kept the 404's styles from ever applying; focus dropping to <body> when Next disabled itself at the end of the binder or dialog; a second banner landmark from the settings dialog's <header>; pixelated artwork in the favorites rail; 1x Compare sprites on phones; cramped Home commands at 1001-1279 px.
+Finished the spec's states: loading dialog, Library Retry, dark Retry, Graphite 404, display PageHeader. Deleted seven unused primitives and the old scope and tokens.
+
+11-24-2026: fixes after B&W-8
+11-24-2026: fixes after B&W-8
+Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
+A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
+Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
+The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a
+
+11-24-2026: fixes after B&W-8
+Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
+A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
+Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
+The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a cache.
+
+11-25-2026: fixes after B&W-8
+Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
+A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
+Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
+The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a cache.

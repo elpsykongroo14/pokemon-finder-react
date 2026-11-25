@@ -1,8 +1,11 @@
+/* A white sheet over a dimmed page (spec 7.6): 2 px Ink, 14 px corners. No notched Panel inside any more; the
+   content box is the surface. The black card dialog and the phone sheet
+   are variants B&W-7 adds together with their only caller */
 @layer features {
   .dialog {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    z-index: var(--z-modal);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -21,6 +24,11 @@
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
+    padding: var(--space-6);
+    border: var(--border-width-line) solid var(--border-line);
+    border-radius: var(--radius-dialog);
+    background: var(--surface-paper);
+    color: var(--text-primary);
   }
 
   .dialog__content:focus-visible {
@@ -31,5 +39,80 @@
     position: absolute;
     top: var(--space-3);
     right: var(--space-3);
+  }
+
+  /* ---- the black card stage (spec 7.4) ----
+     A 92 % black scrim with a blur behind it; the content has no box of
+     its own (the card and its facts sit straight on the black), aligned
+     to the top so a tall card scrolls instead of being cut */
+  .dialog[data-variant="stage"] {
+    align-items: flex-start;
+    padding: max(4vh, var(--space-6)) var(--space-6) var(--space-6);
+    overflow-y: auto;
+  }
+
+  .dialog[data-variant="stage"] .dialog__backdrop {
+    position: fixed;
+    background: var(--surface-overlay-deep);
+    backdrop-filter: blur(8px);
+  }
+
+  .dialog[data-variant="stage"] .dialog__content {
+    max-width: 1080px;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .dialog[data-variant="stage"] .dialog__close {
+    top: calc(var(--space-2) * -1);
+    right: calc(var(--space-2) * -1);
+    z-index: 1;
+  }
+
+  /* phones (spec 8): the stage becomes a black bottom sheet with a grab
+     handle, sliding up from below */
+  @media (max-width: 1000px) {
+    .dialog[data-variant="stage"] {
+      align-items: flex-end;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .dialog[data-variant="stage"] .dialog__content {
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: var(--space-7) var(--space-gutter-phone) var(--space-5);
+      border-radius: var(--radius-dialog) var(--radius-dialog) 0 0;
+      background: var(--surface-ink);
+      animation: dialog-sheet-up var(--dur-slow) var(--ease-settle) both;
+    }
+
+    /* the grab handle: a short Graphite bar, for the eye only */
+    .dialog[data-variant="stage"] .dialog__content::before {
+      content: "";
+      position: absolute;
+      top: var(--space-3);
+      left: 50%;
+      width: var(--space-7);
+      height: var(--space-1);
+      translate: -50% 0;
+      border-radius: var(--radius-pill);
+      background: var(--border-hairline);
+    }
+
+    .dialog[data-variant="stage"] .dialog__close {
+      top: var(--space-4);
+      right: var(--space-3);
+    }
+  }
+
+  @keyframes dialog-sheet-up {
+    from {
+      transform: translateY(100%);
+    }
   }
 }

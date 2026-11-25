@@ -92,4 +92,97 @@ describe("MessageBox", () => {
     const { container } = renderBox("Loading…");
     expect(typedText(container)).toBe("Loading…");
   });
+
+  //the blinking triangle in the corner of a battle dialog: "done talking,
+  //your move". it must not show while the line is still typing
+  it("shows the continue caret only once the text has finished typing", () => {
+    const { container } = renderBox("Hi");
+    expect(container.querySelector(".message-box__caret")).toBeNull();
+
+    act(() => {
+      vi.advanceTimersByTime(TYPEWRITER_TICK_MS * 2);
+    });
+    const caret = container.querySelector(".message-box__caret");
+    expect(caret).toBeInTheDocument();
+    expect(caret).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("never shows the caret on an error", () => {
+    const { container } = renderBox("Pokémon not found", "error");
+    expect(container.querySelector(".message-box__caret")).toBeNull();
+  });
+
+  //B&W-5, Home's battle dialog (spec 6.1): each line types out on the
+  //encounter's clock, in CSS. the text itself is all there from the start
+  describe("typing line by line", () => {
+    const TEXT = "A wild ZOROARK appeared!\nWhat will you do?";
+
+    function renderLines(text = TEXT) {
+      return render(
+        <PreferencesProvider>
+          <MessageBox text={text} typing="lines" />
+        </PreferencesProvider>,
+      );
+    }
+
+    it("puts every line in the page at once, each with its length for the CSS", () => {
+      const { container } = renderLines();
+
+      const lines =
+        container.querySelectorAll<HTMLElement>(".message-box__line");
+      expect(lines).toHaveLength(2);
+      expect(lines[0]).toHaveTextContent("A wild ZOROARK appeared!");
+      expect(lines[0].style.getPropertyValue("--chars")).toBe("24");
+      expect(lines[1].style.getPropertyValue("--chars")).toBe("17");
+      expect(typedText(container)).toBe(
+        "A wild ZOROARK appeared!What will you do?",
+      );
+    });
+
+    it("shows the caret from the start, since no script is typing", () => {
+      const { container } = renderLines();
+
+      expect(
+        container.querySelector(".message-box__caret"),
+      ).toBeInTheDocument();
+    });
+
+    //a live region announces CHANGES to its text. replacing the region
+    //itself with a new one that already holds the text is often not read
+    //at all, so a new Pokémon must change the text inside the same region
+    it("keeps the same live region when the text changes, so it is announced", () => {
+      const view = renderLines();
+      const status = screen.getByRole("status");
+
+      view.rerender(
+        <PreferencesProvider>
+          <MessageBox
+            text={"A wild PIKACHU appeared!\nWhat will you do?"}
+            typing="lines"
+          />
+        </PreferencesProvider>,
+      );
+
+      expect(screen.getByRole("status")).toBe(status);
+      expect(status).toHaveTextContent("A wild PIKACHU appeared!");
+    });
+
+    it("draws fresh lines for new text, so the typing plays again", () => {
+      const view = renderLines();
+      const before = view.container.querySelector(".message-box__line");
+
+      view.rerender(
+        <PreferencesProvider>
+          <MessageBox
+            text={"A wild PIKACHU appeared!\nWhat will you do?"}
+            typing="lines"
+          />
+        </PreferencesProvider>,
+      );
+
+      expect(view.container.querySelector(".message-box__line")).not.toBe(
+        before,
+      );
+    });
+  });
 });

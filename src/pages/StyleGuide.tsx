@@ -2,25 +2,21 @@ import { useState } from "react";
 import "./StyleGuide.css";
 import { Button } from "../ui/Button";
 import { IconButton } from "../ui/IconButton";
-import { Panel } from "../ui/Panel";
-import { Cursor } from "../ui/Cursor";
-import { Menu } from "../ui/Menu";
-import { MenuItem } from "../ui/MenuItem";
 import { Tabs } from "../ui/Tabs";
 import { TabList } from "../ui/TabList";
 import { Tab } from "../ui/Tab";
 import { TabPanel } from "../ui/TabPanel";
 import { MessageBox } from "../ui/MessageBox";
 import { StatMeter } from "../ui/StatMeter";
-import { Toggle } from "../ui/Toggle";
 import { Select } from "../ui/Select";
-import { Input } from "../ui/Input";
 import { Dialog } from "../ui/Dialog";
 import { Spinner } from "../ui/Spinner";
 import { Skeleton } from "../ui/Skeleton";
 import { TypeBadge } from "../components/TypeBadge";
 import { Icon } from "../components/Icon";
-import { StageConsole } from "../ui/StageConsole";
+import { SegmentedControl } from "../ui/SegmentedControl";
+import { SectionHeading } from "../ui/SectionHeading";
+import { TierMark } from "../components/TierMark";
 
 const TYPES = [
   "normal",
@@ -43,89 +39,81 @@ const TYPES = [
   "fairy",
 ] as const;
 
-const NEUTRAL_RAMP = [
-  "900",
-  "800",
-  "700",
-  "600",
-  "500",
-  "400",
-  "300",
-  "100",
-  "050",
-];
-const TEAL_RAMP = ["700", "600", "500"];
-const GOLD_RAMP = ["600", "500", "400"];
+//the five neutrals of the Black & White base (D41). Every other color on
+//screen comes from a Pokémon type, shown in the chips below
+const NEUTRALS = [
+  ["ink", "Text, plates, primary buttons"],
+  ["paper", "The page"],
+  ["mist", "Inputs, tracks, hover fills"],
+  ["line", "Hairlines, inactive pips"],
+  ["graphite", "Secondary text"],
+] as const;
 
-/** Static because it documents a measurement, not app state — these are
- * the exact ratios computed while building type-themes.css (Part 4). */
-const CONTRAST_ROWS: Array<[string, string, number]> = [
-  ["normal", "dark", 7.46],
-  ["fire", "dark", 6.47],
-  ["water", "dark", 5.49],
-  ["electric", "dark", 11.4],
-  ["grass", "dark", 7.41],
-  ["ice", "dark", 11.53],
-  ["fighting", "light", 5.41],
-  ["poison", "light", 5.35],
-  ["ground", "dark", 10.41],
-  ["flying", "dark", 6.92],
-  ["psychic", "dark", 5.89],
-  ["bug", "dark", 8.34],
-  ["rock", "dark", 7.1],
-  ["ghost", "light", 5.65],
-  ["dragon", "light", 5.54],
-  ["dark", "light", 6.29],
-  ["steel", "dark", 9.44],
-  ["fairy", "dark", 8.55],
-];
+const SECTION_DEMO = "Base stats";
+const VIEW_OPTIONS = [
+  { value: "grid", label: "Grid" },
+  { value: "table", label: "Table" },
+  { value: "binder", label: "Binder" },
+] as const;
+const MATCHUPS = [
+  ["ground", 4],
+  ["fire", 2],
+  ["grass", 0.5],
+  ["bug", 0.25],
+  ["electric", 0],
+] as const;
 
 export function StyleGuide() {
   const [activeType, setActiveType] = useState<(typeof TYPES)[number]>("fire");
-  const [lastSelected, setLastSelected] = useState<string | null>(null);
-  const [shinyDemo, setShinyDemo] = useState(false);
   const [sortDemo, setSortDemo] = useState("newest");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [viewDemo, setViewDemo] =
+    useState<(typeof VIEW_OPTIONS)[number]["value"]>("grid");
 
   return (
     <div className="styleguide">
       <header className="styleguide__intro">
         <h1>Style Guide (dev only)</h1>
         <p>
-          Every token from Parts 1–4, rendered so they can be checked by eye
-          instead of by reading CSS.
+          The Black & White primitives (R10B), rendered so they can be checked
+          by eye. The picked type below themes every section marked "themed".
         </p>
       </header>
 
       <section className="styleguide__section">
         <h2>Palette</h2>
-        <SwatchRow label="Slate (chrome)" prefix="slate" steps={NEUTRAL_RAMP} />
-        <SwatchRow
-          label="Teal (border-line / accent)"
-          prefix="teal"
-          steps={TEAL_RAMP}
-        />
-        <SwatchRow
-          label="Gold (selection accent)"
-          prefix="gold"
-          steps={GOLD_RAMP}
-        />
+        <div className="swatch-row__swatches">
+          {NEUTRALS.map(([name, role]) => (
+            <div key={name} className="swatch-row">
+              <div
+                className="swatch"
+                style={{ background: `var(--${name})` }}
+              />
+              <p className="swatch-row__label">
+                <strong>{name}</strong> {role}
+              </p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="styleguide__section">
-        <h2>Type badges (base fill + ink text)</h2>
+        <h2>TypeBadge</h2>
         <div className="type-grid">
           {TYPES.map((t) => (
-            <span
-              key={t}
-              className="type-badge"
-              style={{
-                background: `var(--type-${t})`,
-                color: `var(--type-${t}-ink)`,
-              }}
-            >
-              {t}
-            </span>
+            <TypeBadge key={t} typeName={t} />
+          ))}
+        </div>
+        <p className="styleguide__note">Sizes: sm, md, lg</p>
+        <div className="primitives-row">
+          <TypeBadge typeName="dragon" size="sm" />
+          <TypeBadge typeName="dragon" />
+          <TypeBadge typeName="dragon" size="lg" />
+        </div>
+        <p className="styleguide__note">With a matchup multiplier</p>
+        <div className="primitives-row">
+          {MATCHUPS.map(([t, m]) => (
+            <TypeBadge key={t} typeName={t} multiplier={m} />
           ))}
         </div>
       </section>
@@ -155,43 +143,12 @@ export function StyleGuide() {
       </section>
 
       <section className="styleguide__section">
-        <h2>Panel</h2>
-        <div className="primitives-row">
-          <Panel variant="raised">Raised</Panel>
-          <Panel variant="sunken">Sunken</Panel>
-          <div data-type={activeType}>
-            <Panel variant="tinted">Tinted ({activeType})</Panel>
-          </div>
-        </div>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>StageConsole</h2>
+        <h2>Contrast</h2>
         <p className="styleguide__note">
-          Resize the window: stacked below 1024px, side by side from 1024px.
+          Enforced by tests, not by a table: semantic.test.ts (every text role
+          on every surface, the focus ring) and type-themes.test.ts (each type's
+          ink on its color).
         </p>
-        <StageConsole
-          stage={
-            <div data-type={activeType}>
-              <Panel variant="tinted">Stage: the hero of the page</Panel>
-            </div>
-          }
-        >
-          <Panel>Console: menus, tabs and details</Panel>
-        </StageConsole>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>Elevation (D14)</h2>
-        <p className="styleguide__note">
-          Press and hold each box — the hard shadow collapses instead of fading.
-        </p>
-        <div className="elevation-row">
-          <div className="elevation-box elevation-box--frame">On frame</div>
-          <div className="surface-window elevation-box elevation-box--window">
-            On window
-          </div>
-        </div>
       </section>
 
       <section className="styleguide__section">
@@ -205,90 +162,40 @@ export function StyleGuide() {
 
       <section className="styleguide__section">
         <h2>Typography</h2>
-        <p style={{ font: "400 var(--text-display)/1.1 var(--font-display)" }}>
-          CHARIZARD #006
+        <p className="type-sample type-sample--display">Hydreigon</p>
+        <SectionHeading>Type matchups</SectionHeading>
+        <p>Build a party of up to six. It stays saved in this browser.</p>
+        <p className="type-sample type-sample--game">
+          A wild HYDREIGON appeared!
         </p>
-        <p style={{ font: "400 var(--text-xl)/1.2 var(--font-body)" }}>
-          Charizard flies around the sky in search of powerful opponents.
-        </p>
-        <p
-          style={{
-            font: "400 var(--text-sm)/1.4 var(--font-body)",
-            color: "var(--text-secondary)",
-          }}
-        >
-          Height 1.7 m · Weight 90.5 kg · 0123456789
-        </p>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>Contrast table (Part 4 measurements)</h2>
-        <table className="contrast-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Ink</th>
-              <th>Ratio</th>
-              <th>AA (4.5:1)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {CONTRAST_ROWS.map(([type, ink, ratio]) => (
-              <tr key={type}>
-                <td>{type}</td>
-                <td>{ink}</td>
-                <td>{ratio.toFixed(2)}:1</td>
-                <td>{ratio >= 4.5 ? "pass" : "FAIL"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <p className="type-sample type-sample--game">No. 635</p>
       </section>
 
       <section className="styleguide__section">
         <h2>Button / IconButton</h2>
+        <p className="styleguide__note">On white: dark and line</p>
         <div className="primitives-row">
-          <Button variant="primary">Primary</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button variant="danger">Danger</Button>
-          <Button pressed>Pressed toggle</Button>
+          <Button>Find a Pokémon</Button>
+          <Button variant="line">Details</Button>
+          <Button variant="line" size="sm">
+            Small
+          </Button>
+          <Button variant="line" pressed>
+            Pressed toggle
+          </Button>
           <Button loading>Saving</Button>
-          <IconButton icon="♥" aria-label="Favorite" />
+          <Button disabled>Disabled</Button>
+          <IconButton icon={<Icon name="settings" />} aria-label="Settings" />
         </div>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>Cursor</h2>
-        <div className="cursor-demo">
-          <Cursor offset={0} />
-          <div className="cursor-demo__row">Fight</div>
-          <div className="cursor-demo__row">Bag</div>
+        <p className="styleguide__note">On a black plate: light and ghost</p>
+        <div className="primitives-row on-dark styleguide__plate">
+          <Button variant="light">Favorited</Button>
+          <Button variant="ghost">Compare</Button>
+          <Button variant="ghost" pressed>
+            Pressed toggle
+          </Button>
+          <TypeBadge typeName="bug" />
         </div>
-      </section>
-
-      <section className="styleguide__section">
-        <h2>Menu / MenuItem</h2>
-        <p className="styleguide__note">
-          Click in, then use arrow keys, Home and End.
-        </p>
-        <Menu aria-label="Battle menu demo">
-          <MenuItem index={0} onSelect={() => setLastSelected("Fight")}>
-            Fight
-          </MenuItem>
-          <MenuItem index={1} onSelect={() => setLastSelected("Bag")}>
-            Bag
-          </MenuItem>
-          <MenuItem index={2} onSelect={() => setLastSelected("Pokémon")}>
-            Pokémon
-          </MenuItem>
-          <MenuItem index={3} onSelect={() => setLastSelected("Run")}>
-            Run
-          </MenuItem>
-        </Menu>
-        <p className="styleguide__note">
-          Last selected: {lastSelected ?? "none yet"}
-        </p>
       </section>
 
       <section className="styleguide__section">
@@ -305,8 +212,30 @@ export function StyleGuide() {
         </Tabs>
       </section>
       <section className="styleguide__section">
-        <h2>MessageBox</h2>
-        <div className="primitives-column">
+        <h2>SegmentedControl</h2>
+        <SegmentedControl
+          label="Library view"
+          labelVisible
+          options={VIEW_OPTIONS}
+          value={viewDemo}
+          onChange={setViewDemo}
+          description="Arrow keys move between options."
+        />
+      </section>
+
+      <section className="styleguide__section">
+        <h2>SectionHeading</h2>
+        <section aria-labelledby="styleguide-section-demo">
+          <SectionHeading id="styleguide-section-demo">
+            {SECTION_DEMO}
+          </SectionHeading>
+          <p>A 2 px Ink rule, 16 px, the heading, 20 px, then the content.</p>
+        </section>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>MessageBox (themed)</h2>
+        <div className="primitives-column" data-type={activeType}>
           <MessageBox text="A wild PIKACHU appeared!" />
           <MessageBox text="Added to your team!" variant="success" />
           <MessageBox text="Pokémon not found." variant="error" />
@@ -314,8 +243,8 @@ export function StyleGuide() {
       </section>
 
       <section className="styleguide__section">
-        <h2>StatMeter</h2>
-        <div className="primitives-column">
+        <h2>StatMeter (themed)</h2>
+        <div className="primitives-column" data-type={activeType}>
           <StatMeter label="Attack" value={80} max={255} />
           <StatMeter label="Speed" value={130} max={255} variant="highest" />
           <StatMeter label="HP (low)" value={15} max={100} variant="tiered" />
@@ -325,9 +254,8 @@ export function StyleGuide() {
       </section>
 
       <section className="styleguide__section">
-        <h2>Toggle / Select / Input</h2>
+        <h2>Select</h2>
         <div className="primitives-row">
-          <Toggle checked={shinyDemo} onChange={setShinyDemo} label="Shiny" />
           <Select
             aria-label="Sort demo"
             value={sortDemo}
@@ -337,7 +265,20 @@ export function StyleGuide() {
             <option value="oldest">Oldest</option>
             <option value="rarity">Rarity</option>
           </Select>
-          <Input aria-label="Text input demo" placeholder="Type here" />
+        </div>
+      </section>
+
+      <section className="styleguide__section">
+        <h2>TierMark</h2>
+        <p className="styleguide__note">
+          One mark in four strengths (spec 7.4); the words are the card's own
+          rarity
+        </p>
+        <div className="primitives-row">
+          <TierMark rarity="Common" />
+          <TierMark rarity="Rare" />
+          <TierMark rarity="Rare Holo" />
+          <TierMark rarity="Special Illustration Rare" />
         </div>
       </section>
 
@@ -372,47 +313,6 @@ export function StyleGuide() {
           <Icon name="x" label="X" />
         </div>
       </section>
-
-      <section className="styleguide__section">
-        <h2>TypeBadge</h2>
-        <div className="primitives-row">
-          <TypeBadge typeName="water" />
-          <TypeBadge typeName="electric" />
-          <div className="primitives-row">
-            <TypeBadge typeName="fire" />
-            <TypeBadge typeName="flying" />
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function SwatchRow({
-  label,
-  prefix,
-  steps,
-}: {
-  label: string;
-  prefix: string;
-  steps: string[];
-}) {
-  return (
-    <div className="swatch-row">
-      <p className="swatch-row__label">{label}</p>
-      <div className="swatch-row__swatches">
-        {steps.map((step) => (
-          <div
-            key={step}
-            className="swatch"
-            style={{ background: `var(--${prefix}-${step})` }}
-          >
-            <span>
-              {prefix}-{step}
-            </span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

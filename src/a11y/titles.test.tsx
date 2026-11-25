@@ -23,7 +23,7 @@ describe("every route has its own document title", () => {
     ["/", "Pokémon Finder"],
     ["/pokemon/pikachu", "Pikachu · Pokémon Finder"],
     ["/compare", "Compare Pokémon · Pokémon Finder"],
-    ["/team", "Your Team · Pokémon Finder"],
+    ["/team", "Your team · Pokémon Finder"],
     ["/library", "TCG Library · Pokémon Finder"],
     ["/library/pikachu", "TCG Library: pikachu · Pokémon Finder"],
     ["/no/such/page", "Page not found · Pokémon Finder"],

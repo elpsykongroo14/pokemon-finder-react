@@ -44,10 +44,14 @@ export function usePokemon(name: string): UsePokemonResult {
     async function run() {
       try {
         const result = await fetchPokemon(name, { signal: controller.signal });
+        //a cached answer ignores the signal: a cancelled lookup can still
+        //get here, and must not write over the newer one
+        if (controller.signal.aborted) return;
         setData(result);
         setOutCome({ failure: null });
       } catch (err: unknown) {
         //abort = a newer request replaced this one. say nothing, change nothing
+        if (controller.signal.aborted) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
         setOutCome({ failure: classifyFetchError(err) });
       }

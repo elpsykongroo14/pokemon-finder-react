@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState, useMemo } from "react";
+import { useCallback, useEffect, useReducer, useState, useMemo } from "react";
 import {
   fetchTCGCards,
   fetchTCGCardsBatch,
@@ -22,6 +22,10 @@ export function useTCGLibrary(pokemonName?: string) {
     initialTCGLibraryState,
   );
   const [sortMode, setSortMode] = useState<SortMode>("newest");
+  //how many times the person asked to try again: it exists only so the
+  //effect below has something new to run on when the name is unchanged
+  //(the same idea as usePokemon's retry)
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -50,7 +54,7 @@ export function useTCGLibrary(pokemonName?: string) {
 
     run();
     return () => controller.abort();
-  }, [pokemonName]);
+  }, [pokemonName, attempt]);
 
   //derived, not stored same principle as sortTCGCards itself.
   //we recompute this from state.cards + sortMode on every render instead of keeping a second "sortCards" field in the reducer.
@@ -60,7 +64,11 @@ export function useTCGLibrary(pokemonName?: string) {
     [state.cards, sortMode],
   );
 
-  return { ...state, cards: sortedCards, sortMode, setSortMode };
+  //Retry (B&W-8, spec 7.6). FETCH_START runs in the effect, a render
+  //later; the count changes now, so the button's click is all it takes
+  const retry = useCallback(() => setAttempt((count) => count + 1), []);
+
+  return { ...state, cards: sortedCards, sortMode, setSortMode, retry };
 }
 
 async function fetchFeaturedCards(signal: AbortSignal): Promise<TCGCard[]> {

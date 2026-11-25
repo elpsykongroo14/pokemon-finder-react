@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { buildEvolutionTree, collectEvolutionNames } from "./evolution";
+import {
+  buildEvolutionTree,
+  collectEvolutionNames,
+  evolutionCondition,
+} from "./evolution";
 import type { ChainLink } from "./type";
 
 function link(name: string, evolves_to: ChainLink[] = []): ChainLink {
@@ -61,5 +65,80 @@ describe("collectEvolutionNames", () => {
       "ivysaur",
       "venusaur",
     ]);
+  });
+});
+
+describe("evolutionCondition (D47)", () => {
+  const trigger = (name: string) => ({ name, url: "" });
+
+  it("names a level-up by its level", () => {
+    expect(
+      evolutionCondition([{ trigger: trigger("level-up"), min_level: 50 }]),
+    ).toBe("Level 50");
+  });
+
+  it("names an evolution stone, in words", () => {
+    expect(
+      evolutionCondition([
+        { trigger: trigger("use-item"), item: { name: "dusk-stone", url: "" } },
+      ]),
+    ).toBe("Dusk Stone");
+  });
+
+  it("names a trade", () => {
+    expect(evolutionCondition([{ trigger: trigger("trade") }])).toBe("Trade");
+  });
+
+  it("names a friendship level-up", () => {
+    expect(
+      evolutionCondition([
+        { trigger: trigger("level-up"), min_level: null, min_happiness: 160 },
+      ]),
+    ).toBe("Friendship");
+  });
+
+  it("shows no label for a trigger it cannot name", () => {
+    expect(evolutionCondition([{ trigger: trigger("shed") }])).toBeUndefined();
+    //level-up with nothing we model (a move, a place, a time of day)
+    expect(
+      evolutionCondition([{ trigger: trigger("level-up") }]),
+    ).toBeUndefined();
+  });
+
+  it("shows no label for the first stage, which has no details", () => {
+    expect(evolutionCondition([])).toBeUndefined();
+    expect(evolutionCondition(undefined)).toBeUndefined();
+  });
+
+  it("reads the first entry when the games disagree", () => {
+    expect(
+      evolutionCondition([
+        { trigger: trigger("level-up"), min_level: 30 },
+        { trigger: trigger("trade") },
+      ]),
+    ).toBe("Level 30");
+  });
+});
+
+describe("buildEvolutionTree with conditions", () => {
+  it("puts each stage's condition on that stage", () => {
+    const chain: ChainLink = {
+      species: { name: "deino", url: "" },
+      evolution_details: [],
+      evolves_to: [
+        {
+          species: { name: "zweilous", url: "" },
+          evolution_details: [
+            { trigger: { name: "level-up", url: "" }, min_level: 50 },
+          ],
+          evolves_to: [],
+        },
+      ],
+    };
+
+    const tree = buildEvolutionTree(chain);
+
+    expect(tree.condition).toBeUndefined();
+    expect(tree.children[0].condition).toBe("Level 50");
   });
 });

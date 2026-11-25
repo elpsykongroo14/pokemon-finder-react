@@ -1,6 +1,11 @@
 import type { FetchFailureKind } from "./fetchErrors";
 import type { StatOutcome } from "./statComparison";
 import type { AnimationMode } from "./preferences";
+import type { FavoriteOutcome, TeamOutcome } from "./type";
+import { formatSlug } from "./text";
+import { MAX_TEAM } from "./teamReducer";
+import type { SpriteMode } from "./sprites";
+import type { CardsSummary, RarityTier, YearSpan } from "./tcg";
 
 //every sentence the user reads when something goes wrong lives here
 //components pick a massage by kind,
@@ -14,9 +19,6 @@ export const LOADING_LABEL = "Searching the tall grass…";
 export const CARDS_LOADING_LABEL = "Flipping through the binder…";
 export const BINDER_PAGES_LABEL = "Binder pages";
 
-export const SORT_CARDS_LABEL = "Sort cards";
-export const CARD_ZOOM_LABEL = "Zoom card";
-
 //the dialog's accessible name: a screen reader says "Charizard card details, dialog"
 export function cardDialogLabel(name: string): string {
   return `${name} card details`;
@@ -24,11 +26,88 @@ export function cardDialogLabel(name: string): string {
 
 export const RETRY_LABEL = "Retry";
 
-//toggle buttons keep ONE name; their state is aria-pressed
+//toggle buttons keep ONE name; their state is aria-pressed. only the
+//visible words swap (D44)
 export const FAVORITE_TOGGLE_LABEL = "Favorite";
 export const TEAM_TOGGLE_LABEL = "Team";
+export const FAVORITE_OFF_TEXT = "Favorite";
+export const FAVORITE_ON_TEXT = "Favorited";
+export const TEAM_OFF_TEXT = "Add to team";
+export const TEAM_ON_TEXT = "On your team";
+export const COMPARE_LINK_TEXT = "Compare";
+export const CARDS_LINK_TEXT = "Cards";
+
+//the inline confirmation under the actions (spec 6.2): one sentence about
+//the last click, replaced by the next one, never stacked
+export const FAVORITE_SAVED = "Saved to your favorites.";
+export const FAVORITE_REMOVED = "Removed from favorites.";
+
+export function favoriteNote({ added, first }: FavoriteOutcome): string {
+  if (!added) return FAVORITE_REMOVED;
+  return first ? FIRST_FAVORITE : FAVORITE_SAVED;
+}
+
+//null for a refused add: the party-full hint already says why
+export function teamNote(name: string, outcome: TeamOutcome): string | null {
+  const who = formatSlug(name);
+  const filled = `${outcome.size} of ${MAX_TEAM} slots filled.`;
+  switch (outcome.kind) {
+    case "joined":
+      return `${who} joined your party. ${filled}`;
+    case "left":
+      return `${who} left your party. ${filled}`;
+    case "rejected":
+      return null;
+  }
+}
+
+//the name plate and the readout (spec 7.2)
+export const BASE_STAT_TOTAL_LABEL = "Base stat total";
+export const READOUT_LABEL = "Pokémon details";
+export const STATS_HEADING = "Base stats";
+export const PROFILE_HEADING = "Profile";
+export const EVOLUTION_HEADING = "Evolution";
+export const MATCHUPS_HEADING = "Type matchups";
+//the phone tabs: shorter words for the same four sections
+export const STATS_TAB = "Stats";
+export const MATCHUPS_TAB = "Matchups";
+export const HIDDEN_ABILITY_LABEL = "Hidden ability";
+export const NO_HIDDEN_ABILITY = "None";
+export const WEAK_TO_LABEL = "Weak to";
+export const RESISTS_LABEL = "Resists";
+export const IMMUNE_TO_LABEL = "Immune to";
+export const EVOLUTION_LOADING = "Loading evolution chain...";
+export const EVOLUTION_FAILED = "Couldn't load evolution data.";
+export const NO_EVOLUTION = "This Pokémon does not evolve.";
 
 export const MENU_PROMPT = "What will you do?";
+
+//Home (spec 7.1): the field is a named region, and the command plate's four
+//rows are a title plus one line saying what each does
+export const WILD_ENCOUNTER_LABEL = "Wild encounter";
+export const ENTRY_COMMAND = "Check its entry";
+export const ENTRY_COMMAND_HINT = "Stats, evolution and type matchups";
+export const COMPARE_COMMAND_HINT = "Size it up against another Pokémon";
+export const REROLL_COMMAND = "Look for another";
+export const REROLL_COMMAND_HINT = "A different wild Pokémon appears";
+
+//the line under "Add to team" on Home: what selecting it will do, given the
+//party right now. the title above it swaps between TEAM_OFF_TEXT/TEAM_ON_TEXT
+export function teamCommandHint({
+  name,
+  onTeam,
+  partySize,
+}: {
+  name: string;
+  onTeam: boolean;
+  partySize: number;
+}): string {
+  if (onTeam)
+    return `${formatSlug(name)} joined your party. Select again to release it`;
+  if (partySize >= MAX_TEAM)
+    return "Your party is full. Release one on the Team page";
+  return `Your party has room for ${MAX_TEAM - partySize} more`;
+}
 
 //compare page: the empty state invites, the self compare error says what to do
 export const EMPTY_COMPARE =
@@ -40,6 +119,37 @@ export const SELF_COMPARE = "Choose a different Pokémon to compare.";
 //screen reader can tell it apart from the header search
 export const COMPARE_HEADING = "Compare Pokémon";
 export const OPPONENT_SEARCH_LABEL = "Choose an opponent";
+
+//the identity band (spec 7.3, D52): a picker per side, its visible label
+//("First") and its search landmark's name, then the Swap button
+export const COMPARE_FIRST_LABEL = "First";
+export const COMPARE_SECOND_LABEL = "Second";
+export const COMPARE_FIRST_SEARCH_LABEL = "Choose the first Pokémon";
+export const COMPARE_SECOND_SEARCH_LABEL = "Choose the second Pokémon";
+export const SWAP_SIDES_LABEL = "Swap sides";
+export const TOTAL_LABEL = "Total";
+
+export function compareRegionLabel(first: string, second: string): string {
+  return `Comparing ${first} and ${second}`;
+}
+
+//the small "+23" badge next to the winning value: by how much it wins
+export function statLeadText(lead: number): string {
+  return `+${lead}`;
+}
+
+//the verdict under the stat duel: who has the higher base stat total, and
+//by how much. a tie names both, so nobody "wins" it
+export function compareVerdict(
+  left: { name: string; total: number },
+  right: { name: string; total: number },
+): string {
+  if (left.total === right.total)
+    return `${formatSlug(left.name)} and ${formatSlug(right.name)} have the same base stat total.`;
+  const [winner, loser] =
+    left.total > right.total ? [left, right] : [right, left];
+  return `${formatSlug(winner.name)} has the higher base stat total, by ${winner.total - loser.total}.`;
+}
 
 //the words a screen reader says after a compared state value, so the result
 //never depends on color alone. Record<StatOutcome, ...? makes the compiler
@@ -68,13 +178,19 @@ export const TEAM_COMPLETE = "Team complete! Your party is ready.";
 
 //party screen announcements
 export const PARTY_LABEL = "Your party";
+//the header counter: the visible word, then the count for screen readers.
+//together they name the link "Party, 4 of 6" (D45)
+export const PARTY_WORD = "Party";
+export function partyCountText(count: number, max: number): string {
+  return `, ${count} of ${max}`;
+}
 export function removedFromTeamMessage(name: string): string {
   return `${name} removed from your team.`;
 }
 
 //empty states are invitations: say what is missing AND how to fill it
 export const EMPTY_FAVORITES =
-  "No favorites yet. Tap ♥ on any Pokémon to keep it here.";
+  "No favorites yet. Select Favorite on any Pokémon to keep it here.";
 
 //party screen: an empty slot must still say something to a screen reader,
 //and the remove button must say WHICH pokemon it removes
@@ -82,9 +198,7 @@ export const LEAD_LABEL = "Lead";
 //page headers: a name, and one sentence saying what the page is FOR
 export const COMPARE_SUBTITLE =
   "Two Pokémon side by side: see who wins each stat.";
-export const TEAM_HEADING = "Your Team";
-export const TEAM_SUBTITLE =
-  "Build a party of up to six. It stays saved in this browser.";
+export const TEAM_HEADING = "Your team";
 export const LIBRARY_HEADING = "TCG Library";
 export const LIBRARY_SUBTITLE =
   "Trading cards for any Pokémon, as a grid, a table or a binder.";
@@ -103,9 +217,18 @@ export const FOOTER_DISCLAIMER =
   "Unofficial fan project, not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company.";
 export const FOOTER_MADE_BY = "Made by";
 
-export function emptySlotLabel(slotNumber: number): string {
-  return `Empty slot ${slotNumber}`;
+//the Team page (spec 7.5). the band's sentence replaces the old subtitle:
+//it says how full the party is AND that it is kept, in one line
+export function teamBandText(count: number): string {
+  if (count >= MAX_TEAM) return "Six of six. Your party is ready.";
+  return `${count} of ${MAX_TEAM} slots filled. Your team is saved in this browser.`;
 }
+//shown in the open slot, so the eye and a screen reader get the same words
+export function emptySlotLabel(slotNumber: number): string {
+  return `Slot ${slotNumber} is open`;
+}
+export const FIND_POKEMON_LABEL = "Find a Pokémon";
+export const DETAILS_LABEL = "Details";
 export function removeFromTeamLabel(name: string): string {
   return `Remove ${name} from team`;
 }
@@ -129,9 +252,24 @@ export function failureMessage(kind: FetchFailureKind, query: string): string {
 //the same word on purpose: what a screen reader announces matches what a
 //sighted person reads
 export const SETTINGS_LABEL = "Settings";
+
+//header search. on phones the field hides behind an icon button with the
+//same word, which says whether it is open with aria-expanded
+export const SEARCH_PLACEHOLDER = "Search by name or number";
+export const SEARCH_INPUT_LABEL = "Search Pokémon";
+export const SEARCH_TOGGLE_LABEL = "Search";
+//the black strip of favorites under the Pokémon page's field (D48)
+export const FAVORITES_LABEL = "Favorites";
 export const SETTINGS_NOTE = "Saved in this browser, on this device.";
 export const ANIMATIONS_LABEL = "Animations";
 export const SPRITES_LABEL = "Sprites";
+//one list for both places that choose the sprite look: the settings dialog
+//and the stage's segmented control (spec 5.3)
+export const SPRITE_MODE_OPTIONS = [
+  { value: "pixel", label: "Pixel" },
+  { value: "artwork", label: "Artwork" },
+] as const satisfies readonly { value: SpriteMode; label: string }[];
+export const SHINY_LABEL = "Shiny";
 export const SPRITES_HINT =
   "Pixel sprites move when animations are on. Artwork is always still.";
 
@@ -151,4 +289,140 @@ export function animationsHint(
 }
 
 //celebrations: rare, and only right after the person caused them
-export const FIRST_FAVORITE = "First favorite! It's waiting in your tray.";
+export const FIRST_FAVORITE = "First favorite! It's waiting in the row below.";
+
+//type matchups: the badge inside a type chip ("×½") and what a screen
+//reader says instead. the chart only ever produces these six values;
+//anything else falls back to plain numbers rather than throwing
+const MULTIPLIER_GLYPH: Record<number, string> = { 0.5: "½", 0.25: "¼" };
+const MULTIPLIER_WORDS: Record<number, string> = {
+  1: "normal damage",
+  0.5: "half damage",
+  0.25: "quarter damage",
+  0: "no damage",
+};
+
+export function multiplierText(multiplier: number): string {
+  return `×${MULTIPLIER_GLYPH[multiplier] ?? multiplier}`;
+}
+
+export function multiplierSpoken(multiplier: number): string {
+  return MULTIPLIER_WORDS[multiplier] ?? `${multiplier} times damage`;
+}
+
+//---- B&W-7: the Library (spec 7.4, 9) ----
+
+//the four rarity tiers, as the legend, the grid's groups and the tier
+//marks' spoken names say them
+export const TIER_LABELS: Record<RarityTier, string> = {
+  ultra: "Ultra rare and up",
+  holo: "Holo",
+  rare: "Rare",
+  common: "Common",
+};
+//a date-sorted group for cards whose set names no series
+export const OTHER_CARDS_LABEL = "Other cards";
+
+export function cardCountText(count: number): string {
+  return count === 1 ? "1 card" : `${count} cards`;
+}
+export function libraryTitle(name: string): string {
+  return `${formatSlug(name)} cards`;
+}
+export function libraryEntryText(name: string): string {
+  return `${formatSlug(name)}'s entry`;
+}
+
+//"25 cards printed between 2011 and 2026, from Black & White to Mega
+//Evolution." every part comes from the cards; a part they do not have is
+//left out rather than guessed
+export function libraryLead(summary: CardsSummary): string {
+  const { firstYear, lastYear, firstSeries, lastSeries } = summary;
+  let sentence = cardCountText(summary.count);
+  if (firstYear !== null && lastYear !== null) {
+    sentence +=
+      firstYear === lastYear
+        ? ` printed in ${firstYear}`
+        : ` printed between ${firstYear} and ${lastYear}`;
+  }
+  if (firstSeries && lastSeries) {
+    sentence +=
+      firstSeries === lastSeries
+        ? `, from ${firstSeries}`
+        : `, from ${firstSeries} to ${lastSeries}`;
+  }
+  return `${sentence}.`;
+}
+
+//the Pokémon page's cards teaser (spec 7.2)
+export function cardsTeaserText(name: string, summary: CardsSummary): string {
+  const { firstYear, firstSet, lastSet } = summary;
+  let sentence = `${formatSlug(name)} has appeared on ${cardCountText(summary.count)}`;
+  if (firstYear !== null) sentence += ` since ${firstYear}`;
+  if (firstSet && lastSet) {
+    sentence +=
+      firstSet === lastSet
+        ? `, in the ${firstSet} set`
+        : `, from ${firstSet} to the ${lastSet} set`;
+  }
+  return `${sentence}. Browse them by era, by rarity, or flip through them in a binder.`;
+}
+export function seeAllCardsText(count: number): string {
+  return count === 1 ? "See the card" : `See all ${count} cards`;
+}
+
+//a group's years: "2023 to 2025", or one year
+export function yearSpanText({ first, last }: YearSpan): string {
+  return first === last ? String(first) : `${first} to ${last}`;
+}
+
+//the hero plate
+export const LIBRARY_SEARCH_LABEL = "Find another Pokémon's cards";
+export const LIBRARY_SEARCH_PLACEHOLDER = "Pokémon name";
+export const OPEN_BINDER_TEXT = "Open the binder";
+export const LIBRARY_HAND_LABEL = "Three of the rarest cards";
+//back from a search to the featured cards (the arrow before it is decoration)
+export const FEATURED_CARDS_LINK = "Featured cards";
+
+//the toolbar
+export const SORT_LABEL = "Sort";
+export const SORT_OPTION_LABELS = {
+  newest: "Newest first",
+  oldest: "Oldest first",
+  rarity: "Rarest first",
+} as const;
+export const RARITY_LEGEND_LABEL = "Cards by rarity";
+
+//the table
+export const TABLE_PICTURE_HEADER = "Picture";
+export const TABLE_CARD_HEADER = "Card";
+export const TABLE_NUMBER_HEADER = "Number";
+export const TABLE_RELEASED_HEADER = "Released";
+export const TABLE_RARITY_HEADER = "Rarity";
+export const TABLE_ARTIST_HEADER = "Artist";
+export const NOT_LISTED = "Not listed";
+
+//the binder (D54): the pages on show, and the page past the last card
+export function binderPagesText(pages: number[], pageCount: number): string {
+  const shown = pages.filter((page) => page <= pageCount);
+  if (shown.length === 2) {
+    return `Pages ${shown[0]} and ${shown[1]} of ${pageCount}`;
+  }
+  return `Page ${shown[0]} of ${pageCount}`;
+}
+export function endOfBinderText(count: number): string {
+  return count === 1 ? "That's the only card." : `That's all ${count} cards.`;
+}
+
+//the card dialog (D53)
+export function cardPositionText(position: number, count: number): string {
+  return `Card ${position} of ${count}`;
+}
+export const PREVIOUS_CARD = "Previous card";
+export const NEXT_CARD = "Next card";
+//"Use ← → to flip through, Esc to close." in three pieces around the keys
+export const CARD_KEYS_HINT = {
+  before: "Use",
+  between: "to flip through,",
+  after: "to close.",
+} as const;

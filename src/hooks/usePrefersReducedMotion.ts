@@ -2,25 +2,10 @@
 //but a typewriter is driven by javascript timers, and CSS  cant turn those off
 //so JS has to read the setting itself
 
-import { useSyncExternalStore } from "react";
+import { useMediaQuery } from "./useMediaQuery";
 
-const QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribe(onChange: () => void) {
-  if (typeof window.matchMedia !== "function") return () => {};
-  const mql = window.matchMedia(QUERY);
-  mql.addEventListener("change", onChange);
-  return () => mql.removeEventListener("change", onChange);
-}
-
-function getSnapshot() {
-  if (typeof window.matchMedia !== "function") return false;
-  return window.matchMedia(QUERY).matches;
-}
-
+//one media query among others: the subscription itself lives in
+//useMediaQuery (which also covers jsdom having no matchMedia)
 export function usePrefersReduceMotion() {
-  return useSyncExternalStore(subscribe, getSnapshot);
+  return useMediaQuery("(prefers-reduced-motion: reduce)");
 }
-
-//the typeof window.matchMedia !== "function" guards exist because jsdom
-//doesn't implement matchMedia. Without them, every test that renders a MessageBox would crash

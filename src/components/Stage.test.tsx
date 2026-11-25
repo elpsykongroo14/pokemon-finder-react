@@ -22,6 +22,8 @@ const pokemon = {
   },
 } as PokemonDetails;
 
+const shinyButton = () => screen.getByRole("button", { name: "Shiny" });
+
 function renderStage(shinyToggle = false) {
   return render(
     <PreferencesProvider>
@@ -35,14 +37,16 @@ describe("Stage", () => {
     localStorage.clear();
   });
 
-  it("shows the dex number, the name as a heading, and the type", () => {
-    renderStage();
+  //B&W-4: the dex number, name and types moved to the name plate (see
+  //NamePlate.test); the stage is the platform and the sprite now
+  it("stands the sprite on a platform, and no longer names the Pokémon", () => {
+    const { container } = renderStage();
 
-    expect(screen.getByText("#025")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "pikachu" }),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/electric/i)).toBeInTheDocument();
+    expect(container.querySelector(".stage__platform")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
   });
 
   it("shows the animated pixel sprite by default", () => {
@@ -54,11 +58,14 @@ describe("Stage", () => {
     );
   });
 
-  it("switches to the artwork when Pixel sprites is turned off", async () => {
+  //spec 5.3: Pixel / Artwork is a segmented control, one of two options,
+  //so radio buttons (it was a "Pixel sprites" checkbox before B&W-4)
+  it("switches to the artwork when Artwork is chosen", async () => {
     const user = userEvent.setup();
     renderStage();
+    expect(screen.getByRole("radio", { name: "Pixel" })).toBeChecked();
 
-    await user.click(screen.getByRole("checkbox", { name: "Pixel sprites" }));
+    await user.click(screen.getByRole("radio", { name: "Artwork" }));
 
     expect(screen.getByRole("img", { name: "pikachu" })).toHaveAttribute(
       "src",
@@ -88,10 +95,10 @@ describe("Stage", () => {
 
     const group = screen.getByRole("group", { name: "Sprite options" });
     expect(
-      within(group).getByRole("checkbox", { name: "Pixel sprites" }),
+      within(group).getByRole("group", { name: "Sprites" }),
     ).toBeInTheDocument();
     expect(
-      within(group).getByRole("checkbox", { name: "Shiny" }),
+      within(group).getByRole("button", { name: "Shiny" }),
     ).toBeInTheDocument();
   });
 
@@ -99,15 +106,35 @@ describe("Stage", () => {
     renderStage();
 
     expect(
-      screen.queryByRole("checkbox", { name: "Shiny" }),
+      screen.queryByRole("button", { name: "Shiny" }),
     ).not.toBeInTheDocument();
   });
 
+  //B&W-5: Home and Compare draw no sprite controls at all (spec 7.1, 7.3);
+  //the same choice stays in Settings. no empty "Sprite options" group either
+  it("can leave the sprite options out entirely (Home, Compare)", () => {
+    render(
+      <PreferencesProvider>
+        <Stage pokemon={pokemon} spriteOptions={false} />
+      </PreferencesProvider>,
+    );
+
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("group", { name: "Sprite options" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "pikachu" })).toBeInTheDocument();
+  });
+
+  //a toggle button: one name, aria-pressed says on or off
   it("swaps to the shiny sprite when Shiny is switched on", async () => {
     const user = userEvent.setup();
     renderStage(true);
+    expect(shinyButton()).toHaveAttribute("aria-pressed", "false");
 
-    await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
+    await user.click(shinyButton());
+
+    expect(shinyButton()).toHaveAttribute("aria-pressed", "true");
 
     expect(screen.getByRole("img", { name: "pikachu(shiny)" })).toHaveAttribute(
       "src",
@@ -120,7 +147,7 @@ describe("Stage", () => {
     const { container } = renderStage(true);
     expect(container.querySelector(".shiny-sparkle")).toBeNull();
 
-    await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
+    await user.click(shinyButton());
 
     const burst = container.querySelector(".shiny-sparkle");
     expect(burst).not.toBeNull();
@@ -131,7 +158,7 @@ describe("Stage", () => {
   it("plays a fresh burst each time Shiny is switched on again", async () => {
     const user = userEvent.setup();
     const { container } = renderStage(true);
-    const shinySwitch = screen.getByRole("checkbox", { name: "Shiny" });
+    const shinySwitch = shinyButton();
 
     await user.click(shinySwitch); //on
     const first = container.querySelector(".shiny-sparkle");
@@ -150,7 +177,7 @@ describe("Stage", () => {
     const user = userEvent.setup();
     const { container } = renderStage(true);
 
-    await user.click(screen.getByRole("checkbox", { name: "Shiny" }));
+    await user.click(shinyButton());
 
     expect(container.querySelector(".shiny-sparkle")).toBeNull();
   });

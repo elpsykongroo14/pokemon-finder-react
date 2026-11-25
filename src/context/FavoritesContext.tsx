@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import type { FavoritePokemon, PokemonDetails } from "../lib/type";
-import { getSpriteUrl } from "../lib/sprites";
+import { toFavorite } from "../lib/teamMember";
 import { FavoritesContext } from "../hooks/useFavorites";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 
@@ -16,14 +16,9 @@ function favoritesReducer(
     case "ADD": {
       const pokemon = action.payload;
       if (state.some((f) => f.name === pokemon.name)) return state;
-      return [
-        ...state,
-        {
-          name: pokemon.name,
-          id: pokemon.id,
-          sprite: getSpriteUrl(pokemon.sprites),
-        },
-      ];
+      //the small summary a favorite is saved as (name, id, sprite and,
+      //since D48, types). a team member is the same plus its stat total
+      return [...state, toFavorite(pokemon)];
     }
     case "REMOVE":
       return state.filter((f) => f.name !== action.payload);

@@ -1,6 +1,7 @@
 import "./EvolutionNode.css";
-import type { CSSProperties } from "react";
 import { SpriteDisplay } from "./SpriteDisplay";
+import { TransitionLink } from "./TransitionLink";
+import { Icon } from "./Icon";
 import type { EvolutionNode as EvolutionNodeData } from "../lib/type";
 import type { PokemonSprites, SpriteMode } from "../lib/sprites";
 
@@ -10,33 +11,84 @@ interface EvolutionNodeProps {
   //default "artwork" keeps this component looking the way it always did
   //EvolutionSection passes the user's real preference down
   mode?: SpriteMode;
-  //how many arrows are above this node. Each level of the tree draws its
-  //arrow a beat later than the level before so the chain reads left to right
-  depth?: number;
+  //the Pokémon whose page this is: its stage is marked, not linked
+  current?: string;
+}
+
+//a stage sprite is 96 px of pixel art: 2x, a whole-number zoom, so every
+//pixel stays square (the spec's 176 px would be 1.83x)
+const NODE_SPRITE_BOX = 192;
+const NODE_MAX_SCALE = 2;
+
+//one stage: sprite on a small platform, name underneath. every stage but
+//the current one is a link to that Pokémon's page (spec 7.2)
+function EvolutionStage({
+  name,
+  sprites,
+  mode,
+  isCurrent,
+}: {
+  name: string;
+  sprites: PokemonSprites | null;
+  mode: SpriteMode;
+  isCurrent: boolean;
+}) {
+  const content = (
+    <>
+      <span className="evolution-stage__sprite">
+        {/* decorative: the name is right underneath, as text. never animated
+            (only the stage sprite moves) and lazy, it is below the fold */}
+        <SpriteDisplay
+          sprites={sprites ?? {}}
+          name={name}
+          shiny={false}
+          mode={mode}
+          size={NODE_SPRITE_BOX}
+          maxScale={NODE_MAX_SCALE}
+          lazy
+          plain
+          decorative
+        />
+      </span>
+      <span className="evolution-stage__platform" aria-hidden="true" />
+      <span className="evolution-stage__name">{name}</span>
+    </>
+  );
+
+  //you are already here: no link to the page you are on. aria-current
+  //says "this one is the current page" to a screen reader; the theme-color
+  //platform and the bold name say it to the eye
+  if (isCurrent) {
+    return (
+      <span className="evolution-stage" aria-current="page">
+        {content}
+      </span>
+    );
+  }
+
+  return (
+    <TransitionLink
+      to={`/pokemon/${encodeURIComponent(name)}`}
+      className="evolution-stage"
+    >
+      {content}
+    </TransitionLink>
+  );
 }
 
 export function EvolutionNode({
   data,
   sprites,
   mode = "artwork",
-  depth = 0,
+  current,
 }: EvolutionNodeProps) {
-  const nodeSprites = sprites[data.name] ?? null;
-
   const stage = (
-    <div className="evolution-stage">
-      {/* evolution icons never animate (animate stays false): only the stage sprite is allowed to move, and they are lazy because this tab starts hiddem */}
-      <SpriteDisplay
-        sprites={nodeSprites ?? {}}
-        name={data.name}
-        shiny={false}
-        mode={mode}
-        size={96}
-        lazy
-        plain
-      />
-      <span>{data.name}</span>
-    </div>
+    <EvolutionStage
+      name={data.name}
+      sprites={sprites[data.name] ?? null}
+      mode={mode}
+      isCurrent={data.name === current}
+    />
   );
 
   //base case:
@@ -47,25 +99,28 @@ export function EvolutionNode({
   }
 
   //recursive case:
-  //draw this stage, then let every child subtree draw itself the same way
-  //this line is where the recursion happens
-  //depth + 1 is how each each recursive call learn it is one level deeper
+  //draw this stage, then every child subtree draws itself the same way,
+  //each one after its own step: the condition ("Level 50") above an arrow.
+  //the condition belongs to the CHILD (it says how the child is reached),
+  //which is why it is read from child.condition
   return (
     <div className="evolution-branch-row">
       {stage}
-      <div
-        className="evolution-arrow"
-        style={{ "--evo-depth": depth } as CSSProperties}
-      />
       <div className="evolution-branch-group">
         {data.children.map((child) => (
-          <EvolutionNode
-            key={child.name}
-            data={child}
-            sprites={sprites}
-            mode={mode}
-            depth={depth + 1}
-          />
+          <div key={child.name} className="evolution-step">
+            <p className="evolution-step__how">
+              {child.condition && <span>{child.condition}</span>}
+              <Icon name="arrow" />
+            </p>
+            {/* this line is where the recursion happens */}
+            <EvolutionNode
+              data={child}
+              sprites={sprites}
+              mode={mode}
+              current={current}
+            />
+          </div>
         ))}
       </div>
     </div>

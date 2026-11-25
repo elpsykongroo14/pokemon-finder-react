@@ -82,7 +82,7 @@ describe("Layout", () => {
     expect(screen.queryByText("Home Content")).not.toBeInTheDocument();
   });
 
-  it("exposes the shell as landmarks: banner, navigation, main, favorites", () => {
+  it("exposes the shell as landmarks: banner, navigation, main", () => {
     renderLayout("/");
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
@@ -90,9 +90,6 @@ describe("Layout", () => {
       screen.getByRole("navigation", { name: "Main" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
-    expect(
-      screen.getByRole("complementary", { name: "Favorites and party" }),
-    ).toBeInTheDocument();
   });
 
   it("has exactly one banner and one contentinfo landmark", () => {
@@ -112,18 +109,29 @@ describe("Layout", () => {
     );
   });
 
-  it("keeps favorites and the party counter together in the tray", () => {
+  //B&W-3 moved the party up into the header (spec 5.1). B&W-4 gave
+  //favorites their rail on the Pokémon page (D48), so the shell's tray,
+  //and its "Favorites" complementary landmark, are gone
+  it("puts the party counter in the header, and has no favorites tray", () => {
     renderLayout("/");
 
-    const tray = screen.getByRole("complementary", {
-      name: "Favorites and party",
-    });
-    expect(within(tray).getByRole("status")).toHaveTextContent(
-      "No favorites yet. Tap ♥ on any Pokémon to keep it here.",
-    );
     expect(
-      within(tray).getByRole("link", { name: "Party 0/6" }),
+      within(screen.getByRole("banner")).getByRole("link", {
+        name: "Party, 0 of 6",
+      }),
     ).toBeInTheDocument();
+    expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Favorites" }),
+    ).not.toBeInTheDocument();
+  });
+
+  //D42: the global drifting backdrop is retired; the color now lives in
+  //the fields that show a Pokémon
+  it("no longer paints a backdrop behind the app", () => {
+    const { container } = renderLayout("/");
+
+    expect(container.querySelector(".backdrop")).not.toBeInTheDocument();
   });
 
   it("renders the routed page inside <main>, not in the header or tray", () => {

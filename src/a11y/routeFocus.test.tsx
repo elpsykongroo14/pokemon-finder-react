@@ -1,5 +1,5 @@
 //on every page change, focus moves to a skip link
-//whose name says which page you are on ("Your Team: skip to content").
+//whose name says which page you are on ("Your team: skip to content").
 //a screen reader reads it, a keyboard user starts from it, and Enter on it
 //jumps past the header into the page
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -34,7 +34,7 @@ describe("route change focus", () => {
     await user.click(within(nav).getByRole("link", { name: "Team" }));
 
     const skip = await screen.findByRole("link", {
-      name: "Your Team: skip to content",
+      name: "Your team: skip to content",
     });
     await waitFor(() => expect(skip).toHaveFocus());
   });
@@ -54,7 +54,7 @@ describe("route change focus", () => {
     await user.click(within(nav).getByRole("link", { name: "Team" }));
 
     await waitFor(() =>
-      expect(namesAtFocus).toEqual(["Your Team: skip to content"]),
+      expect(namesAtFocus).toEqual(["Your team: skip to content"]),
     );
   });
 

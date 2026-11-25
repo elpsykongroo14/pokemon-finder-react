@@ -1,182 +1,339 @@
+/* The party (spec 7.5): six cards in an auto-fill grid. A filled card is
+   a 2 px Ink ring around a mini encounter field and an info block; an
+   open slot is diagonal Mist stripes with the faded brand disc and a way
+   to fill it.
+
+   The mini field is the same scenery as the Pokémon page: FieldSky reads
+   the field tokens, and the <li>'s data-type picks them, so this file has
+   no colors of its own. Its sizes describe one illustration and are named
+   once on .team-slots. */
 @layer features {
-  /* phone: six equal cards in 2 columns x 3 rows */
   .team-slots {
+    --slot-min: 340px;
+    --slot-min-height: 470px;
+    --slot-field-height: 262px;
+    --slot-cut: 26px; /* how far the field's bottom edge slants */
+    --slot-platform-width: 190px;
+    --slot-platform-height: 40px;
+    --slot-platform-bottom: 30px;
+    --slot-sprite-size: 192px; /* a 96 px sprite at 2x */
+    --slot-sprite-bottom: 40px;
+    --slot-name: 1.6875rem; /* 27 px, the team card name */
+    --slot-stripe: calc(var(--space-4) - var(--space-1) / 2); /* 14 px */
+
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3);
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(var(--slot-min), 100%), 1fr)
+    );
+    gap: var(--space-5);
+    max-width: var(--measure-page);
+    margin: 0 auto;
+    padding: var(--space-7) var(--space-7) calc(2 * var(--space-7));
     list-style: none;
-    padding: 0;
-    margin: var(--space-4) 0;
-    max-width: 52rem;
+  }
+
+  /* the list takes focus after a removal (TeamSlots.tsx); it is a parking
+     spot, not a control, so it draws no ring */
+  .team-slots:focus {
+    outline: none;
   }
 
   .team-slot {
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    min-height: 11rem;
-    padding: var(--space-3);
-    border: var(--border-width-line) solid transparent;
-    border-radius: var(--radius-md);
-    text-align: center;
+    min-width: 0;
+    min-height: var(--slot-min-height);
   }
 
-  /* empty: a dashed, sunken socket with an outlined orb in it */
-  .team-slot--empty {
-    background: var(--surface-window-sunken);
-    border-style: dashed;
-    border-color: var(--text-secondary);
+  /* ---- a filled slot ---- */
+
+  .team-slot--filled {
+    overflow: hidden;
+    background: var(--surface-paper);
+    box-shadow: inset 0 0 0 var(--border-width-line) var(--border-line);
+  }
+
+  .team-slot__field {
+    position: relative;
+    isolation: isolate; /* FieldSky's z-index: -1 stays inside the card */
+    flex: none;
+    height: var(--slot-field-height);
+    overflow: hidden;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--slot-cut)), 0 100%);
+    /* FieldSky reads these two; a real encounter field sets its own. The
+       sky's height matters on phones, where EncounterField.css lets go of
+       the sky's bottom edge and sizes it by --field-stage-height alone */
+    --field-ground-height: 34%;
+    --field-stage-height: 100%;
+  }
+
+  .team-slot__platform {
+    position: absolute;
+    left: 50%;
+    bottom: var(--slot-platform-bottom);
+    width: var(--slot-platform-width);
+    height: var(--slot-platform-height);
+    translate: -50% 0;
+    border-radius: 50%;
+    background: var(--field-platform);
+    box-shadow: inset 0 0 0 var(--border-width-thick) var(--field-platform-ring);
+  }
+
+  .team-slot__platform::after {
+    content: "";
+    position: absolute;
+    inset: 24% 18%;
+    border-radius: 50%;
+    background: var(--field-platform-inner);
+  }
+
+  .team-slot__sprite {
+    position: absolute;
+    left: 50%;
+    bottom: var(--slot-sprite-bottom);
+    width: var(--slot-sprite-size);
+    height: var(--slot-sprite-size);
+    translate: -50% 0;
+    object-fit: contain;
+    transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  /* a 96 px pixel sprite in the 192 px box: exactly 2x, kept crisp */
+  .team-slot__sprite[data-mode="pixel"] {
+    image-rendering: pixelated;
+  }
+
+  /* hop (spec 6.2): the sprite answers a pointer on the card, or keyboard
+     focus on its link. A token transition: still with motion off */
+  .team-slot--filled:hover .team-slot__sprite,
+  .team-slot--filled:focus-within .team-slot__sprite {
+    transform: translateY(calc(var(--space-3) * -1));
+  }
+
+  .team-slot__info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: calc(var(--space-2) + var(--space-1) / 2);
+    padding: calc(var(--space-4) - var(--space-1) / 2)
+      calc(var(--space-5) - var(--space-1) / 2)
+      calc(var(--space-4) + var(--space-1) / 2);
+  }
+
+  .team-slot__dex {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-2) + var(--space-1) / 2);
+    margin: 0;
+    font-family: var(--font-game);
+    font-size: var(--text-heading);
+    line-height: 1;
     color: var(--text-secondary);
   }
 
-  /* filled: tinted by the pokemon's own type (data-type on the <li>) */
-  .team-slot--filled {
-    /* extra room on top for the LEAD tag and the remove button */
-    padding-top: var(--space-6);
-    background: var(--theme-accent-soft);
-    border-color: var(--theme-accent-deep);
-    color: var(--theme-soft-ink);
-    transition: transform var(--dur-fast) var(--ease-standard);
+  /* the slanted Ink "Lead" tag: the plate leans, the word does not */
+  .team-slot__tag {
+    display: inline-block;
+    padding: var(--border-width-line)
+      calc(var(--space-2) + var(--border-width-line));
+    background: var(--surface-ink);
+    color: var(--surface-paper);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    transform: skewX(var(--slant));
   }
 
-  .team-slot--filled:hover {
-    transform: translateY(calc(var(--border-width-line) * -1));
+  .team-slot__tag > span {
+    display: inline-block;
+    transform: skewX(calc(var(--slant) * -1));
   }
 
-  /* ENTER: cards pop in one after another, like a party being called out.
-     the stagger step is a motion token, so with reduced motion there is no
-     stagger and no motion: everything is simply there. "backwards" holds the
-     starting look only during the delay, so hover still works afterwards */
-  .team-slot--filled {
-    animation: team-slot-enter var(--dur-base) var(--ease-snap) backwards;
-    animation-delay: calc(var(--slot-index, 0) * var(--dur-instant));
-  }
-
-  /* EXIT: TeamSlots.tsx sets data-leaving, waits for this animation to end
-     (animationend), and only THEN removes the member from the team */
-  .team-slot--filled[data-leaving] {
-    animation: team-slot-exit var(--dur-base) var(--ease-standard) forwards;
-    animation-delay: 0ms;
-    pointer-events: none;
-  }
-
-  @keyframes team-slot-enter {
-    from {
-      opacity: 0;
-      transform: translateY(var(--space-2)) scale(0.96);
-    }
-  }
-
-  @keyframes team-slot-exit {
-    to {
-      opacity: 0;
-      transform: scale(0.85);
-    }
+  .team-slot__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--slot-name);
+    font-weight: var(--weight-black);
+    font-style: italic;
+    font-stretch: var(--width-display);
+    letter-spacing: var(--tracking-display);
+    line-height: 1.05;
+    text-transform: capitalize;
+    overflow-wrap: anywhere;
   }
 
   .team-slot__link {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
     color: inherit;
     text-decoration: none;
   }
 
-  /* the whole card is clickable: the link's hit area stretches over the slot.
-     the remove button sits above it (z-index) so it stays separately clickable */
+  /* the whole card is the link's hit area. The remove button sits above it
+     (z-index), so it stays a separate target */
   .team-slot__link::after {
     content: "";
     position: absolute;
     inset: 0;
   }
 
-  .team-slot__sprite {
-    width: 6rem;
-    height: 6rem;
-    object-fit: contain;
+  /* the ring belongs around the card the link stands for, not the name */
+  .team-slot__link:focus-visible {
+    outline: none;
   }
 
-  .team-slot__name {
-    font-family: var(--font-display);
-    text-transform: capitalize;
-    overflow-wrap: anywhere;
+  .team-slot__link:focus-visible::after {
+    outline: var(--border-width-thick) solid var(--focus-ring);
+    outline-offset: calc(var(--border-width-thick) * -1);
   }
 
-  /* reserve a row for the badges even before they exist, so cards do not
-     jump when the lazy backfill delivers types a moment later */
+  /* reserve a row for the chips even before they exist, so cards do not
+     jump when the backfill delivers types a moment later */
   .team-slot__types {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: var(--space-1);
-    min-height: 1.5rem;
+    min-height: var(--space-5);
   }
 
-  .team-slot__tag {
-    position: absolute;
-    top: var(--space-2);
-    left: var(--space-2);
-    padding: 0 var(--space-2);
-    border: var(--border-width-line) solid var(--theme-accent-deep);
-    border-radius: var(--radius-pill);
-    background: var(--surface-window);
+  /* the base stat total sits at the bottom of the info block, above the
+     actions, whatever the name's length */
+  .team-slot__total {
+    display: grid;
+    gap: calc(var(--space-2) - var(--space-1) / 2);
+    margin-top: auto;
+  }
+
+  .team-slot__total-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    font-size: var(--text-chip);
+    color: var(--text-secondary);
+  }
+
+  .team-slot__total-row strong {
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+    font-variant-numeric: tabular-nums;
     color: var(--text-primary);
-    font-size: var(--text-xs);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
-  /* a small visible circle with a 44px touch target (the ::after) */
-  .remove-team {
+  /* the name plate's bar, drawn smaller: scaled, never resized */
+  .team-slot__bar {
+    position: relative;
+    display: block;
+    height: calc(var(--space-2) + var(--space-1) / 2);
+    overflow: hidden;
+    background: var(--surface-well);
+    transform: skewX(var(--slant));
+  }
+
+  .team-slot__fill {
     position: absolute;
-    top: var(--space-2);
-    right: var(--space-2);
-    z-index: 1;
+    inset: 0;
+    background: var(--theme-accent);
+    transform: scaleX(var(--fill, 0));
+    transform-origin: left center;
+  }
+
+  .team-slot__actions {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+  }
+
+  /* with no total yet, the actions still sit at the bottom */
+  .team-slot__types + .team-slot__actions {
+    margin-top: auto;
+  }
+
+  /* "Details" is part of the card's link (TeamSlots.tsx), so the link's
+     states drive it: hovering the card or focusing the link inverts it
+     the way a line button inverts on hover */
+  .team-slot__details {
+    pointer-events: none;
+  }
+
+  .team-slot--filled:hover .team-slot__details,
+  .team-slot--filled:has(.team-slot__link:focus-visible) .team-slot__details {
+    --btn-plate: var(--surface-ink);
+    --btn-ring: transparent;
+    --btn-ink: var(--surface-paper);
+  }
+
+  .team-slot__remove {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---- an open slot ---- */
+
+  .team-slot--empty {
+    align-items: center;
     justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    padding: 0;
-    border: var(--border-width-line) solid var(--border-line);
-    border-radius: var(--radius-pill);
-    background: var(--surface-window);
-    color: var(--text-primary);
-    font-size: var(--text-lg);
-    line-height: 1;
-    cursor: pointer;
+    gap: calc(var(--space-4) - var(--space-1) / 2);
+    padding: var(--space-5);
+    background: repeating-linear-gradient(
+      -77deg,
+      var(--surface-well) 0 var(--slot-stripe),
+      var(--surface-paper) var(--slot-stripe) calc(2 * var(--slot-stripe))
+    );
+    color: var(--text-secondary);
+    text-align: center;
   }
 
-  .remove-team::after {
-    content: "";
-    position: absolute;
-    inset: -0.5rem;
+  .team-slot--empty .brand-mark {
+    opacity: var(--opacity-disabled);
   }
 
-  .remove-team:hover {
-    color: var(--text-danger);
-    border-color: var(--text-danger);
+  .team-slot__open {
+    margin: 0;
+    font-size: var(--text-md);
   }
 
-  /* tablet and up: the lead slot becomes a big feature card (2x2 cells) and
-     the other five fill the remaining cells of a 3 x 3 grid */
-  @media (min-width: 768px) {
+  /* ---- motion (spec 6.2), all of it only while motion is on (D59) ---- */
+
+  /* the mini fields hold still: the stripe drift is the encounter
+     field's one ambient motion (D42), and six of them would be a crowd */
+  :root[data-motion="on"] .team-slot__field .encounter-field__stripes {
+    animation: none;
+  }
+
+  /* cards rise in on load, 60 ms apart */
+  :root[data-motion="on"] .team-slot {
+    animation: team-slot-rise 450ms var(--ease-settle) both;
+    animation-delay: calc(var(--slot-index, 0) * 60ms);
+  }
+
+  /* slot leave: TeamSlots.tsx sets data-leaving, waits for this animation
+     to end (animationend), and only THEN removes the member. With motion
+     off this rule does not exist, so TeamSlots removes the member at once */
+  :root[data-motion="on"] .team-slot[data-leaving] {
+    animation: team-slot-leave 320ms var(--ease-leave) both;
+    animation-delay: 0ms;
+    pointer-events: none;
+  }
+
+  @keyframes team-slot-rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @keyframes team-slot-leave {
+    to {
+      opacity: 0;
+      transform: translateY(-12px) rotate(-2deg) scale(0.96);
+    }
+  }
+
+  @media (max-width: 1000px) {
     .team-slots {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .team-slot[data-lead] {
-      grid-column: span 2;
-      grid-row: span 2;
-    }
-
-    .team-slot[data-lead] .team-slot__sprite {
-      width: 10rem;
-      height: 10rem;
+      padding: var(--space-5) var(--space-4) var(--space-8);
     }
   }
 }

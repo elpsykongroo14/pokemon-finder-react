@@ -33,6 +33,15 @@ function renderDialog() {
 beforeEach(() => localStorage.clear());
 
 describe("SettingsDialog", () => {
+  //B&W-8 (found by axe in a real browser): the dialog renders through a
+  //portal into <body>, outside <main>, so a <header> in it became a second
+  //page banner while the dialog was open
+  it("adds no banner landmark to the page", () => {
+    renderDialog();
+
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+  });
+
   it("is a dialog named  Settings with a matching visible heading", () => {
     renderDialog();
 
@@ -80,7 +89,10 @@ describe("SettingsDialog", () => {
     ).toHaveAccessibleDescription("Following your device: motion is on.");
   });
 
-  it("shares one source of truth with the Stage's pixel switch", async () => {
+  //B&W-4: the Stage's control is a Pixel / Artwork segmented control too
+  //(it was a "Pixel sprites" checkbox), so both places show the same two
+  //radios; each query is scoped to its own place
+  it("shares one source of truth with the Stage's sprite control", async () => {
     const user = userEvent.setup();
     render(
       <PreferencesProvider>
@@ -88,19 +100,20 @@ describe("SettingsDialog", () => {
         <SettingsDialog onClose={vi.fn()} />
       </PreferencesProvider>,
     );
-    const pixelSwitch = screen.getByRole("checkbox", { name: "Pixel sprites" });
-    expect(pixelSwitch).toBeChecked();
+    const stage = within(screen.getByRole("group", { name: "Sprite options" }));
+    const dialog = within(screen.getByRole("dialog"));
+    expect(stage.getByRole("radio", { name: "Pixel" })).toBeChecked();
 
     //change it in the dialog: the Stage follows
-    await user.click(screen.getByRole("radio", { name: "Artwork" }));
-    expect(pixelSwitch).not.toBeChecked();
+    await user.click(dialog.getByRole("radio", { name: "Artwork" }));
+    expect(stage.getByRole("radio", { name: "Artwork" })).toBeChecked();
     expect(screen.getByRole("img", { name: "pikachu" })).toHaveAttribute(
       "src",
       "art.png",
     );
 
     //change it on the Stage: the dialog follows
-    await user.click(pixelSwitch);
-    expect(screen.getByRole("radio", { name: "Pixel" })).toBeChecked();
+    await user.click(stage.getByRole("radio", { name: "Pixel" }));
+    expect(dialog.getByRole("radio", { name: "Pixel" })).toBeChecked();
   });
 });

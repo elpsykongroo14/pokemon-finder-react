@@ -1,0 +1,51 @@
+/* The keyed encounter layer (spec 6.1, 7.2): the stage and the name plate
+   on the right with its slanted edge. The wipe slabs on top are their own
+   component since B&W-5 (EncounterWipe.css). */
+@layer features {
+  .encounter {
+    --plate-edge: 132px; /* where the slanted edge meets the top */
+    --plate-overlap: 28px; /* phones: how far the plate rises into the field */
+
+    position: absolute;
+    inset: 0;
+  }
+
+  .encounter > .name-plate {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    width: 50%;
+    clip-path: polygon(var(--plate-edge) 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .encounter > .name-plate .name-plate__inner {
+    width: 100%;
+    padding: calc(var(--space-7) - var(--space-1)) var(--space-8)
+      calc(var(--space-7) - var(--space-1))
+      calc(var(--plate-edge) + var(--space-gutter));
+  }
+
+  /* phones (spec 8): the plate under the stage, its slanted edge on top,
+     rising 28 px into the field */
+  @media (max-width: 1000px) {
+    .encounter {
+      position: relative;
+    }
+
+    .encounter > .name-plate {
+      position: relative;
+      width: auto;
+      margin-top: calc(var(--plate-overlap) * -1);
+      clip-path: polygon(0 var(--plate-overlap), 100% 0, 100% 100%, 0 100%);
+    }
+
+    .encounter > .name-plate .name-plate__inner {
+      padding: calc(var(--space-7) - var(--space-1) / 2)
+        var(--space-gutter-phone) var(--space-5);
+    }
+  }
+}

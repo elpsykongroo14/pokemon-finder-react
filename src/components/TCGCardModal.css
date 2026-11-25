@@ -1,100 +1,199 @@
+/* The card dialog (spec 7.4, D53): the card on the left in a 3D flipper,
+   its facts on the right, white on the black stage (.on-dark).
+
+   The flip: the flipper turns in from its back (rotateY 180deg, .9 scale)
+   to its face. Both faces hide their back side, so for the first half of
+   the turn the card's back shows: black, a white / black / white frame,
+   the brand disc. It replays on every new card because the flipper is
+   keyed by card. Only with motion on.
+
+   Phones (spec 8): the bottom sheet. A 220 px card, the name, the
+   subtitle, the tier mark, three facts (Released, Artist, HP) and
+   Previous / Next; the key hint and the position step aside. */
 @layer features {
-  .card-modal-body {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-5);
+  .card-dialog {
+    --dialog-card-width: 420px;
+    --dialog-name: 3rem; /* 48 px */
+
+    display: grid;
+    grid-template-columns: minmax(0, var(--dialog-card-width)) minmax(0, 1fr);
+    gap: calc(var(--space-7) + var(--space-2));
+    align-items: center;
   }
 
-  /* the image is a real button: click or Enter/Space toggles the zoom.
-     reset the browser's button look so only the card shows */
-  .card-modal-stage {
-    flex-shrink: 0;
-    width: 220px;
-    padding: 0;
-    border: none;
-    background: none;
-    border-radius: var(--radius-md);
-    cursor: zoom-in;
-    transition: transform var(--dur-fast) var(--ease-standard);
+  .card-dialog__card {
+    perspective: 1400px;
   }
 
-  .card-modal-body[data-zoomed="true"] .card-modal-stage {
-    width: min(100%, 420px);
-    margin-inline: auto;
-    cursor: zoom-out;
+  .card-dialog__flipper {
+    position: relative;
+    transform-style: preserve-3d;
   }
 
-  .card-modal-art {
-    display: block;
-    border-radius: var(--radius-md);
-    overflow: hidden;
+  .card-dialog__face,
+  .card-dialog__back {
+    backface-visibility: hidden;
   }
 
-  .card-modal-art img {
-    display: block;
-    width: 100%;
+  .card-dialog__face .holo-card {
+    box-shadow: var(--shadow-card-dialog);
   }
 
-  /* tilt follows the mouse (--rx / --ry from useHoloPointer); real mouse only.
-     will-change lives on the one hovered image, never at rest */
-  @media (hover: hover) and (pointer: fine) {
-    .card-modal-stage:hover {
-      transform: perspective(800px) rotateX(var(--rx, 0deg))
-        rotateY(var(--ry, 0deg));
-      will-change: transform;
+  .card-dialog__back {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-card);
+    background: var(--surface-ink);
+    box-shadow:
+      inset 0 0 0 calc(var(--space-2) + var(--border-width-line))
+        var(--surface-paper),
+      inset 0 0 0 calc(var(--space-3) + var(--border-width-line))
+        var(--surface-ink),
+      inset 0 0 0 var(--space-4) var(--surface-paper);
+    transform: rotateY(180deg);
+  }
+
+  .card-dialog__back .brand-mark {
+    width: 38%;
+    height: auto;
+  }
+
+  :root[data-motion="on"] .card-dialog__flipper {
+    animation: card-dialog-flip 700ms var(--ease-flip) both;
+  }
+
+  @keyframes card-dialog-flip {
+    from {
+      transform: rotateY(180deg) scale(0.9);
     }
   }
 
-  .card-modal-info {
-    flex: 1;
-    min-width: 200px;
+  .card-dialog__info {
+    display: grid;
+    gap: calc(var(--space-4) + var(--border-width-line));
+    align-content: start;
+    justify-items: start;
   }
 
-  /* this content sits on the Dialog's light panel; --text-* re-binds there.
-     The explicit color predates the alias removal and is kept as-is. */
-  .card-modal-name {
-    margin-bottom: var(--space-3);
-    color: var(--text-primary);
+  .card-dialog__position {
+    margin: 0;
+    font-size: var(--text-chip);
+    font-weight: var(--weight-semibold);
+    color: var(--text-tertiary);
   }
 
-  .card-modal-chips {
+  .card-dialog__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--dialog-name);
+    font-weight: var(--weight-black);
+    font-style: italic;
+    font-stretch: var(--width-era);
+    letter-spacing: var(--tracking-display);
+    line-height: 1;
+  }
+
+  .card-dialog__sub {
+    margin: 0;
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+  }
+
+  .card-dialog__facts {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: calc(var(--space-6) - var(--space-1));
+    width: 100%;
+    margin: 0;
+  }
+
+  /* each pair is a <div> inside the <dl> (allowed in HTML), so a row can
+     be hidden on phones; display: contents lets dt and dd sit in the grid */
+  .card-dialog__fact {
+    display: contents;
+  }
+
+  .card-dialog__facts dt,
+  .card-dialog__facts dd {
+    margin: 0;
+    padding: calc(var(--space-2) + var(--border-width-line)) 0;
+    border-bottom: var(--border-width-hairline) solid var(--border-hairline);
+  }
+
+  .card-dialog__facts dt {
+    font-size: var(--text-md);
+    color: var(--text-tertiary);
+  }
+
+  .card-dialog__facts dd {
+    font-weight: var(--weight-semibold);
+  }
+
+  .card-dialog__flavor {
+    margin: 0;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  .card-dialog__nav {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-3);
+    gap: var(--space-3) var(--space-4);
+    margin-top: calc(var(--space-1) + var(--border-width-line));
   }
 
-  .card-modal-meta {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
+  .card-dialog__keys {
+    margin: 0;
+    font-size: var(--text-meta);
+    color: var(--text-tertiary);
   }
 
-  .meta-row {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--space-3);
-    font-size: var(--text-sm);
-    padding: var(--space-1) 0;
-    border-bottom: 1px solid var(--border-hairline);
-  }
-
-  .meta-row:last-child {
-    border-bottom: none;
-  }
-
-  .meta-label {
-    color: var(--text-secondary);
-  }
-
-  .meta-value {
+  .card-dialog__keys kbd {
+    display: inline-block;
+    min-width: var(--space-5);
+    margin: 0 var(--border-width-line);
+    padding: 1px calc(var(--space-1) + var(--border-width-line));
+    border: var(--border-width-line) solid var(--border-key);
+    border-radius: var(--radius-square);
     color: var(--text-primary);
-    text-align: right;
+    font: inherit;
+    font-size: var(--text-xs);
+    text-align: center;
   }
 
-  .card-modal-flavor {
-    margin-top: var(--space-3);
-    color: var(--text-secondary);
-    font-size: var(--text-sm);
+  @media (max-width: 1000px) {
+    .card-dialog {
+      --dialog-card-width: 220px;
+      --dialog-name: var(--text-display-phone);
+
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+    }
+
+    .card-dialog__card {
+      width: 100%;
+      max-width: var(--dialog-card-width);
+      margin: 0 auto;
+    }
+
+    .card-dialog__info {
+      gap: var(--space-3);
+    }
+
+    .card-dialog__position,
+    .card-dialog__keys,
+    .card-dialog__flavor,
+    .card-dialog__fact[data-sheet="hide"] {
+      display: none;
+    }
+
+    /* Previous and Next share the row, half each */
+    .card-dialog__nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+    }
   }
 }

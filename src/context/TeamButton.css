@@ -11,7 +11,9 @@
 
   /* the celebration: six pips light up in order, then the words pop in.
      every duration is a motion token, and so is the stagger step
-     (--dur-instant), so with reduced motion everything is simply there */
+     (--dur-instant), so with reduced motion everything is simply there.
+     B&W-8: the pips are the party counter's slanted pips (spec 5.1), in
+     the Pokémon's color, and the words are the heading style */
   .team-complete {
     display: flex;
     align-items: center;
@@ -19,6 +21,8 @@
     margin-top: var(--space-2);
     color: var(--text-primary);
     font-family: var(--font-display);
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
     animation: team-complete-pop var(--dur-epic) var(--ease-bounce) backwards;
   }
 
@@ -28,10 +32,11 @@
   }
 
   .team-complete__pip {
-    width: var(--space-3);
-    height: var(--space-3);
-    border-radius: var(--radius-pill);
+    width: 10px;
+    height: 18px;
     background: var(--theme-accent);
+    box-shadow: inset 0 0 0 var(--border-width-line) var(--border-line);
+    transform: skewX(var(--slant));
     animation: team-complete-pip var(--dur-slow) var(--ease-snap) backwards;
     animation-delay: calc(var(--i) * var(--dur-instant));
   }
@@ -46,7 +51,7 @@
   @keyframes team-complete-pip {
     from {
       background: transparent;
-      transform: scale(0.4);
+      transform: skewX(var(--slant)) scale(0.4);
     }
   }
 }

@@ -30,7 +30,7 @@ describe("MetaInfo", () => {
       />,
     );
 
-    for (const name of ["Height", "Weight", "Abilities", "Hidden"]) {
+    for (const name of ["Height", "Weight", "Abilities", "Hidden ability"]) {
       expect(screen.getByRole("rowheader", { name })).toBeInTheDocument();
     }
   });
@@ -45,11 +45,13 @@ describe("MetaInfo", () => {
     );
 
     expect(
-      screen.getByRole("cell", { name: "overgrow, chlorophyll" }),
+      screen.getByRole("cell", { name: "Overgrow, Chlorophyll" }),
     ).toBeInTheDocument();
   });
 
-  it("does not render a Hidden row when no ability is hidden", () => {
+  //spec 7.2: the row is always there, so every profile has the same four
+  //rows; "None" answers the question instead of hiding it
+  it("says None in the Hidden ability row when no ability is hidden", () => {
     render(
       <MetaInfo
         height={10}
@@ -58,7 +60,25 @@ describe("MetaInfo", () => {
       />,
     );
 
-    expect(screen.queryByText("Hidden")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("rowheader", { name: "Hidden ability" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "None" })).toBeInTheDocument();
+  });
+
+  it("writes API slugs as words", () => {
+    render(
+      <MetaInfo
+        height={10}
+        weight={10}
+        abilities={[makeAbility("flame-body"), makeAbility("swarm", true)]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("cell", { name: "Flame Body" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "Swarm" })).toBeInTheDocument();
   });
 
   it("renders a separate Hidden row for the hidden ability", () => {
@@ -70,12 +90,14 @@ describe("MetaInfo", () => {
       />,
     );
 
-    expect(screen.getByText("Hidden")).toBeInTheDocument();
     expect(
-      screen.getByRole("cell", { name: "chlorophyll" }),
+      screen.getByRole("rowheader", { name: "Hidden ability" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("cell", { name: "Chlorophyll" }),
     ).toBeInTheDocument();
     //and it must not also show up in the regular abilities list:
-    expect(screen.getByRole("cell", { name: "overgrow" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "Overgrow" })).toBeInTheDocument();
   });
 });
 

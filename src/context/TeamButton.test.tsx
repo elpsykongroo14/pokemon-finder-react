@@ -45,6 +45,11 @@ function renderButton() {
 
 const pikachu = { name: "pikachu" } as PokemonDetails;
 
+//the icon wrapper inside the Team button: it carries data-pop after a pop
+//(the icon itself is a drawn plus or check now, not a "+" character)
+const popIcon = () =>
+  screen.getByRole("button", { name: "Team" }).querySelector(".pop-icon");
+
 beforeEach(() => {
   vi.useFakeTimers();
   setTeam();
@@ -60,11 +65,11 @@ describe("TeamButton", () => {
     setTeam({ isOnTeam: () => false });
     const user = userEvent.setup();
     render(<TeamButton pokemon={pikachu} />);
-    expect(screen.getByText("+")).not.toHaveAttribute("data-pop");
+    expect(popIcon()).not.toHaveAttribute("data-pop");
 
     await user.click(screen.getByRole("button", { name: "Team" }));
 
-    expect(screen.getByText("+")).toHaveAttribute("data-pop");
+    expect(popIcon()).toHaveAttribute("data-pop");
   });
 
   it("does not pop when a full party rejects the add", async () => {
@@ -75,7 +80,24 @@ describe("TeamButton", () => {
 
     await user.click(screen.getByRole("button", { name: "Team" }));
 
-    expect(screen.getByText("+")).not.toHaveAttribute("data-pop");
+    expect(popIcon()).not.toHaveAttribute("data-pop");
+  });
+
+  //spec 5.2 / D44: the visible words swap, the name stays "Team"
+  it("says 'Add to team' off the team and 'On your team' on it", () => {
+    vi.useRealTimers();
+    setTeam({ isOnTeam: () => false });
+    const { unmount } = renderButton();
+    expect(screen.getByRole("button", { name: "Team" })).toHaveTextContent(
+      "Add to team",
+    );
+    unmount();
+
+    setTeam({ isOnTeam: () => true });
+    renderButton();
+    expect(screen.getByRole("button", { name: "Team" })).toHaveTextContent(
+      "On your team",
+    );
   });
 
   it("shows 'Team' and calls addToTeam when not on the team", async () => {

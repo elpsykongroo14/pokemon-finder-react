@@ -7,6 +7,12 @@ import { useTCGLibrary } from "../hooks/useTCGLibrary";
 
 vi.mock("../hooks/useTCGLibrary");
 
+//B&W-7: the hero looks the Pokémon up for its dex number and colors. that
+//lookup has its own tests; here it simply has nothing to say
+vi.mock("../hooks/usePokemon", () => ({
+  usePokemon: () => ({ data: null, loading: false, error: null, retry() {} }),
+}));
+
 vi.mock("../components/SearchBar", () => ({
   SearchBar: ({ onSubmit }: { onSubmit: (query: string) => void }) => (
     <button onClick={() => onSubmit("charmander")}>fake-search-submit</button>
@@ -32,19 +38,25 @@ vi.mock("../components/TCGCardGrid", () => ({
     status,
     emptyMessage,
     onSelect,
+    entering,
+    onRetry,
   }: {
     status: string;
     emptyMessage: string;
     onSelect: (card: { id: string; name: string }) => void;
+    entering?: boolean;
+    onRetry?: () => void;
   }) => (
     <div
       data-testid="tcg-card-grid"
       data-status={status}
       data-empty-message={emptyMessage}
+      data-entering={entering ? "yes" : "no"}
     >
       <button onClick={() => onSelect({ id: "1", name: "Pikachu Card" })}>
         fake-select-card
       </button>
+      <button onClick={onRetry}>fake-retry</button>
     </div>
   ),
 }));
@@ -58,12 +70,17 @@ vi.mock("../components/TCGCardTable", () => ({
 vi.mock("../components/TCGCardModal", () => ({
   TCGCardModal: ({
     card,
+    cards,
     onClose,
   }: {
     card: { name: string };
+    cards?: { id: string }[];
     onClose: () => void;
   }) => (
-    <div data-testid="tcg-card-modal">
+    <div
+      data-testid="tcg-card-modal"
+      data-cards={cards?.map((c) => c.id).join(",")}
+    >
       {card.name}
       <button onClick={onClose}>fake-close-modal</button>
     </div>
@@ -80,6 +97,7 @@ function makeLibraryState(
     error: null,
     sortMode: "newest" as const,
     setSortMode: vi.fn(),
+    retry: vi.fn(),
     ...overrides,
   };
 }
@@ -103,10 +121,11 @@ describe("LibraryPage", () => {
 
     renderLibraryPage("/library");
 
+    //changed in B&W-7: the panel title under the header is gone; the
+    //hero's title names the page (spec 7.4)
     expect(
-      screen.getByRole("heading", { name: "TCG Library" }),
+      screen.getByRole("heading", { level: 2, name: "TCG Library" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Featured Cards")).toBeInTheDocument();
 
     const grid = screen.getByTestId("tcg-card-grid");
     expect(grid).toHaveAttribute("data-status", "success");
@@ -138,7 +157,7 @@ describe("LibraryPage", () => {
     );
 
     expect(
-      screen.getByRole("heading", { level: 3, name: "charmander" }),
+      screen.getByRole("heading", { level: 2, name: "Charmander cards" }),
     ).toBeInTheDocument();
   });
 
@@ -148,7 +167,8 @@ describe("LibraryPage", () => {
     const user = userEvent.setup();
 
     renderLibraryPage("/library");
-    await user.selectOptions(screen.getByLabelText("Sort cards"), "oldest");
+    //B&W-7: the select's label is the visible word "Sort" (spec 7.4)
+    await user.selectOptions(screen.getByLabelText("Sort"), "oldest");
 
     expect(setSortMode).toHaveBeenCalledWith("oldest");
   });
@@ -196,7 +216,7 @@ describe("LibraryPage", () => {
 
     //we are now on /library/charmander?view=table
     expect(
-      screen.getByRole("heading", { level: 3, name: "charmander" }),
+      screen.getByRole("heading", { level: 2, name: "Charmander cards" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "Table" })).toBeChecked();
     expect(screen.getByRole("link", { name: /Featured/ })).toHaveAttribute(
@@ -276,7 +296,7 @@ describe("LibraryPage", () => {
 
     //now on /library/charmander?view=binder, page reset
     expect(
-      screen.getByRole("heading", { level: 3, name: "charmander" }),
+      screen.getByRole("heading", { level: 2, name: "Charmander cards" }),
     ).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "Binder" })).toBeChecked();
     expect(screen.getByTestId("tcg-card-binder")).toHaveAttribute(
@@ -304,6 +324,82 @@ describe("LibraryPage", () => {
 
     await user.click(screen.getByRole("button", { name: "fake-close-modal" }));
     expect(screen.queryByTestId("tcg-card-modal")).not.toBeInTheDocument();
+  });
+
+  //B&W-8 (spec 7.6): a failed load's Retry is the hook's retry
+  it("hands the views the hook's retry", async () => {
+    const retry = vi.fn();
+    vi.mocked(useTCGLibrary).mockReturnValue(
+      makeLibraryState({ status: "error", retry }),
+    );
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library");
+    await user.click(screen.getByRole("button", { name: "fake-retry" }));
+
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
+  //tile in (spec 6.2): when the view or the sort changes, never on load
+  it("lets the tiles rise in after a sort change, but not on first load", async () => {
+    const setSortMode = vi.fn();
+    let sortMode: "newest" | "oldest" = "newest";
+    vi.mocked(useTCGLibrary).mockImplementation(() =>
+      makeLibraryState({ sortMode, setSortMode }),
+    );
+    const user = userEvent.setup();
+
+    const view = renderLibraryPage("/library");
+    expect(screen.getByTestId("tcg-card-grid")).toHaveAttribute(
+      "data-entering",
+      "no",
+    );
+
+    sortMode = "oldest";
+    await user.selectOptions(screen.getByLabelText("Sort"), "oldest");
+    view.rerender(
+      <MemoryRouter initialEntries={["/library"]}>
+        <Routes>
+          <Route path="/library" element={<LibraryPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByTestId("tcg-card-grid")).toHaveAttribute(
+      "data-entering",
+      "yes",
+    );
+  });
+
+  it("switches to the binder from the hero's Open the binder", async () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(makeLibraryState());
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library");
+    await user.click(screen.getByRole("button", { name: "Open the binder" }));
+
+    expect(screen.getByRole("radio", { name: "Binder" })).toBeChecked();
+    expect(screen.getByTestId("tcg-card-binder")).toBeInTheDocument();
+  });
+
+  //D53: the dialog flips through the cards in the order the page shows
+  it("hands the dialog every card in the current order", async () => {
+    vi.mocked(useTCGLibrary).mockReturnValue(
+      makeLibraryState({
+        cards: [
+          { id: "1", name: "Pikachu Card" },
+          { id: "2", name: "Raichu Card" },
+        ],
+      }),
+    );
+    const user = userEvent.setup();
+
+    renderLibraryPage("/library");
+    await user.click(screen.getByRole("button", { name: "fake-select-card" }));
+
+    expect(screen.getByTestId("tcg-card-modal")).toHaveAttribute(
+      "data-cards",
+      "1,2",
+    );
   });
 });
 

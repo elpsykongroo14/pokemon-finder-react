@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { getSpriteUrl, integerScale, resolveSprite } from "./sprites";
+import {
+  getSpriteUrl,
+  integerScale,
+  resolveSprite,
+  spriteUrlFromId,
+  listSpriteUrl,
+} from "./sprites";
 import type { PokemonSprites } from "./sprites";
 
 describe("getSpriteUrl", () => {
@@ -155,5 +161,50 @@ describe("integerScale", () => {
   it("returns 1 when the size is unknown (0 or NAN)", () => {
     expect(integerScale({ width: 0, height: 0 }, 180)).toBe(1);
     expect(integerScale({ width: NaN, height: NaN }, 180)).toBe(1);
+  });
+
+  //spec 7.1: 3x for the big Black & White sprites, 4x for small ones. one
+  //box plus a ceiling gives both: Hydreigon (108 px) fits 3x in 330, and
+  //Pikachu (50 px) would fit 6x but stops at 4x
+  it("stops at the ceiling when one is given", () => {
+    expect(integerScale({ width: 90, height: 108 }, 330, 4)).toBe(3);
+    expect(integerScale({ width: 50, height: 46 }, 330, 4)).toBe(4);
+  });
+});
+
+describe("spriteUrlFromId", () => {
+  //D51: an autocomplete row only knows a name and a dex number. the sprite
+  //files are named by number, so the row can show one with no API request
+  it("builds the front sprite address from the dex number", () => {
+    expect(spriteUrlFromId(635)).toBe(
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/635.png",
+    );
+  });
+
+  it("returns null for an id that cannot be a Pokémon", () => {
+    expect(spriteUrlFromId(0)).toBeNull();
+    expect(spriteUrlFromId(-1)).toBeNull();
+    expect(spriteUrlFromId(2.5)).toBeNull();
+  });
+});
+
+//B&W-8: the picture for a saved Pokémon in a list (favorites rail, team
+//cards). pixel sprites come from the dex number; artwork is what was
+//saved with it. one rule, so the two lists cannot disagree
+describe("listSpriteUrl", () => {
+  it("draws the dex-number pixel sprite in pixel mode, saved or not", () => {
+    expect(listSpriteUrl("pixel", { id: 25, sprite: "art.png" })).toMatch(
+      /\/pokemon\/25\.png$/,
+    );
+    expect(listSpriteUrl("pixel", { id: 25, sprite: null })).toMatch(
+      /\/pokemon\/25\.png$/,
+    );
+  });
+
+  it("draws the saved artwork in artwork mode, or nothing without one", () => {
+    expect(listSpriteUrl("artwork", { id: 25, sprite: "art.png" })).toBe(
+      "art.png",
+    );
+    expect(listSpriteUrl("artwork", { id: 25, sprite: null })).toBeNull();
   });
 });

@@ -3,16 +3,35 @@ import { useRef } from "react";
 import { useEncounter } from "../hooks/useEncounter";
 import { useTypeTheme } from "../hooks/useTypeTheme";
 import { BattleMenu } from "../components/BattleMenu";
+import { EncounterField } from "../components/EncounterField";
+import { EncounterWipe } from "../components/EncounterWipe";
 import { FailureMessage } from "../components/FailureMessage";
+import { PokemonSkeleton } from "../components/PokemonSkeleton";
 import { Stage } from "../components/Stage";
-import { StageSkeleton } from "../components/StageSkeleton";
 import { MessageBox } from "../ui/MessageBox";
-import { StageConsole } from "../ui/StageConsole";
-import { encounterMessage, LOADING_LABEL, MENU_PROMPT } from "../lib/copy";
 import { PageTitle } from "../ui/PageTitle";
+import {
+  encounterMessage,
+  LOADING_LABEL,
+  WILD_ENCOUNTER_LABEL,
+} from "../lib/copy";
 
+//Home (spec 7.1): one wild encounter. the field on the left with the
+//battle dialog, the command plate on the right.
+//
+//what is keyed and what is not, and why (the same rule as the Pokémon
+//page, D43):
+//  the field              NOT keyed: its sky changes color under the slab
+//  the stage              keyed by name: a new Pokémon drops in again
+//  the wipe               keyed by name: the slabs cross again
+//  the dialog             NOT keyed: its live region must stay the same
+//                         element so the new greeting is announced; it
+//                         restarts its own typing inside (MessageBox)
+//  the command plate      NOT keyed: "Look for another" lives on it, and a
+//                         keyed plate would be thrown away by its own click,
+//                         taking keyboard focus with it
 export function HomePage() {
-  const { id, data, loading, error, retry } = useEncounter();
+  const { id, data, loading, error, retry, reroll } = useEncounter();
   const stageRef = useRef<HTMLDivElement>(null);
 
   //the wild pokemon paints the page in its type colors same way
@@ -26,39 +45,47 @@ export function HomePage() {
     retry();
   }
 
-  //exactly one situation at a time, the menu below is the same in all of them:
-  //home must stay usable when the encounter cannot load
-  let stage;
-  let message;
-  if (error) {
-    stage = (
-      <FailureMessage kind={error} query={String(id)} onRetry={handleRetry} />
-    );
-    message = MENU_PROMPT;
-  } else if (loading || !data) {
-    stage = <StageSkeleton />;
-    message = LOADING_LABEL;
-  } else {
-    stage = <Stage pokemon={data} />;
-    message = encounterMessage(data.name);
-  }
+  //the Pokémon to show, or null. usePokemon keeps the previous Pokémon in
+  //data while the next one loads (after "Look for another"), so data alone
+  //is not enough: only a finished, successful lookup counts
+  const pokemon = !loading && !error ? data : null;
 
   return (
-    <>
+    //page--bleed: Home runs edge to edge, like the Pokémon page
+    <div className="home-page page--bleed">
       {/* Home is the app itself, so the tab shows just the app name */}
       <PageTitle />
-      <StageConsole
-        stage={
-          <div className="home-stage" ref={stageRef} tabIndex={-1}>
-            {stage}
+      <EncounterField variant="home" label={WILD_ENCOUNTER_LABEL}>
+        {/* the stage slot stays mounted while its content swaps, so focus
+            has somewhere to land after Retry. data-encounter: the Stage
+            inside plays the drop and the silhouette (Stage.css) */}
+        <div className="home-stage" data-encounter ref={stageRef} tabIndex={-1}>
+          {pokemon ? (
+            <Stage key={pokemon.name} pokemon={pokemon} spriteOptions={false} />
+          ) : (
+            !error && <PokemonSkeleton decorative />
+          )}
+
+          <div className="home-stage__dialog">
+            {error ? (
+              <FailureMessage
+                kind={error}
+                query={String(id)}
+                onRetry={handleRetry}
+              />
+            ) : (
+              <MessageBox
+                text={pokemon ? encounterMessage(pokemon.name) : LOADING_LABEL}
+                typing={pokemon ? "lines" : "letters"}
+              />
+            )}
           </div>
-        }
-      >
-        <div className="home-console">
-          <MessageBox text={message} />
-          <BattleMenu />
         </div>
-      </StageConsole>
-    </>
+
+        <BattleMenu pokemon={pokemon} onReroll={reroll} />
+
+        {pokemon && <EncounterWipe key={pokemon.name} />}
+      </EncounterField>
+    </div>
   );
 }

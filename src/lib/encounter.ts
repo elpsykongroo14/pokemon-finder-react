@@ -40,12 +40,28 @@ export function getSessionEncounterId(
   }
 
   const id = pickEncounterId(random);
+  storeEncounterId(storage, id);
+  return id;
+}
 
+//"Look for another" (spec 7.1): a new wild Pokémon, never the current one.
+//when the dice land on the current Pokémon we step to the next number
+//instead of rolling again: no loop, so the result is always one roll away
+//and a test can predict it exactly. the % wraps the last Pokémon back to #1
+export function pickNextEncounterId(
+  current: number,
+  random: () => number,
+): number {
+  const id = pickEncounterId(random);
+  return id === current ? (id % POKEDEX_SIZE) + 1 : id;
+}
+
+//remember the encounter for this session. writing can throw (storage full
+//or blocked); then the encounter just won't survive a refresh
+export function storeEncounterId(storage: StorageLike | null, id: number) {
   try {
     storage?.setItem(ENCOUNTER_KEY, String(id));
   } catch {
-    //a storage full or blocked: the ecnounter just will not survive a refresh
+    //nothing to do: the app works without storage
   }
-
-  return id;
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { fetchPokemon } from "../lib/api";
 import { useTeam } from "./useTeam";
+import { isIncompleteMember } from "../lib/teamMember";
 
-//lazily fills in 'types' for team members saved before that field existed
+//lazily fills in 'types' and 'statTotal' (D49) for team members saved
+//before those fields existed
 //each effect run does exactly one job (fetch next member who needs it)
 //finishing it changes the team, which changes 'next', which re-runs the effect
 export function useTeamBackfill(): void {
@@ -11,7 +13,7 @@ export function useTeamBackfill(): void {
   const [failed, setFailed] = useState<string[]>([]);
 
   const next = team.find(
-    (member) => member.types === undefined && !failed.includes(member.name),
+    (member) => isIncompleteMember(member) && !failed.includes(member.name),
   )?.name;
 
   useEffect(() => {

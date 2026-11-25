@@ -1,67 +1,144 @@
+/* The favorites rail (spec 7.2): a black strip under the field, with
+   slanted 84 x 64 tiles. Each tile shows the sprite, a 5 px underline in
+   the Pokémon's type color, and white at 12 % behind it. The current
+   Pokémon's tile is white. Sprites hop on hover and focus.
+
+   The sprite (96 px) is bigger than the tile on purpose: it overflows the
+   plate the way a sprite overflows a platform. */
 @layer features {
-  /* A horizontal strip: it scrolls sideways instead of growing taller,
-     so a long favorites list never makes the tray eat the screen. */
-  .favorites-list {
+  .favorites-rail {
+    --tile-width: 84px;
+    --tile-height: 64px;
+    --tile-line: 5px;
+    --tile-sprite: 96px;
+
     display: flex;
-    gap: var(--space-2);
+    align-items: center;
+    gap: var(--space-5);
+    padding: calc(var(--space-3) + var(--space-1) / 2) var(--space-gutter);
+    overflow-x: auto;
+    background: var(--surface-ink);
+    color: var(--text-primary);
+  }
+
+  .favorites-rail__caption {
+    flex: none;
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+  }
+
+  .favorites-rail__empty {
+    margin: 0;
+    font-size: var(--text-chip);
+    color: var(--text-secondary);
+  }
+
+  .favorites-rail__list {
+    display: flex;
+    gap: var(--space-3);
     margin: 0;
     padding: 0;
     list-style: none;
-    overflow-x: auto;
   }
 
-  .favorites-list li {
-    display: flex;
-    flex: none;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
-    background: var(--surface-window-sunken);
-    border: var(--border-width-hairline) solid var(--border-hairline);
-    border-radius: var(--radius-pill);
-    /* each chip pops in a beat after the one before it; --fav-slot comes from
-       staggerSlot(). The delay and duration are motion tokens, which are 0ms
-       when animations are off, so the entrance simply disappears. */
+  .favorite-tile {
+    position: relative;
+    isolation: isolate;
+    display: block;
+    width: var(--tile-width);
+    height: var(--tile-height);
+  }
+
+  .favorite-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    background: var(--white-a12);
+    transition: background-color var(--dur-fast) var(--ease-standard);
+  }
+
+  .favorite-tile:hover::before {
+    background: var(--white-a20);
+  }
+
+  .favorite-tile[aria-current="page"]::before {
+    background: var(--surface-paper);
+  }
+
+  .favorite-tile__sprite {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--tile-sprite);
+    height: var(--tile-sprite);
+    translate: -50% -54%;
+    object-fit: contain;
+    transition: transform var(--dur-base) var(--ease-spring);
+  }
+
+  /* a pixel sprite at its own 96 px: crisp. Artwork scales smoothly
+     (B&W-8: pixelated artwork shrank in hard steps and looked broken) */
+  .favorite-tile__sprite[data-mode="pixel"] {
+    image-rendering: pixelated;
+  }
+
+  /* the ring follows the slant, like the buttons: a skewed ::after 6 px
+     out. --focus-ring is white here (.on-dark), and the 3 px of black
+     between ring and tile keeps it visible even on the white current tile */
+  .favorite-tile:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .favorite-tile:focus-visible::after {
+    content: "";
+    position: absolute;
+    inset: calc(-2 * var(--border-width-thick));
+    transform: skewX(var(--slant));
+    border: var(--border-width-thick) solid var(--focus-ring);
+    pointer-events: none;
+  }
+
+  /* hop (spec 6.2) */
+  .favorite-tile:hover .favorite-tile__sprite,
+  .favorite-tile:focus-visible .favorite-tile__sprite {
+    transform: translateY(calc(var(--space-2) * -1));
+  }
+
+  /* the type underline; neutral for favorites saved without types */
+  .favorite-tile__line {
+    position: absolute;
+    left: var(--space-1);
+    right: var(--space-1);
+    bottom: 0;
+    height: var(--tile-line);
+    transform: skewX(var(--slant));
+    background: var(--border-hairline);
+  }
+
+  .favorite-tile[data-type] .favorite-tile__line {
+    background: var(--theme-accent);
+  }
+
+  /* a favorite added while you are on the page pops in; the ones that
+     were already there do not move (D42). A token duration: 0 ms with
+     motion off */
+  .favorite-tile[data-new] {
     animation: favorite-enter var(--dur-base) var(--ease-snap) both;
-    animation-delay: calc(var(--fav-slot, 0) * var(--dur-instant));
   }
 
   @keyframes favorite-enter {
     from {
       opacity: 0;
-      transform: translateY(6px) scale(0.9);
+      transform: translateY(var(--space-2)) scale(0.9);
     }
   }
 
-  .favorites-list .favorite-link {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    color: var(--text-primary);
-    font-size: var(--text-sm);
-    text-decoration: none;
-    text-transform: capitalize;
-  }
-
-  .favorites-list .favorite-link img {
-    background: var(--surface-frame);
-    border-radius: var(--radius-pill);
-  }
-
-  .favorites-list button {
-    /* 24px is the smallest comfortable (and WCAG 2.2) touch target */
-    min-width: 24px;
-    min-height: 24px;
-    padding: var(--space-1);
-    color: var(--text-secondary);
-    font-size: var(--text-xs);
-    line-height: 1;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .favorites-list button:hover {
-    color: var(--text-danger);
+  @media (max-width: 1000px) {
+    .favorites-rail {
+      padding-inline: var(--space-gutter-phone);
+    }
   }
 }

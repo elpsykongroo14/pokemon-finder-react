@@ -12,7 +12,7 @@ import { NOT_FOUND_SCENE_LABEL } from "../lib/copy";
 //PixelArt (the generic renderer); this component only puts the two together
 export function LostRouteScene() {
   return (
-    <div className="lost-rout">
+    <div className="lost-route">
       <PixelArt
         className="lost-route__art"
         width={LOST_ROUTE_WIDTH}

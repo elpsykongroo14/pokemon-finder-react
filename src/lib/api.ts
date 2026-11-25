@@ -39,6 +39,7 @@ const evoChainCache: Record<string, EvolutionChain> = {};
 //within a session, so the cache is meant to live for the app's whole life)
 export function clearPokeCache(): void {
   for (const key in pokeCache) delete pokeCache[key];
+  for (const key in tcgCache) delete tcgCache[key];
   for (const key in speciesCache) delete speciesCache[key];
   for (const key in evoChainCache) delete evoChainCache[key];
   indexCache = null;
@@ -176,9 +177,54 @@ export async function fetchTCGCards(
 
   const url = `${TCG_PROXY}/?${params}`;
 
+  //the Pokémon page's teaser and the Library ask for the same cards; the
+  //proxy limits requests per minute, so a search is asked for once
+  const cached = tcgCache[url];
+  if (cached) return cached;
+
   //TCG api wraps results in a 'data' array
-  const data = await getJSON<TCGCardsResponse>(url, { signal });
-  return data.data || [];
+  const data = await getJSONWithOneRetry<TCGCardsResponse>(url, signal);
+  const cards = data.data || [];
+  tcgCache[url] = cards;
+  return cards;
+}
+
+//successful card searches, by their exact URL
+const tcgCache: Record<string, TCGCard[]> = {};
+
+//the card proxy answers 500 now and then: the card API behind it sends an
+//empty or cut-off body (reported after B&W-8). a SERVER error is often
+//gone a moment later, so ask once more after a short pause. anything else
+//(404, 429, a network failure) would not change by asking again at once
+const TCG_RETRY_PAUSE_MS = 700;
+
+async function getJSONWithOneRetry<T>(
+  url: string,
+  signal: AbortSignal | undefined,
+): Promise<T> {
+  try {
+    return await getJSON<T>(url, { signal });
+  } catch (err) {
+    if (!(err instanceof HttpError) || err.status < 500) throw err;
+    await pause(TCG_RETRY_PAUSE_MS, signal);
+    return getJSON<T>(url, { signal });
+  }
+}
+
+//a wait that a cancelled request also cancels, with the same AbortError a
+//cancelled fetch throws, so callers already know how to ignore it
+function pause(ms: number, signal: AbortSignal | undefined): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        reject(new DOMException("Aborted", "AbortError"));
+      },
+      { once: true },
+    );
+  });
 }
 
 export async function fetchTCGCardsBatch(

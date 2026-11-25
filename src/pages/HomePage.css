@@ -1,14 +1,149 @@
+/* Home (spec 7.1): one encounter field, 660 px tall with the horizon at
+   44 % (EncounterField.css, data-variant="home"). This file places what
+   stands in it:
+
+   - the stage slot on the left 56 %, with the platform higher than on the
+     Pokémon page (the battle dialog sits under it), 400 x 84 at 196 px
+   - the battle dialog at the bottom of the stage, 40 px from each side
+   - the command plate on the right 46 %, its left edge slanted 148 px
+
+   Phones (≤ 1000 px): a 540 px stage, then the plate underneath, rising
+   36 px into the field with its slanted edge on top (the same move as the
+   Pokémon page's name plate). The sizes describe one illustration, so
+   they are named once here. */
 @layer features {
+  .home-page {
+    --command-edge: 148px; /* where the plate's slanted edge meets the top */
+    --command-overlap: 36px; /* phones: how far the plate rises into the field */
+    --dialog-min-height: 132px;
+  }
+
   /* the stage slot stays mounted while its content swaps (skeleton, error,
      Pokémon), so keyboard focus has somewhere to land after Retry. it is a
      landing spot, not a control, so no ring */
+  .home-stage {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    width: 56%;
+  }
+
   .home-stage:focus {
     outline: none;
   }
 
-  .home-console {
+  /* the stage fills the slot (EncounterField.css would make it 56 % of
+     the field, and the slot already is) and stands higher than on the
+     Pokémon page, above the dialog */
+  .encounter-field .home-stage .stage {
+    --platform-bottom: 196px;
+    --shadow-bottom: 222px;
+    --shadow-height: 24px;
+    --sprite-bottom: 230px;
+
+    width: 100%;
+  }
+
+  .home-stage__dialog {
+    position: absolute;
+    left: var(--space-gutter);
+    right: var(--space-gutter);
+    bottom: calc(var(--space-6) - var(--space-1) / 2); /* 30 */
+    z-index: 2;
+  }
+
+  /* the battle dialog at Home's size: 40 px game text, two lines */
+  .home-stage__dialog .message-box {
+    --message-box-size: calc(var(--text-2xl) * 1.25); /* 40 */
+
+    min-height: var(--dialog-min-height);
+    padding: calc(var(--space-5) - var(--space-1))
+      calc(var(--space-6) - var(--space-1) / 2); /* 20 30 */
+    line-height: 1.1;
+  }
+
+  .home-page .battle-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
     display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
+    align-items: center;
+    width: 46%;
+    clip-path: polygon(var(--command-edge) 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .home-page .battle-menu__inner {
+    width: 100%;
+    padding: calc(var(--space-7) - var(--space-1)) var(--space-8)
+      calc(var(--space-7) - var(--space-1))
+      calc(var(--command-edge) + var(--space-6));
+  }
+
+  /* B&W-8: between the phone breakpoint and 1280 px the 46 % plate left
+     its commands about 216 px, and every title broke onto two lines. A
+     little wider, with a shorter slant and less padding, they fit */
+  @media (min-width: 1001px) and (max-width: 1279px) {
+    .home-page {
+      --command-edge: 96px;
+    }
+
+    .home-page .battle-menu {
+      width: 50%;
+    }
+
+    /* the stage slot (and the dialog in it) ends where the plate begins,
+       or the plate's slant would cover the dialog's right edge */
+    .home-stage {
+      width: 50%;
+    }
+
+    .home-page .battle-menu__inner {
+      padding-right: var(--space-5);
+      padding-left: calc(var(--command-edge) + var(--space-5));
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .home-stage {
+      position: relative;
+      width: 100%;
+      height: var(--field-stage-height);
+    }
+
+    /* above the part of the stage the plate's slanted edge covers */
+    .home-stage__dialog {
+      left: var(--space-4);
+      right: var(--space-4);
+      bottom: calc(var(--command-overlap) + var(--space-4));
+    }
+
+    .home-stage__dialog .message-box {
+      --message-box-size: calc(var(--text-2xl) - var(--space-1) / 2); /* 30 */
+
+      min-height: 0;
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .encounter-field .home-stage .stage {
+      --platform-width: 300px;
+      --platform-height: 64px;
+      --shadow-width: 140px;
+      --shadow-height: 20px;
+    }
+
+    .home-page .battle-menu {
+      position: relative;
+      width: auto;
+      margin-top: calc(var(--command-overlap) * -1);
+      clip-path: polygon(0 var(--command-overlap), 100% 0, 100% 100%, 0 100%);
+    }
+
+    .home-page .battle-menu__inner {
+      padding: var(--space-8) var(--space-gutter-phone) var(--space-6);
+    }
   }
 }

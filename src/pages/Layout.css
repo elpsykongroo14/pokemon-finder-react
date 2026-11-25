@@ -1,165 +1,116 @@
-/* App shell: header / main / tray.
+/* App shell: header / main / footer. (The favorites tray left in B&W-4:
+   favorites are a rail on the Pokémon page now, D48.)
 
-   Breakpoints (mobile-first, min-width only):
-     768px  tablet   header becomes two rows
-     1024px desktop  header becomes one row
-   CSS cannot read var() inside @media, so these two numbers live
-   here as literals. Decision D15 in the roadmap records why. */
+   One breakpoint for the shell: 1000 px (spec 4.4), the desktop-to-
+   stacked switch. CSS cannot read var() inside @media, so it lives here
+   as a literal next to the 768 / 1024 ones elsewhere (decision D15).
 
+   Desktop: a white bar, 72 px, with a 2 px Ink rule under it.
+   Phones: a 56 px top bar (brand, search toggle, party, settings) and
+   the nav fixed to the bottom as a 68 px bar (MainNav.css), so main and
+   the footer leave that much room at the end.
+
+   No page-load intro any more (D42): the shell is simply there. */
 @layer features {
   .app-shell {
-    --shell-max-width: 80rem;
-    --shell-gutter: var(--space-4);
+    --shell-gutter: var(--space-gutter);
+    --bottom-bar: 0px;
 
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 1fr auto auto;
-    grid-template-areas:
-      "header"
-      "main"
-      "tray"
-      "footer";
+    grid-template-rows: auto 1fr auto;
     min-height: 100svh;
-    max-width: var(--shell-max-width);
-    margin-inline: auto;
+    padding-bottom: var(--bottom-bar);
   }
 
-  /* Header */
-  /* Every header child is placed by name. Phone: title and gear share the
-     first row, nav and search get a full row each. */
   .app-header {
-    grid-area: header;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "title settings"
-      "nav nav"
-      "search search";
+    position: relative;
+    z-index: var(--z-sticky);
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-3) var(--space-6);
+    min-height: 72px;
     padding: var(--space-3) var(--shell-gutter);
-    background: var(--surface-chrome);
-    border-bottom: var(--border-width-line) solid var(--border-hairline);
+    background: var(--surface-paper);
+    border-bottom: var(--border-width-line) solid var(--border-line);
   }
 
   .app-title {
-    grid-area: title;
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: calc(var(--space-2) + var(--space-1) / 2);
     margin: 0;
-    font-family: var(--font-display);
-    font-weight: 400;
+    font-size: var(--text-title);
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+    letter-spacing: -0.01em;
     line-height: 1;
+    white-space: nowrap;
   }
 
-  .main-nav {
-    grid-area: nav;
+  .app-header__end {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-3) + var(--space-1) / 2);
+    margin-left: auto;
   }
 
-  .app-search {
-    grid-area: search;
-  }
-
-  .app-settings {
-    grid-area: settings;
-    justify-self: end;
-  }
-
-  /* Main and tray */
   .app-main {
-    grid-area: main;
+    width: min(100%, var(--measure-page) + 2 * var(--shell-gutter));
     min-width: 0;
-    padding: var(--space-5) var(--shell-gutter);
+    margin-inline: auto;
+    padding: var(--space-6) var(--shell-gutter);
     view-transition-name: page;
   }
 
-  .app-tray {
-    grid-area: tray;
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--shell-gutter);
-    background: var(--surface-chrome);
-    border-top: var(--border-width-line) solid var(--border-hairline);
+  /* a page that runs edge to edge (an encounter field) marks its root
+     .page--bleed, and main lets go of its column and gutters. :has() asks
+     the question from the parent's side, so no page has to undo main's
+     padding with negative margins */
+  .app-main:has(> .page--bleed) {
+    width: 100%;
+    padding: 0;
   }
 
-  /* The favorites strip takes whatever room the party counter leaves.
-     min-width: 0 lets it shrink so its own list can scroll sideways. */
-  .app-tray__favorites {
-    flex: 1;
-    min-width: 0;
-  }
-
-  @media (min-width: 768px) {
+  @media (max-width: 1000px) {
     .app-shell {
-      --shell-gutter: var(--space-5);
+      --shell-gutter: var(--space-gutter-phone);
+      --bottom-bar: 68px;
     }
 
     .app-header {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      grid-template-areas:
-        "title nav settings"
-        "search search search";
+      flex-wrap: nowrap;
+      gap: var(--space-2);
+      min-height: 56px;
+      padding: 0 var(--space-2) 0 var(--space-4);
     }
 
-    .main-nav {
-      justify-self: end;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .app-shell {
-      --shell-gutter: var(--space-6);
+    .app-title {
+      font-size: var(--text-base);
     }
 
-    .app-header {
-      grid-template-columns: auto minmax(0, 1fr) minmax(16rem, 24rem) auto;
-      grid-template-areas: "title nav search settings";
+    .app-header__end {
+      gap: 0;
     }
 
-    .main-nav {
-      justify-self: center;
+    .app-main {
+      padding-block: var(--space-5);
     }
   }
 
-  /* The one orchestrated page-load moment (R9). Like a DS powering on:
-     the top bar drops in, the page rises into place, then the tray slides
-     up from the bottom, each a beat after the last.
-
-     - plays once per page load: Layout mounts once, and route changes swap
-       only the <Outlet />, so navigating never replays it
-     - Transition tier, motion tokens only: motion.css sets them to 0ms when
-       animations are off, which removes the intro with no extra rule
-     - total = 2 x --dur-instant (stagger) + --dur-slow = 580ms, inside the
-       --dur-epic ceiling
-     - animates header/main/tray only, never .app-shell itself: a transform
-       there would become the reference box for the fixed Backdrop and toast */
-  .app-header {
-    animation: shell-drop var(--dur-slow) var(--ease-standard) backwards;
-  }
-
-  .app-main {
-    animation: shell-rise var(--dur-slow) var(--ease-standard) backwards;
-    animation-delay: var(--dur-instant);
-  }
-
-  .app-tray {
-    animation: shell-rise var(--dur-slow) var(--ease-standard) backwards;
-    animation-delay: calc(2 * var(--dur-instant));
-  }
-
-  @keyframes shell-drop {
-    from {
-      opacity: 0;
-      transform: translateY(calc(-1 * var(--space-3)));
-    }
-  }
-
-  @keyframes shell-rise {
-    from {
-      opacity: 0;
-      transform: translateY(var(--space-3));
+  /* The phone top bar holds one control more than the 390 px design (the
+     settings button has nowhere else to live). Below 380 px the brand
+     keeps only its mark; the words stay in the h1 for screen readers,
+     so the heading's name never changes */
+  @media (max-width: 380px) {
+    .app-title__words {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
   }
 }

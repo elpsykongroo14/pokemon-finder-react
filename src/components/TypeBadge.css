@@ -1,15 +1,75 @@
+/* Type chip (spec 5.4): a slanted plate in the type's own color, upright
+   text in that type's ink. data-type on the chip itself is what makes it
+   work: type-themes.css answers [data-type] anywhere, so every chip
+   carries its own --theme-accent no matter which Pokémon owns the page */
 @layer features {
   .type-badge {
+    --chip-height: 30px;
+
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-pill);
-    background: var(--theme-accent);
+    gap: var(--space-2);
+    height: var(--chip-height);
+    padding: 0 var(--space-4);
     color: var(--theme-accent-ink);
-    box-shadow: var(--bevel-highlight);
     font-family: var(--font-body);
+    font-size: var(--text-chip);
+    font-weight: var(--weight-bold);
+    font-stretch: var(--width-heading);
+    line-height: 1;
+    white-space: nowrap;
+    text-transform: capitalize; /* "fire" from the API, "Fire" on screen */
+  }
+
+  .type-badge::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    background: var(--theme-accent);
+  }
+
+  .type-badge[data-size="sm"] {
+    --chip-height: 24px;
+
+    padding: 0 var(--space-3);
     font-size: var(--text-xs);
-    text-transform: capitalize;
-    letter-spacing: 0.02em;
+  }
+
+  .type-badge[data-size="lg"] {
+    --chip-height: 34px;
+
+    padding: 0 calc(var(--space-4) + var(--space-1));
+    font-size: var(--text-base);
+  }
+
+  /* the multiplier: an Ink box tucked against the chip's right edge.
+     Same rule as the chip: the plate leans, the glyph stays upright.
+     Sized from the chip, so it scales with sm / lg for free (30 x 22
+     on the default chip) */
+  .type-badge__multiplier {
+    position: relative;
+    isolation: isolate;
+    display: inline-grid;
+    place-items: center;
+    min-width: var(--chip-height);
+    height: calc(var(--chip-height) - var(--space-2));
+    margin-right: calc(-1 * var(--space-2));
+    padding: 0 var(--space-2);
+    color: var(--surface-paper);
+    font-size: var(--text-meta);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .type-badge__multiplier::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    background: var(--surface-ink);
   }
 }

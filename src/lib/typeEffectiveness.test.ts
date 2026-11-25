@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { TYPE_CHART, computeDefensiveChart } from "./typeEffectiveness";
+import {
+  TYPE_CHART,
+  computeDefensiveChart,
+  groupMatchups,
+} from "./typeEffectiveness";
 
 describe("computeDefensiveChart", () => {
   it("applies a straightforward weaknes (fire is 2x against grass)", () => {
@@ -56,5 +60,47 @@ describe("TYPE_CHART data integrity", () => {
       });
     });
     expect(invalidReferences).toEqual([]);
+  });
+});
+
+describe("groupMatchups", () => {
+  //Hydreigon: dark/dragon, the Pokémon in the approved screens
+  const hydreigon = groupMatchups(["dark", "dragon"]);
+
+  it("lists what hits harder than normal under 'weak', strongest first", () => {
+    expect(hydreigon.weak[0]).toEqual({ type: "fairy", multiplier: 4 });
+    expect(hydreigon.weak.map((m) => m.type).sort()).toEqual([
+      "bug",
+      "dragon",
+      "fairy",
+      "fighting",
+      "ice",
+    ]);
+  });
+
+  it("lists what hits softer under 'resists', and immunities on their own", () => {
+    expect(hydreigon.resists.map((m) => m.multiplier)).toEqual(
+      Array(6).fill(0.5),
+    );
+    expect(hydreigon.immune).toEqual([{ type: "psychic", multiplier: 0 }]);
+  });
+
+  it("puts a quarter resistance before a half one", () => {
+    //Volcarona, bug/fire: grass does a quarter
+    expect(groupMatchups(["bug", "fire"]).resists[0]).toEqual({
+      type: "grass",
+      multiplier: 0.25,
+    });
+  });
+
+  it("leaves neutral matchups out, and keeps the chart's order within a group", () => {
+    const pikachu = groupMatchups(["electric"]);
+    expect(pikachu.weak).toEqual([{ type: "ground", multiplier: 2 }]);
+    expect(pikachu.resists.map((m) => m.type)).toEqual([
+      "electric",
+      "flying",
+      "steel",
+    ]);
+    expect(pikachu.immune).toEqual([]);
   });
 });

@@ -4,4 +4,16 @@
     flex-direction: column;
     gap: var(--space-4);
   }
+
+  /* once the comparison is up, the field, the band and the duel are one
+     edge-to-edge piece: no gaps between them */
+  .compare-page.page--bleed {
+    gap: 0;
+  }
+
+  /* focus lands here after Retry so keyboard users keep their place;
+     it is a landing spot, not a control, so no ring */
+  .compare-page:focus {
+    outline: none;
+  }
 }

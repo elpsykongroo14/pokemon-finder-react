@@ -88,8 +88,33 @@ export function resolveSprite(
 export function integerScale(
   natural: { width: number; height: number },
   box: number,
+  //optional ceiling: small sprites would otherwise grow huge in a big box
+  max = Infinity,
 ): number {
   const longest = Math.max(natural.width, natural.height);
   if (!(longest > 0)) return 1;
-  return Math.max(1, Math.floor(box / longest));
+  return Math.max(1, Math.min(max, Math.floor(box / longest)));
+}
+
+//PokeAPI names its front sprite files by dex number, so a list that only
+//knows numbers (the autocomplete rows, D51) can show a picture without a
+//details request per row. null for ids that cannot be a Pokémon, so the
+//caller can skip the <img> instead of requesting "0.png"
+const SPRITE_BY_ID_BASE =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
+
+export function spriteUrlFromId(id: number): string | null {
+  if (!Number.isInteger(id) || id < 1) return null;
+  return `${SPRITE_BY_ID_BASE}/${id}.png`;
+}
+
+//the picture for a saved Pokémon in a list: the favorites rail and the
+//team cards (B&W-8). the sprite setting decides, as it does on the
+//Pokémon page: pixel sprites come from the dex number, so even a summary
+//saved without one has a picture; artwork is the image saved with it
+export function listSpriteUrl(
+  mode: SpriteMode,
+  saved: { id: number; sprite: string | null },
+): string | null {
+  return mode === "pixel" ? spriteUrlFromId(saved.id) : saved.sprite;
 }

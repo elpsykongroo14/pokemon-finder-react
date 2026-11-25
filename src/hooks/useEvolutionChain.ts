@@ -29,6 +29,12 @@ export function useEvolutionChain(
   useEffect(() => {
     const controller = new AbortController();
 
+    //the API module answers from its cache WITHOUT looking at the signal,
+    //so a cancelled run can still get answers and keep going. every step
+    //after an await asks first, and a cancelled run writes nothing
+    //(reported after B&W-8: an old chain could land on the new Pokémon)
+    const cancelled = () => controller.signal.aborted;
+
     async function run() {
       setLoading(true);
       setError(null);
@@ -38,9 +44,11 @@ export function useEvolutionChain(
           signal: controller.signal,
         });
         //2) follow that URL to get the raw ChainLink tree
+        if (cancelled()) return;
         const evoData = await fetchEvolutionChain(species.evolution_chain.url, {
           signal: controller.signal,
         });
+        if (cancelled()) return;
         const evoTree = buildEvolutionTree(evoData.chain);
         setTree(evoTree);
 
@@ -57,6 +65,7 @@ export function useEvolutionChain(
           ),
         );
 
+        if (cancelled()) return;
         //zip names and results back together into a lookup map
         const spriteMap: Record<string, PokemonSprites | null> = {};
         names.forEach((name, i) => {
@@ -64,12 +73,14 @@ export function useEvolutionChain(
         });
         setSprites(spriteMap);
       } catch (err) {
+        if (cancelled()) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
         const message =
           err instanceof Error ? err.message : "Something went wrong";
         setError(message);
       } finally {
-        setLoading(false);
+        //a cancelled run must not switch off the NEW run's loading state
+        if (!cancelled()) setLoading(false);
       }
     }
     run();

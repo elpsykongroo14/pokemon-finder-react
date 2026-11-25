@@ -1,11 +1,9 @@
 import "./Layout.css";
 import { Outlet } from "react-router-dom";
-import { SearchBar } from "../components/SearchBar";
-import { FavoritesList } from "../components/FavoritesList";
+import { HeaderSearch } from "../components/HeaderSearch";
 import { MainNav } from "../components/MainNav";
 import { BrandMark } from "../components/BrandMark";
 import { PartyCounter } from "../components/PartyCounter";
-import { Backdrop } from "../components/Backdrop";
 import { SettingsButton } from "../components/SettingsButton";
 import { useViewTransitionNavigate } from "../hooks/useViewTransitionNavigate";
 import { AppFooter } from "../components/AppFooter";
@@ -27,19 +25,18 @@ export function Layout() {
     <div className="app-shell">
       {/* first in the page, so it is the first Tab stop */}
       <SkipLink />
-      <Backdrop />
+      {/* the white bar (spec 5.1). DOM order = Tab order: brand, nav,
+          search, party, settings. On phones CSS moves the nav to a bottom
+          bar; it stays here in the DOM so there is one "Main" landmark */}
       <header className="app-header">
         <h1 className="app-title">
           <BrandMark />
-          Pokémon Finder
+          <span className="app-title__words">Pokémon Finder</span>
         </h1>
         <MainNav />
-
-        <div className="app-search">
-          <SearchBar onSubmit={handleSearch} />
-        </div>
-
-        <div className="app-settings">
+        <div className="app-header__end">
+          <HeaderSearch onSubmit={handleSearch} />
+          <PartyCounter />
           <SettingsButton />
         </div>
       </header>
@@ -47,15 +44,8 @@ export function Layout() {
       {/* tabIndex -1: focusable by the skip link, but not a Tab stop */}
       <main className="app-main" id={MAIN_CONTENT_ID} tabIndex={-1}>
         <Outlet />
-        {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and tray around it persist across every navigation; only this slot swaps.*/}
+        {/* <Outlet /> is where the matched child route (HomePage, PokemonPage, etc.) actually renders. The header and footer around it persist across every navigation; only this slot swaps.*/}
       </main>
-
-      <aside className="app-tray" aria-label="Favorites and party">
-        <div className="app-tray__favorites">
-          <FavoritesList />
-        </div>
-        <PartyCounter />
-      </aside>
 
       <AppFooter />
     </div>

@@ -29,6 +29,11 @@ describe("FailureMessage", () => {
     );
     await user.click(screen.getByRole("button", { name: "Retry" }));
     expect(onRetry).toHaveBeenCalledTimes(1);
+    //B&W-8, spec 7.6: "a dark Retry button"
+    expect(screen.getByRole("button", { name: "Retry" })).toHaveAttribute(
+      "data-variant",
+      "dark",
+    );
   });
 
   it("shows a polite status and no Retry button when not found", () => {

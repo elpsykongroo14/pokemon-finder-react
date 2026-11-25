@@ -1,8 +1,26 @@
+/* The battle dialog (spec 7.1): Paper, a 4 px Ink frame with 14 px corners,
+   then a 4 px white gap and a 4 px ring in the Pokémon's color, drawn as
+   two inset shadows so the box needs no extra elements. The ring reads
+   --theme-accent where the box is, so it is the Pokémon's color on its
+   page and Graphite where there is no Pokémon.
+
+   Game text, Jersey 10, is the one place the pixel font appears besides
+   dex numbers. --message-box-size lets a page make it bigger (Home's
+   dialog is 40 px, B&W-5) without a second component */
 @layer features {
   .message-box {
-    font-family: var(--font-display);
-    font-size: var(--text-base);
-    line-height: 1.4;
+    --message-box-size: var(--text-xl);
+
+    padding: calc(var(--space-5) - var(--space-1)) var(--space-6);
+    border: var(--border-width-heavy) solid var(--border-line);
+    border-radius: var(--radius-dialog);
+    background: var(--surface-paper);
+    box-shadow:
+      inset 0 0 0 var(--border-width-heavy) var(--surface-paper),
+      inset 0 0 0 calc(2 * var(--border-width-heavy)) var(--theme-accent);
+    font-family: var(--font-game);
+    font-size: var(--message-box-size);
+    line-height: 1.15;
     color: var(--text-primary);
   }
 
@@ -14,16 +32,78 @@
     color: var(--text-danger);
   }
 
+  /* the untyped rest keeps its space, so the box never grows while typing */
   .message-box__rest {
     visibility: hidden;
   }
 
   .message-box__actions {
     margin-top: var(--space-3);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
   }
 
   /* keep the line break that encounterMessage() puts between its two lines */
   .message-box__text {
     white-space: pre-line;
+  }
+
+  /* ▼ "your move": a CSS triangle in the text color. It appears when the
+     text is done (MessageBox decides), and bobs only while motion is on */
+  .message-box__caret {
+    display: inline-block;
+    margin-left: var(--space-3);
+    border-top: 0.55em solid currentColor;
+    border-right: 0.4em solid transparent;
+    border-left: 0.4em solid transparent;
+    vertical-align: middle;
+  }
+
+  :root[data-motion="on"] .message-box__caret {
+    animation: message-box-caret 800ms steps(2) infinite;
+  }
+
+  @keyframes message-box-caret {
+    50% {
+      transform: translateY(var(--space-1));
+    }
+  }
+
+  /* ---- typing="lines" (Home's encounter dialog, spec 6.1) ----
+     Every line is in the page from the start; each one is uncovered left
+     to right by clip-path in as many steps as it has letters (--chars,
+     set by MessageBox), on the encounter's clock: line one at 950 ms,
+     line two at 2050 ms. Nothing outside the keyframes hides the text:
+     the "covered" state exists only while the animation applies it
+     (fill-mode both), so if the animation cannot run, or motion is off,
+     the text is simply there. */
+  .message-box__line {
+    display: block;
+  }
+
+  .message-box__clip {
+    display: inline-block;
+  }
+
+  :root[data-motion="on"] .message-box[data-typing="lines"] .message-box__clip {
+    animation: message-box-type 900ms steps(var(--chars, 20), end) 950ms both;
+  }
+
+  :root[data-motion="on"]
+    .message-box[data-typing="lines"]
+    [data-line="2"]
+    .message-box__clip {
+    animation-duration: 500ms;
+    animation-delay: 2050ms;
+  }
+
+  @keyframes message-box-type {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0);
+    }
   }
 }

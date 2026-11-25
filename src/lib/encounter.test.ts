@@ -3,6 +3,8 @@ import {
   ENCOUNTER_KEY,
   getSessionEncounterId,
   pickEncounterId,
+  pickNextEncounterId,
+  storeEncounterId,
   type StorageLike,
 } from "./encounter";
 import { POKEDEX_SIZE } from "./dex";
@@ -92,5 +94,54 @@ describe("getSessionEncounterId", () => {
     };
 
     expect(getSessionEncounterId(hostile, () => 0.5)).toBe(513);
+  });
+});
+
+//"Look for another" (spec 7.1): a reroll must always bring a DIFFERENT
+//Pokémon, or the button would sometimes look broken
+describe("pickNextEncounterId", () => {
+  it("takes the dice's pick when it differs from the current one", () => {
+    expect(pickNextEncounterId(25, () => 0.5)).toBe(513);
+  });
+
+  it("never returns the current Pokémon, even when the dice land on it", () => {
+    //0.5 lands on 513, which is the current one: step to the next number
+    expect(pickNextEncounterId(513, () => 0.5)).toBe(514);
+  });
+
+  it("wraps from the last Pokémon back to #1", () => {
+    expect(pickNextEncounterId(POKEDEX_SIZE, () => 0.999999)).toBe(1);
+  });
+
+  it("never repeats across many rolls", () => {
+    for (let i = 0; i < 2000; i++) {
+      const current = pickEncounterId(Math.random);
+      const next = pickNextEncounterId(current, Math.random);
+      expect(next).not.toBe(current);
+      expect(next).toBeGreaterThanOrEqual(1);
+      expect(next).toBeLessThanOrEqual(POKEDEX_SIZE);
+    }
+  });
+});
+
+describe("storeEncounterId", () => {
+  it("saves the encounter so a refresh keeps it", () => {
+    const storage = fakeStorage({ [ENCOUNTER_KEY]: "25" });
+
+    storeEncounterId(storage, 609);
+
+    expect(storage.map.get(ENCOUNTER_KEY)).toBe("609");
+  });
+
+  it("does nothing, and does not throw, when storage is missing or full", () => {
+    const full: StorageLike = {
+      getItem: () => null,
+      setItem: () => {
+        throw new Error("full");
+      },
+    };
+
+    expect(() => storeEncounterId(null, 1)).not.toThrow();
+    expect(() => storeEncounterId(full, 1)).not.toThrow();
   });
 });

@@ -6,8 +6,16 @@ import { SearchBar } from "../components/SearchBar";
 import { CompareView } from "../components/CompareView";
 import { FailureMessage } from "../components/FailureMessage";
 import { MessageBox } from "../ui/MessageBox";
+import { PageHeader } from "../ui/PageHeader";
+import { PageTitle } from "../ui/PageTitle";
 import { usePokemon } from "../hooks/usePokemon";
-import { getComparePageState } from "../lib/comparePageState";
+import { useComparePageState } from "../hooks/useComparePageState";
+import {
+  pickForSide,
+  swapPair,
+  type ComparePair,
+  type CompareSlot,
+} from "../lib/comparePair";
 import {
   EMPTY_COMPARE,
   LOADING_LABEL,
@@ -16,22 +24,36 @@ import {
   COMPARE_SUBTITLE,
   OPPONENT_SEARCH_LABEL,
 } from "../lib/copy";
-import { PageHeader } from "../ui/PageHeader";
 
 export function ComparePage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const a = searchParams.get("a") ?? "";
-  const b = searchParams.get("b") ?? "";
+  const pair: ComparePair = {
+    a: searchParams.get("a") ?? "",
+    b: searchParams.get("b") ?? "",
+  };
 
-  const first = usePokemon(a);
-  const second = usePokemon(b);
+  const first = usePokemon(pair.a);
+  const second = usePokemon(pair.b);
   const regionRef = useRef<HTMLDivElement>(null);
 
-  //exactly one situation at a time, worked out before anything is drawn
-  const state = getComparePageState({ a, b, first, second });
+  //exactly one situation at a time, worked out before anything is drawn.
+  //the hook also remembers the comparison on screen, so a pick or a Swap
+  //keeps it up (pending) until the next one has loaded
+  const state = useComparePageState({ ...pair, first, second });
 
-  function handlePickSecond(query: string) {
-    setSearchParams({ a, b: query });
+  //the URL is the one place the pair lives: every change goes through it,
+  //so Back and Forward step through comparisons, and a link can share one.
+  //the rules for what it becomes are pure functions (lib/comparePair)
+  function goTo(next: ComparePair) {
+    setSearchParams(next.b ? { a: next.a, b: next.b } : { a: next.a });
+  }
+
+  function handlePick(slot: CompareSlot, query: string) {
+    goTo(pickForSide(pair, slot, query));
+  }
+
+  function handleSwap() {
+    goTo(swapPair(pair));
   }
 
   //a Retry button removes itself when its message is replaced by loading,
@@ -46,7 +68,10 @@ export function ComparePage() {
   //defined inside another component is brand new type on every render, so
   //React would unmout and remount the search bar each time (losing what was typed)
   const opponentSearch = (
-    <SearchBar onSubmit={handlePickSecond} label={OPPONENT_SEARCH_LABEL} />
+    <SearchBar
+      onSubmit={(query) => handlePick("b", query)}
+      label={OPPONENT_SEARCH_LABEL}
+    />
   );
 
   function renderState() {
@@ -93,14 +118,38 @@ export function ComparePage() {
         );
       case "ready":
         return (
-          <CompareView primary={state.primary} secondary={state.secondary} />
+          <CompareView
+            primary={state.primary}
+            secondary={state.secondary}
+            pending={state.pending}
+            onPick={handlePick}
+            onSwap={handleSwap}
+          />
         );
     }
   }
 
+  const ready = state.status === "ready";
+
   return (
-    <div className="compare-page" ref={regionRef} tabIndex={-1}>
-      <PageHeader title={COMPARE_HEADING} subtitle={COMPARE_SUBTITLE} />
+    //page--bleed once the comparison is up: the versus field and the band
+    //run edge to edge. every other state sits in the normal column
+    <div
+      className={ready ? "compare-page page--bleed" : "compare-page"}
+      ref={regionRef}
+      tabIndex={-1}
+    >
+      {ready ? (
+        //spec 7.3: the field and the two names say what this page is, so
+        //the title leaves the screen but stays in the outline (an h2,
+        //under the app's h1) for screen-reader heading navigation
+        <>
+          <PageTitle page={COMPARE_HEADING} />
+          <h2 className="visually-hidden">{COMPARE_HEADING}</h2>
+        </>
+      ) : (
+        <PageHeader title={COMPARE_HEADING} subtitle={COMPARE_SUBTITLE} />
+      )}
       {renderState()}
     </div>
   );

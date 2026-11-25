@@ -1,99 +1,397 @@
+/* Compare (spec 7.3): a split versus field, the black identity band, the
+   stat duel, the verdict.
+
+   The field is two whole-width halves, each clipped to its side of a
+   slanted cut (±60 px around the center = the 13° slant over 520 px), each
+   wearing its own Pokémon's data-type, so FieldSky paints each in its own
+   sky, ground and stripes from the same field tokens as everywhere else.
+   A black seam covers the cut. The keyed layer on top holds what replays
+   for a new pairing: the two stages, the VS and the wipe.
+
+   The sizes describe one illustration, so they are named once here and
+   swapped as a set on phones. */
 @layer features {
   .compare-view {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
     width: 100%;
-    max-width: 60rem;
-    margin-inline: auto;
   }
 
-  /* two halves, each wearing its own Pokémon's type colors, cut on a
-     diagonal. the right half is pulled left by exactly the slant, so the two
-     slanted edges run parallel with only a thin gap between them */
-  .versus-stage {
-    --versus-slant: 28px;
+  /* ---- the versus field ---- */
+  .versus-field {
+    --versus-height: 520px;
+    --versus-cut: 60px; /* half the cut's horizontal travel */
+    --versus-seam: 36px;
+    --versus-vs-size: 132px;
+    --versus-vs-stroke: 6px;
+    /* FieldSky reads these; on Compare there is no .encounter-field to
+       set them, so the field sets its own */
+    --field-ground-height: 30%;
+    --field-stage-height: 100%;
+
     position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    height: var(--versus-height);
+  }
+
+  .versus-half {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .versus-half[data-side="left"] {
+    clip-path: polygon(
+      0 0,
+      calc(50% + var(--versus-cut)) 0,
+      calc(50% - var(--versus-cut)) 100%,
+      0 100%
+    );
+  }
+
+  .versus-half[data-side="right"] {
+    clip-path: polygon(
+      calc(50% + var(--versus-cut)) 0,
+      100% 0,
+      100% 100%,
+      calc(50% - var(--versus-cut)) 100%
+    );
+  }
+
+  /* the right half's stripes, mirrored about the center, so they show on
+     its own side of the cut instead of being clipped away */
+  .versus-half[data-side="right"] .encounter-field__stripe {
+    left: 73%;
+  }
+
+  .versus-half[data-side="right"] .encounter-field__stripe[data-thin] {
+    left: 66.5%;
+  }
+
+  .versus-field__seam {
+    position: absolute;
+    top: -10%;
+    bottom: -10%;
+    left: calc(50% - var(--versus-seam) / 2);
+    z-index: 2;
+    width: var(--versus-seam);
+    transform: skewX(var(--slant));
+    background: var(--surface-ink);
+  }
+
+  .versus-encounter {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+  }
+
+  .versus-stage {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+  }
+
+  .versus-stage[data-side="left"] {
+    left: 0;
+  }
+
+  .versus-stage[data-side="right"] {
+    right: 0;
+  }
+
+  .versus-stage .stage {
+    --platform-width: 360px;
+    --platform-height: 76px;
+    --platform-bottom: 70px;
+    --shadow-width: 160px;
+    --shadow-height: 22px;
+    --shadow-bottom: 94px;
+    --sprite-bottom: 102px;
+    --stage-min-height: 0;
+
+    position: absolute;
+    inset: 0;
+  }
+
+  /* the left sprite faces right, so the two face each other */
+  .versus-stage[data-side="left"] .sprite-display {
+    scale: -1 1;
+  }
+
+  /* "VS": Archivo 900 italic at full width, white with an Ink stroke
+     painted under the fill (paint-order), so the stroke never thins the
+     letters */
+  .versus-field__vs {
+    position: absolute;
+    top: 44%;
+    left: 50%;
+    z-index: 2;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--versus-vs-size);
+    font-style: italic;
+    font-weight: var(--weight-black);
+    font-stretch: var(--width-display);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--surface-paper);
+    -webkit-text-stroke: var(--versus-vs-stroke) var(--surface-ink);
+    paint-order: stroke fill;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  /* ---- the entrance (spec 6.2), only with motion on: the sprites slide
+     in from their outer edges instead of dropping, each shows the
+     silhouette first (Stage.css's stage-reveal), then VS slams down ---- */
+  :root[data-motion="on"] .versus-stage[data-side="left"] .stage__drop {
+    animation: versus-in-left 550ms var(--ease-settle) 300ms both;
+  }
+
+  :root[data-motion="on"] .versus-stage[data-side="right"] .stage__drop {
+    animation: versus-in-right 550ms var(--ease-settle) 300ms both;
+  }
+
+  :root[data-motion="on"] .versus-stage .stage__reveal {
+    animation: stage-reveal 900ms steps(1, end) both;
+  }
+
+  :root[data-motion="on"] .versus-field__vs {
+    animation: versus-slam 500ms var(--ease-spring) 650ms both;
+  }
+
+  @keyframes versus-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-180px);
+    }
+  }
+
+  @keyframes versus-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(180px);
+    }
+  }
+
+  @keyframes versus-slam {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(2.6) rotate(-8deg);
+    }
+  }
+
+  /* ---- the identity band ---- */
+  .versus-band {
+    --versus-name-size: 46px;
+    --versus-swap-size: 60px;
+    --versus-pick-width: 260px;
+
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-1);
-    filter: drop-shadow(var(--drop-raised));
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-5);
+    padding: calc(var(--space-6) - var(--space-1)) var(--space-gutter);
+    background: var(--surface-ink);
   }
 
   .versus-side {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-4) var(--space-3);
-    background: var(--theme-accent-soft);
-    color: var(--theme-soft-ink);
-    text-align: center;
-    animation-duration: var(--dur-slow);
-    animation-timing-function: var(--ease-snap);
-    animation-fill-mode: both;
-  }
-
-  .versus-side[data-side="left"] {
-    clip-path: polygon(
-      0 0,
-      100% 0,
-      calc(100% - var(--versus-slant)) 100%,
-      0 100%
-    );
-    padding-inline-end: calc(var(--space-3) + var(--versus-slant));
-    animation-name: versus-enter-left;
+    display: grid;
+    gap: calc(var(--space-3) - var(--space-1) / 2);
+    align-content: start;
+    justify-items: start;
+    min-width: 0;
   }
 
   .versus-side[data-side="right"] {
-    clip-path: polygon(var(--versus-slant) 0, 100% 0, 100% 100%, 0 100%);
-    margin-inline-start: calc(var(--versus-slant) * -1);
-    padding-inline-start: calc(var(--space-3) + var(--versus-slant));
-    animation-name: versus-enter-right;
+    justify-items: end;
+    text-align: right;
+  }
+
+  .versus-side[data-side="right"] .type-badge-list {
+    justify-content: flex-end;
+  }
+
+  /* "No. 635" in Jersey 10, in this side's soft tint: the side wears its
+     own data-type, so --field-dex is its own Pokémon's */
+  .versus-side__dex {
+    margin: 0;
+    font-family: var(--font-game);
+    font-size: var(--text-xl);
+    line-height: 1;
+    color: var(--field-dex);
   }
 
   .versus-side__name {
-    color: inherit;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--versus-name-size);
+    font-style: italic;
+    font-weight: var(--weight-black);
+    font-stretch: var(--width-display);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
     text-transform: capitalize;
     overflow-wrap: anywhere;
+    color: inherit;
   }
 
-  /* the VS badge sits on the middle of the seam, above both halves */
-  .versus-stage__badge {
-    position: absolute;
-    top: 50%;
-    left: calc(50% - var(--versus-slant) / 2);
-    z-index: 1;
-    transform: translate(-50%, -50%);
-    padding: var(--space-1) var(--space-3);
-    border: var(--border-width-thick) solid var(--border-line);
-    border-radius: var(--radius-pill);
-    background: var(--surface-window);
+  /* the picker: a label ("First") beside a black field with a white
+     border, like the prototype's select. The magnifier moves to the
+     field's end, because the label now sits at its start */
+  .versus-side__pick {
+    width: min(100%, var(--versus-pick-width));
+  }
+
+  .versus-side__pick .search-bar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: calc(var(--space-3) - var(--space-1) / 2);
+  }
+
+  .versus-side__pick .search-bar__label {
+    font-size: var(--text-chip);
+    color: var(--text-secondary);
+  }
+
+  .versus-side__pick .search-bar__input {
+    grid-column: 2;
+    padding: 0 var(--control-md) 0 var(--space-3);
+    border-color: var(--border-line);
+    background: var(--surface-ink);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+  }
+
+  /* the current Pokémon stands in the empty field like a select's value */
+  .versus-side__pick .search-bar__input::placeholder {
     color: var(--text-primary);
-    font-size: var(--text-sm);
-    letter-spacing: 0.1em;
-    animation: versus-badge-pop var(--dur-slow) var(--ease-snap) both;
-    animation-delay: var(--dur-base);
   }
 
-  @keyframes versus-enter-left {
-    from {
-      transform: translateX(calc(var(--space-5) * -1));
-      opacity: 0;
+  /* on black the resting border is already white, so focus needs the
+     standard ring (white on .on-dark) instead of a border change */
+  .versus-side__pick .search-bar__input:focus-visible {
+    border-color: var(--border-line);
+    background: var(--surface-ink);
+    outline: var(--border-width-thick) solid var(--focus-ring);
+    outline-offset: var(--border-width-thick);
+  }
+
+  /* pinned to the field's bottom-right corner, not the form's: on phones
+     the label stacks above the field and the form gets taller */
+  .versus-side__pick .search-bar__submit {
+    inset: auto 0 0 auto;
+    height: var(--control-md);
+  }
+
+  /* the Swap button is a light Button (the primitive draws the slanted
+     plate, the hover and the focus ring); here it only becomes a 60 px
+     square, and its icon spins a half turn on hover (a response, on a
+     token, so it stops with motion off) */
+  .versus-band__swap .btn {
+    width: var(--versus-swap-size);
+    height: var(--versus-swap-size);
+    padding: 0;
+  }
+
+  .versus-band__swap .icon {
+    transition: transform var(--dur-slow) var(--ease-spring);
+  }
+
+  .versus-band__swap .btn:hover .icon {
+    transform: rotate(180deg);
+  }
+
+  /* ---- the stat duel and the verdict ---- */
+  .compare-duel {
+    --duel-measure: 1024px;
+
+    box-sizing: content-box;
+    width: calc(100% - 2 * var(--space-gutter));
+    max-width: var(--duel-measure);
+    margin-inline: auto;
+    padding: calc(var(--space-7) + var(--space-2)) 0 var(--space-8);
+  }
+
+  .compare-verdict {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-4) - var(--space-1) / 2);
+    margin: var(--space-7) 0 0;
+    font-size: var(--text-title);
+    font-weight: var(--weight-bold);
+    font-stretch: var(--width-heading);
+  }
+
+  .compare-verdict__sprite {
+    flex: none;
+    width: 72px;
+    height: 72px;
+    margin-block: calc(var(--space-3) * -1);
+  }
+
+  .compare-verdict__sprite .sprite-display {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  /* ---- phones: the media rules of the reference (spec 8) ---- */
+  @media (max-width: 1000px) {
+    .versus-field {
+      --versus-height: 380px;
+      --versus-cut: 44px;
+      --versus-seam: 24px;
+      --versus-vs-size: 76px;
+      --versus-vs-stroke: 4px;
     }
-  }
 
-  @keyframes versus-enter-right {
-    from {
-      transform: translateX(var(--space-5));
-      opacity: 0;
+    .versus-stage .stage {
+      --platform-width: 200px;
+      --platform-height: 48px;
+      --platform-bottom: 52px;
+      --shadow-width: 96px;
+      --shadow-height: 16px;
+      --shadow-bottom: 68px;
+      --sprite-bottom: 72px;
     }
-  }
 
-  @keyframes versus-badge-pop {
-    from {
-      transform: translate(-50%, -50%) scale(0.4);
-      opacity: 0;
+    /* fluid on phones: at 375 px a 30 px name in the widest Archivo
+       does not fit half the band, and would break mid-word */
+    .versus-band {
+      --versus-name-size: clamp(1.25rem, 6.4vw, 1.875rem);
+
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+      padding: var(--space-5) var(--space-gutter-phone);
+    }
+
+    /* the label goes above the field, so the field gets the full column
+       and the current name stays readable */
+    .versus-side__pick .search-bar {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-1);
+    }
+
+    .versus-side__pick .search-bar__input {
+      grid-column: 1;
+    }
+
+    .versus-band__swap {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      justify-self: center;
+    }
+
+    .compare-duel {
+      width: calc(100% - 2 * var(--space-4));
+      padding: calc(var(--space-7) - var(--space-2)) 0 var(--space-7);
+    }
+
+    .compare-verdict {
+      font-size: var(--text-base);
     }
   }
 }

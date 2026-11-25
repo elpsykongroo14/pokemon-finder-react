@@ -1,0 +1,37 @@
+/* The readout under the field (spec 7.2). Desktop: a 1240 px grid, two
+   rows of two (Base stats | Profile, Evolution | Type matchups), columns
+   7 : 5. Phones: the Tabs primitive over one panel. */
+@layer features {
+  .readout {
+    /* the stat bars wait for the encounter's plate (spec 6.1) */
+    --stat-head-start: 380ms;
+
+    width: min(100%, var(--measure-page));
+    margin-inline: auto;
+    padding: calc(var(--space-7) + var(--space-2)) var(--space-7)
+      calc(var(--space-6) + var(--space-2));
+  }
+
+  .readout[data-layout="grid"] {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: calc(var(--space-7) + var(--space-2))
+      calc(var(--space-8) + var(--space-2));
+    align-items: start;
+  }
+
+  .readout__section {
+    min-width: 0;
+  }
+
+  @media (max-width: 1000px) {
+    .readout {
+      padding: var(--space-5) var(--space-gutter-phone) var(--space-6);
+    }
+
+    .readout .tab-panel,
+    .readout [role="tabpanel"] {
+      padding-top: var(--space-5);
+    }
+  }
+}

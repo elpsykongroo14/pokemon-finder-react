@@ -2,7 +2,7 @@ import { useEffect, useId, useState } from "react";
 import { useTeam } from "./useTeam";
 import { MAX_TEAM } from "../lib/teamReducer";
 import { TEAM_COMPLETE, TEAM_FULL_ATTEMPT } from "../lib/copy";
-import type { PokemonDetails } from "../lib/type";
+import type { PokemonDetails, TeamOutcome } from "../lib/type";
 
 //everything in the "add to team" feature KNOWS and DOES, with no markup.
 //the button and the messages about it are drawn by two seperate components
@@ -17,7 +17,8 @@ export interface TeamAction {
   announcement: string;
   popKey: number; //goes up by one each time this click adds the pokemon
   hintId: string;
-  toggle: () => void;
+  //returns what the click did, so the page can confirm it in words
+  toggle: () => TeamOutcome;
 }
 
 export function useTeamAction(pokemon: PokemonDetails): TeamAction {
@@ -47,19 +48,24 @@ export function useTeamAction(pokemon: PokemonDetails): TeamAction {
     //this is necessary to avoid overlapping timers and a race where an old timer could clear an error message that belongs to a newer rejection
   }, [error, clearError]);
 
-  function toggle() {
+  function toggle(): TeamOutcome {
     if (onTeam) {
       removeFromTeam(pokemon.name);
       setJustCompleted(false);
-      return;
+      return { kind: "left", size: team.length - 1 };
     }
 
-    //decide before adding, from what the team looked like at click time
+    //decide before adding, from what the team looked like at click time.
+    //team is this render's snapshot: the reducer has not run yet, so the
+    //size after the click is worked out, not read back
     const completesParty = team.length === MAX_TEAM - 1;
     addToTeam(pokemon);
-    //a full party rejects the add, so only pop when there was room
-    if (team.length < MAX_TEAM) setPopKey((key) => key + 1);
+    //a full party rejects the add (the reducer sets the error), so only
+    //pop, and only report a join, when there was room
+    if (team.length >= MAX_TEAM) return { kind: "rejected", size: team.length };
+    setPopKey((key) => key + 1);
     if (completesParty) setJustCompleted(true);
+    return { kind: "joined", size: team.length + 1 };
   }
 
   //one status message at a time. chosen from situation

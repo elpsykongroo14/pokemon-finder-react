@@ -18,7 +18,14 @@ export interface PointerBox {
   height: number;
 }
 
-export const MAX_TILT_DEG = 8;
+//spec 7.4: the card tips up to 8deg up and down and 10deg side to side
+//(the full swing, edge to edge, is 16deg and 20deg). a card under 300 px
+//wide (a grid tile, a binder pocket) tips only 70 % as far: the same angle
+//on a small card looks like a much bigger jolt
+export const MAX_TILT_X_DEG = 8;
+export const MAX_TILT_Y_DEG = 10;
+export const SMALL_CARD_WIDTH = 300;
+export const SMALL_CARD_DAMPING = 0.7;
 
 //0..1, with "the middle" as the answer for anything that is not a number
 function clamp01(value: number): number {
@@ -39,15 +46,15 @@ export function getHoloPose(
   box: PointerBox,
   clientX: number,
   clientY: number,
-  maxTilt: number = MAX_TILT_DEG,
 ): HoloPose {
   const px = box.width > 0 ? clamp01((clientX - box.left) / box.width) : 0.5;
   const py = box.height > 0 ? clamp01((clientY - box.top) / box.height) : 0.5;
+  const damping = box.width < SMALL_CARD_WIDTH ? SMALL_CARD_DAMPING : 1;
 
   return {
     mx: round2(px * 100),
     my: round2(py * 100),
-    ry: round2((px - 0.5) * 2 * maxTilt),
-    rx: round2(-(py - 0.5) * 2 * maxTilt),
+    ry: round2((px - 0.5) * 2 * MAX_TILT_Y_DEG * damping),
+    rx: round2((0.5 - py) * 2 * MAX_TILT_X_DEG * damping),
   };
 }

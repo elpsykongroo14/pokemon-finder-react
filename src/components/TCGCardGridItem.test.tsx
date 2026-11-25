@@ -128,10 +128,15 @@ describe("TCGCardGridItem holo effect", () => {
     });
 
     expect(button.style.getPropertyValue("--mx")).toBe("75%");
-    expect(button.style.getPropertyValue("--ry")).toBe("4deg");
+    //changed in B&W-7: the spec's tilt (10deg sideways at most), and a
+    //card under 300 px wide tips 70 % as far: 0.25 * 20 * 0.7 = 3.5
+    expect(button.style.getPropertyValue("--ry")).toBe("3.5deg");
   });
 
-  it("a common card never gets the variables: common has no effect", () => {
+  //changed in B&W-7: every card tilts now (spec 6.2, "pointer over any
+  //card"); what a common card lacks is the LIGHT, which CSS decides from
+  //its tier (rarity-tiers.css). leaving still puts it back at rest
+  it("a common card tilts too, and settles back when the pointer leaves", () => {
     const button = renderCard("common");
 
     fireEvent.pointerMove(button, {
@@ -139,9 +144,63 @@ describe("TCGCardGridItem holo effect", () => {
       clientY: 25,
       pointerType: "mouse",
     });
-    fireEvent.pointerLeave(button);
+    expect(button.style.getPropertyValue("--mx")).toBe("75%");
 
+    fireEvent.pointerLeave(button);
     expect(button.style.getPropertyValue("--mx")).toBe("");
+  });
+});
+
+//B&W-7 (spec 7.4): the tile shows the set and the card's number on one
+//row and the tier mark under them; the card's own name is not printed
+//(the scan shows it), so it is in the button's name for screen readers
+describe("TCGCardGridItem, B&W-7 tile", () => {
+  it("shows the card number next to the set", () => {
+    render(
+      <TCGCardGridItem
+        card={makeCard({
+          number: "240",
+          set: { name: "Surging Sparks", printedTotal: 191 },
+        })}
+        onSelect={() => {}}
+      />,
+    );
+
+    expect(screen.getByText("240/191")).toBeInTheDocument();
+  });
+
+  it("keeps the card's name for screen readers only", () => {
+    render(<TCGCardGridItem card={makeCard()} onSelect={() => {}} />);
+
+    expect(screen.getByText("Charizard")).toHaveClass("visually-hidden");
+  });
+
+  it("draws its rarity as a tier mark", () => {
+    const { container } = render(
+      <TCGCardGridItem
+        card={makeCard({ rarity: "Ultra Rare" })}
+        onSelect={() => {}}
+      />,
+    );
+
+    expect(container.querySelector(".tier-mark")).toHaveAttribute(
+      "data-rarity",
+      "ultra",
+    );
+  });
+
+  //tile in (spec 6.2): its place in the line-up, for the CSS delay
+  it("hands its stagger slot to CSS, capped at 14", () => {
+    const { container, rerender } = render(
+      <TCGCardGridItem card={makeCard()} onSelect={() => {}} index={3} />,
+    );
+    const tile = container.querySelector(".tcg-card") as HTMLElement;
+    expect(tile.style.getPropertyValue("--tile-index")).toBe("3");
+
+    rerender(
+      <TCGCardGridItem card={makeCard()} onSelect={() => {}} index={40} />,
+    );
+    expect(tile.style.getPropertyValue("--tile-index")).toBe("14");
   });
 });
 

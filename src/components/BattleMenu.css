@@ -1,45 +1,159 @@
-/* Design idea: the menu is a 2x2 pad of big, equal buttons, like the
-   fight/bag/pokemon/run box in the games. The ▶ cursor is hidden until a
-   button is hovered or focused, so the pad stays calm until you touch it. */
+/* The command plate (spec 7.1): Home's black plate, four slanted command
+   rows. Where the plate sits in the field (right 46 %, slanted edge) is
+   HomePage.css's job; this file draws the plate and its rows.
+
+   A row is the Button idea at a bigger size: the element never leans, its
+   ::before is the skewed plate, and the row sets three local properties
+   (plate, ring, ink) that hover only swaps. At rest a row is a white ring
+   on black; the first row is primary, a white plate. On hover a row fills
+   white and nudges 8 px left, toward the field; the primary row turns
+   black. A row that is ON (the team command, aria-pressed) wears the
+   primary look, so "on" never depends on a pointer. */
 @layer features {
   .battle-menu {
+    --command-height: 78px;
+    --command-gap: 14px;
+    --command-nudge: 8px;
+
+    background: var(--surface-ink);
+    color: var(--text-primary);
+  }
+
+  .battle-menu__list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3);
+    gap: var(--command-gap);
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .battle-menu .btn {
+  .command {
+    --command-plate: transparent;
+    --command-ring: var(--surface-paper);
+    --command-ink: var(--surface-paper);
+
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
     width: 100%;
-    justify-content: flex-start;
-    gap: var(--space-3);
-    padding-block: var(--space-4);
-    font-size: var(--text-lg, var(--text-base));
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    min-height: var(--command-height);
+    padding: 0 calc(var(--space-6) - var(--space-1)); /* 28 */
+    border: 0;
+    background: transparent;
+    color: var(--command-ink);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-standard);
   }
 
-  .battle-menu__cursor {
-    width: 1ch;
-    opacity: 0;
-    transform: translateX(-6px);
+  .command::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(var(--slant));
+    background: var(--command-plate);
+    box-shadow: inset 0 0 0 var(--border-width-line) var(--command-ring);
     transition:
-      opacity var(--dur-fast) var(--ease-standard),
-      transform var(--dur-fast) var(--ease-standard);
+      background-color var(--dur-fast) var(--ease-standard),
+      transform var(--dur-fast) var(--ease-settle);
   }
 
-  .battle-menu .btn:hover .battle-menu__cursor,
-  .battle-menu .btn:focus-visible .battle-menu__cursor {
-    opacity: 1;
-    transform: translateX(0);
+  .command[data-primary],
+  .command[aria-pressed="true"],
+  .command:hover {
+    --command-plate: var(--surface-paper);
+    --command-ink: var(--surface-ink);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .battle-menu__cursor {
-      transition: none;
-      transform: none;
+  .command[data-primary]:hover,
+  .command[aria-pressed="true"]:hover {
+    --command-plate: var(--surface-ink);
+    --command-ink: var(--surface-paper);
+  }
+
+  .command:hover::before {
+    transform: skewX(var(--slant)) translateX(calc(var(--command-nudge) * -1));
+  }
+
+  .command:active::before {
+    transform: skewX(var(--slant))
+      translate(calc(var(--command-nudge) * -1), var(--border-width-line));
+  }
+
+  /* focus: the same skewed ring as a Button, white on the black plate */
+  .command:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .command:focus-visible::after {
+    content: "";
+    position: absolute;
+    inset: calc(-2 * var(--border-width-thick));
+    transform: skewX(var(--slant));
+    border: var(--border-width-thick) solid var(--focus-ring);
+    pointer-events: none;
+  }
+
+  .command__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    width: 100%;
+  }
+
+  .command__text {
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .command__title {
+    font-size: calc(var(--text-heading) - var(--space-1) / 4); /* 21 */
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
+    line-height: var(--leading-heading);
+  }
+
+  /* the line under the title, in the row's own ink (it inverts with the
+     row), a touch quieter */
+  .command__hint {
+    font-size: var(--text-chip);
+    line-height: 1.4;
+    opacity: 0.84;
+  }
+
+  .command__icon {
+    display: inline-flex;
+    flex: none;
+  }
+
+  /* the plate slides in from 56 px to the right the first time it appears
+     (the plate is not keyed: rerolling keeps it, and keeps focus on it) */
+  :root[data-motion="on"] .battle-menu__inner {
+    animation: battle-menu-in 460ms var(--ease-settle) 260ms both;
+  }
+
+  @keyframes battle-menu-in {
+    from {
+      opacity: 0;
+      transform: translateX(56px);
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .battle-menu {
+      --command-height: 68px;
+      --command-gap: var(--space-3);
+    }
+
+    .command__title {
+      font-size: var(--text-lg);
     }
   }
 }

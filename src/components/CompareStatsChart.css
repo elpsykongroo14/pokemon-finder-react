@@ -1,8 +1,8 @@
+/* the six stat rows and the total row stack with no gap: each row is its
+   own 50 px band (CompareStatRow.css), the total brings its own rule */
 @layer features {
   .compare-stats-chart {
-    margin-top: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
   }
 }

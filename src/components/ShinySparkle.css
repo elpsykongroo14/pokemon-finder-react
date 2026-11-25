@@ -1,7 +1,10 @@
-/* Six small stars, each popping in and out once, a few tens of ms apart.
-   Total time stays inside the --dur-epic ceiling for celebrations:
-   last start = 5 x (80ms / 2) = 200ms, plus 420ms = 620ms.
-   Small and one-shot, so nothing comes near the WCAG flash thresholds. */
+/* Five stars around the sprite (spec 6.2): each grows, turns 90 degrees
+   and fades, 850 ms, a few tens of ms after the one before. Small and
+   one-shot, nowhere near the WCAG flash thresholds.
+
+   Two gates: Stage only renders this when animations are on (JS), and the
+   animation itself only exists under data-motion="on" (literal timings).
+   The stars rest at opacity 0, so with no animation nothing shows. */
 @layer features {
   .shiny-sparkle {
     position: absolute;
@@ -13,33 +16,38 @@
     position: absolute;
     left: var(--x);
     top: var(--y);
-    width: var(--size);
-    height: var(--size);
+    width: var(--space-6);
+    height: var(--space-6);
     translate: -50% -50%;
-    animation: shiny-star var(--dur-slow) var(--ease-snap) both;
-    animation-delay: calc(var(--i) * var(--dur-instant) / 2);
+    opacity: 0;
+    overflow: visible;
   }
 
-  .shiny-sparkle__star svg {
-    display: block;
-    width: 100%;
-    height: 100%;
+  .shiny-sparkle__star path {
+    fill: var(--surface-paper);
+    stroke: var(--surface-ink);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  :root[data-motion="on"] .shiny-sparkle__star {
+    animation: shiny-star 850ms var(--ease-settle) var(--delay) both;
   }
 
   @keyframes shiny-star {
     0% {
       opacity: 0;
-      transform: scale(0);
+      transform: scale(0) rotate(0);
     }
 
-    50% {
+    40% {
       opacity: 1;
-      transform: scale(1.15);
+      transform: scale(1.15) rotate(45deg);
     }
 
     100% {
       opacity: 0;
-      transform: scale(0.6);
+      transform: scale(0.2) rotate(90deg);
     }
   }
 }

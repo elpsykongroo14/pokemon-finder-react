@@ -1,12 +1,30 @@
 import "./Icon.css";
 
 export type IconName =
+  | "arrow"
   | "bluesky"
+  | "binder"
+  | "check"
+  | "chevron-left"
+  | "chevron-right"
+  | "compare"
+  | "heart"
+  | "heart-outline"
+  | "home"
+  | "library"
+  | "plus"
+  | "search"
+  | "sparkle"
+  | "team"
   | "discord"
   | "documentation"
+  | "grid"
+  | "list"
   | "github"
   | "settings"
+  | "shuffle"
   | "social"
+  | "swap"
   | "x";
 
 interface IconProps {
