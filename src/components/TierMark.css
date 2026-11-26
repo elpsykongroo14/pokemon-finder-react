@@ -9,8 +9,11 @@
     display: inline-flex;
     align-items: center;
     gap: calc(var(--space-1) + var(--space-1) / 2);
-    height: var(--space-5);
-    padding: 0 calc(var(--space-2) + var(--border-width-line));
+    /* min-height, not height: a wrapped rarity grows the plate instead of
+       spilling out of it */
+    min-height: var(--space-5);
+    padding: var(--space-1) calc(var(--space-2) + var(--border-width-line));
+    line-height: var(--leading-heading);
     color: var(--tier-ink);
     font-size: var(--text-xs);
     font-weight: var(--weight-bold);

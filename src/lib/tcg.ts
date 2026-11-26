@@ -37,6 +37,10 @@ const RARITY_RANK: Record<string, number> = {
   "Rare Holo V": 4,
   "Rare Holo GX": 4,
   "Rare Holo EX": 4,
+  //Mega Evolution era. numbered past the set's size (e.g. 265/217), like
+  //the other secret rares, so it ranks with them. the API sends it as
+  //MEGA_ATTACK_RARE; normalizeRarity turns it into this name
+  "Mega Attack Rare": 8,
   "Double Rare": 4, //the modern "ex" cards: tier holo
   "Rare BREAK": 4, //tier holo
   "Rare Holo": 3,
@@ -45,6 +49,21 @@ const RARITY_RANK: Record<string, number> = {
   Uncommon: 1,
   Common: 0,
 };
+
+//the card API spells every rarity as a name ("Special Illustration Rare"),
+//except a newer one it sends as a raw code ("MEGA_ATTACK_RARE"). a code is
+//all capitals, digits and underscores, with at least one underscore; it
+//becomes a name ("Mega Attack Rare"). anything else passes through untouched,
+//so real names keep their own spelling ("Rare Holo LV.X", "Rare BREAK")
+const RARITY_CODE = /^[A-Z0-9]+(?:_[A-Z0-9]+)+$/;
+
+export function normalizeRarity(rarity?: string): string | undefined {
+  if (!rarity || !RARITY_CODE.test(rarity)) return rarity;
+  return rarity
+    .split("_")
+    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(" ");
+}
 
 export function getRarityRank(rarity?: string): number {
   return RARITY_RANK[rarity ?? ""] ?? 0;

@@ -103,6 +103,22 @@ describe("fetchTCGCards", () => {
     expect(cards).toEqual([{ id: "card-1" }]);
   });
 
+  it("turns a raw rarity code into a name before anyone sees it", async () => {
+    mockFetch.mockResolvedValue(
+      fakeResponse(true, {
+        data: [
+          { id: "card-1", rarity: "MEGA_ATTACK_RARE" },
+          { id: "card-2", rarity: "Rare Holo" },
+        ],
+      }),
+    );
+    const cards = await fetchTCGCards("froslass");
+    expect(cards.map((card) => card.rarity)).toEqual([
+      "Mega Attack Rare",
+      "Rare Holo",
+    ]);
+  });
+
   it("returns an empty array when the response has no data field", async () => {
     mockFetch.mockResolvedValue(fakeResponse(true, {}));
     const cards = await fetchTCGCards("pikachu");
