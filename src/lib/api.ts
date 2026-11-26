@@ -10,6 +10,7 @@ import type {
 } from "./type";
 
 import { HttpError } from "./httpError";
+import { normalizeRarity } from "./tcg";
 import { POKEDEX_SIZE } from "./dex";
 import { toIndexEntry, type PokemonIndexEntry } from "./pokemonIndex";
 
@@ -184,7 +185,12 @@ export async function fetchTCGCards(
 
   //TCG api wraps results in a 'data' array
   const data = await getJSONWithOneRetry<TCGCardsResponse>(url, signal);
-  const cards = data.data || [];
+  //clean the rarity once, here at the edge, so every consumer (badge,
+  //sort, tier colors, table, search) sees the same name
+  const cards = (data.data || []).map((card) => ({
+    ...card,
+    rarity: normalizeRarity(card.rarity),
+  }));
   tcgCache[url] = cards;
   return cards;
 }

@@ -5,6 +5,7 @@ import {
   getCardMetaRows,
   getRarityRank,
   getRarityTier,
+  normalizeRarity,
   formatCardNumber,
   getCardStage,
   formatReleaseDate,
@@ -109,6 +110,30 @@ describe("getRarityRank", () => {
     expect(getRarityRank("Common")).toBe(0);
     expect(getRarityRank("Some Future Rarity")).toBe(0);
     expect(getRarityRank(undefined)).toBe(0);
+  });
+});
+
+describe("normalizeRarity", () => {
+  it("turns a raw code into a name", () => {
+    expect(normalizeRarity("MEGA_ATTACK_RARE")).toBe("Mega Attack Rare");
+  });
+
+  it.each([
+    "Special Illustration Rare",
+    "Rare Holo LV.X",
+    "Rare BREAK",
+    "Promo",
+    "",
+  ])("leaves the real name %j untouched", (rarity) => {
+    expect(normalizeRarity(rarity)).toBe(rarity);
+  });
+
+  it("leaves a missing rarity missing", () => {
+    expect(normalizeRarity(undefined)).toBeUndefined();
+  });
+
+  it("ranks the cleaned name with the secret rares", () => {
+    expect(getRarityTier(normalizeRarity("MEGA_ATTACK_RARE"))).toBe("ultra");
   });
 });
 

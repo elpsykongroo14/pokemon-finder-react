@@ -43,9 +43,9 @@ Sizes are relative (S / M / L, where M ≈ one of the bigger testing-pass sessio
 | ✓   | **R8**   | TCG Library                            | L    | R4 (and tcg-proxy fix) | Holo cards, grid/table/binder                  |
 | ✓   | **R9**   | Juice, settings & presentation         | M    | R5–R8                  | Celebrations, polish                           |
 | ✓   | **R10**  | Quality gates & launch                 | M    | R9                     | Confidence + merge to `main`                   |
-| ☐   | **R10B** | Black & White redesign                 | L    | R10                    | **Black & white UI, color only from Pokémon**  |
-| ☐   | **R11**  | Port to the vanilla version            | L    | R10B                   | Both apps match                                |
-| ☐   | **R12**  | Backlog (game-depth features)          | —    | —                      | Only after R11                                 |
+| ✓   | **R10B** | Black & White redesign                 | L    | R10                    | **Black & white UI, color only from Pokémon**  |
+| ✗   | **R11**  | Port to the vanilla version            | L    | R10B                   | Both apps match                                |
+| ☐   | **R12**  | Backlog (game-depth features)          | —    | —                      | Only after R10B                                |
 
 **Order rationale:** the first _visible_ transformation lands at R4–R5, deliberately early. The foundation phases (R0–R3) are unglamorous but they are what stops the redesign from becoming another rushed, vibecoded pass, which is exactly the thing we're fixing.
 
@@ -683,31 +683,61 @@ Type colors: reuse the existing `--type-*` values as **primitives**; derive deep
 
 ---
 
-### R11: Port to the vanilla version
+### R11: Port to the vanilla version (dropped)
+
+**Status: dropped on 2026-11-26 (D69).** The vanilla app was archived instead of
+ported. The original plan is kept below as a record.
+
+**Why.** The survey of the vanilla repo (R11 Part 1) found a one-page app with
+query-string navigation and no Home, Compare or Team pages. Matching the B&W design
+meant rebuilding about 10,000 lines of UI with a hand-written router, store and
+lifecycle, for a design that already ships here. After that, every change would have
+had to be made twice or the two apps would drift apart again. The parts worth learning
+(a router, a store with `subscribe`, cleanup on unmount) don't need a full port.
+
+**What happened instead**
+
+1. The `tcg-proxy` worker, which lived in the vanilla repo and was deployed by its CD,
+   moved with its history (`git subtree split`) to
+   [pokemon-finder-tcg-proxy](https://github.com/elpsykongroo14/pokemon-finder-tcg-proxy).
+   There it got 16 behavior tests, a pipeline (tests and a dry run on PRs; deploy and a
+   production smoke test on `main`, through a protected `production` environment), its
+   own Cloudflare token, and the stable `ratelimits` config in place of `unsafe`.
+2. Deploys were handed over with at most one deployer at any time: the vanilla
+   `deploy-worker` job was removed first, then the new pipeline turned on.
+3. The vanilla site was taken down after screenshots were saved. The repo got an
+   archive README and a closing DEVLOG entry, its final commit is tagged `v1-final`,
+   and it is archived.
+4. The worker's CORS allowlist dropped the retired vanilla origin and a redundant
+   `ui-rehaul` entry (covered by the pattern). It now allows this app's Pages hosts by
+   pattern, plus `localhost:5173` and `localhost:4173`.
+5. The vanilla repo's secrets were deleted and its token revoked. Each remaining
+   Cloudflare token has one consumer.
+
+<details>
+<summary>Original plan (not carried out)</summary>
 
 **Size L · Depends on:** R10
 
 **Goal:** the vanilla app gets the same identity without re-designing it.
 
-**Not yet inspected:** I've only seen the React repo. The first task is to review the vanilla repo's structure (upload it when we get here).
+**What ports (near copy/paste):** tokens (all files), fonts, `@layer` order, primitive
+CSS, keyframes, icons/SVGs, sprite fallback logic (pure function), copy/voice.
+**What gets re-implemented:** theme setter, typewriter, tilt/holo pointer handler,
+settings persistence, dialog semantics, Tabs/Menu behavior.
 
-**What ports (near copy/paste):** tokens (all files), fonts, `@layer` order, primitive CSS, keyframes, icons/SVGs, sprite fallback logic (pure function), copy/voice.
-**What gets re-implemented:** theme setter (a tiny module setting `data-type`), typewriter, tilt/holo pointer handler, settings persistence, dialog semantics, Tabs/Menu behavior. Same design, vanilla DOM code, using your existing `requireElement` / `requireQuery` helpers and `createElement`/`textContent` discipline (no `innerHTML` regressions).
+**Tasks:** diff the markup; choose the sharing mechanism (D11); port tokens →
+primitives → shell → Pokémon → Home/search → Compare/Team → Library → juice; re-run
+the a11y/perf gates.
 
-**Tasks**
+**Checkpoint:** side-by-side screenshots equivalent; vanilla tests/CI green; both
+deployed.
 
-1. Diff the vanilla markup vs the React markup; list where class names/structure differ.
-2. Choose the sharing mechanism (D11): copy files (simplest), git subtree, or a shared package (overkill for two repos). Recommendation: **copy + a `DESIGN-SYSTEM-VERSION` note** in each repo.
-3. Port in the same order as React: tokens → primitives → shell → Pokémon → Home/search → Compare/Team → Library → juice.
-4. Re-run the a11y/perf gates.
-
-**Checkpoint:** side-by-side screenshots of React and vanilla are equivalent; vanilla tests/CI green; both deployed.
-
-**Learning focus:** what a framework abstracts vs. what CSS alone gives you; keeping two implementations in sync.
+</details>
 
 ---
 
-### R12: Backlog (only after R11)
+### R12: Backlog
 
 Not commitments. Each needs its own mini-roadmap before it starts.
 
@@ -807,7 +837,7 @@ Fan project using public APIs (PokeAPI sprites/data; the Pokémon TCG API via yo
 | D8 | Visual regression | Manual; Playwright | Playwright in R10 | R10 | |
 | D9 | Skeuomorphic console shell | Yes; no | No for v1 (backlog skin) | R1 | |
 | D10 | Party card data | Fetch at render; extend persisted shape | Extend with optional fields | R7 | answer: Optional types on a TeamMember subtype (not on FavoritePokemon); no stat total; lazy backfill, Team page only. |
-| D11 | Sharing design system with vanilla | Copy; subtree; package | Copy + version note | R11 | |
+| D11 | Sharing design system with vanilla | Copy; subtree; package | Copy + version note | R11 | Not needed: R11 dropped (D69). |
 | D12 | Retire "no glow, no color bloom" | Keep; retire w/ replacement rule | Retire, glow/gradient only when it carries type/state info | R1 | |
 
 _(Add rows as new decisions appear. Never edit history; append a superseding row.)_
@@ -927,6 +957,8 @@ D33 Fifth motion tier, Status Spinner and skeleton: allowed where loading happen
 | D67 | The B&W-8 pass | (1) Deleted, unused in the shipped app: Panel, StageConsole, Menu, MenuItem, Cursor, Toggle, Input, `sanitize.ts`, the `.surface-window` scope, the elevation and window tokens, the pastel foil alphas, `--ease-tick`; the style guide lost those sections. (2) Found by the audit and fixed: the 404 scene's wrapper class was misspelled (`lost-rout`), so none of its styles or motions had ever applied; the settings dialog's `<header>` became a second page banner (it renders outside `<main>`); Next / Next card onto the last spread or card disabled itself and dropped focus to `<body>` (now moves to the way back); the favorites rail drew 475 px artwork with pixelated scaling; Compare's phone sprites fell to 1x (box 150 → 192); Home's command titles wrapped between 1001 and 1279 px (plate 50 %, shorter slant). (3) Kept on purpose: axe's experimental label-in-name rule flags the team toggle (the D44 exception) and Home's command links, whose visible hint is a description, not part of the label. (4) Favorites and team cards follow the sprite setting through one rule, `listSpriteUrl`. (5) The TCG proxy answers 500 for some names (e.g. "wimpod", every time): upstream, not the app; the featured batch already skips a failed name. (6) Budgets JS 97.5 / CSS 18.4 kB gzip: the ratchet could not go far, because the retired primitives had already left the bundle. | R10B |
 | D68 | Fixes reported after B&W-8 | (1) The Pokémon page keyed its readout and its cards teaser by the same name; duplicate sibling keys made React leave the old readout in the page, so evolution chains piled up search after search. Keys are now `readout-<name>` / `teaser-<name>`. (2) `useEvolutionChain` and `usePokemon` ignore a cancelled run that still resolves (the API cache does not look at the abort signal). (3) Enter in a search field picked the highlighted suggestion even while the list still held the previous text's matches (they lag the typing by 250 ms): `useAutocomplete` reports `settled`, and Enter only picks a match when it is. (4) Card searches retry once after a 5xx and are cached in memory by URL (the teaser and the Library ask for the same cards; the proxy limits requests per minute). (5) The TCG proxy worker (pokemon-finder/tcg-proxy, a separate repo): its CORS allowlist lacked this app's Pages site and its per-deploy preview subdomains, now matched by an anchored pattern; an empty or broken upstream body is retried once, and a final failure is a 502 with CORS headers, never cached. The worker change needs a `wrangler deploy` to take effect. | R10B |
 
+| D69 | Port the redesign to the vanilla app (R11)? | (A) full port with pages and a hand-written router; (B) reskin the one-page layout; (C) pages as `?view=` views; (D) drop R11, archive the vanilla app | The R11 survey found a one-page app with query-string navigation, ~2,470 lines of TS and 92 tests; ESLint did not lint `.ts` and CI did not typecheck or build. (A) is the only port that meets the design without inventing screens, but it doubles every future change. Recommended (D). | R11 | (D). R11 dropped. `tcg-proxy` moved with history to `pokemon-finder-tcg-proxy` (16 tests; PR checks; deploy + smoke test on `main` via a protected environment; own token; stable `ratelimits` config); deploys handed over with at most one deployer. The D68 worker fixes went live through that pipeline. Vanilla site taken down after screenshots; repo archived with README, closing DEVLOG entry and tag `v1-final`; its secrets deleted and token revoked. CORS: this app's Pages hosts by pattern plus `localhost:5173` / `4173`; the vanilla origin and the redundant `ui-rehaul` entry removed. |
+
 ## 11. Component map (current → target)
 
 | Current                                                | Target treatment                                                    | Phase      |
@@ -1038,3 +1070,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-11-24 | B&W-7 Library: hero with the hand of three and the deal, plate with lead sentence, search and actions; sticky toolbar with count, rarity legend, view switch and sort; four tier marks; one tilting card face with glare and foil by tier; the grid as a series timeline (tiers when sorted by rarity) with sticky era headings; the six-column table; binder spreads with rings, pockets, an end page and the page turn; the card dialog on a black stage with the flip, Previous / Next and arrow keys, and the phone bottom sheet; the Pokémon page's cards teaser, fetched lazily. D66 recorded. Tests 1184 → 1302. |
 | 2026-11-24 | B&W-8 pass: unused primitives, scopes and tokens deleted; the §7.6 states finished (loading dialog, Library Retry, dark Retry, Graphite 404, display PageHeader); contrast tests for the tier marks, binder and card stage; a real-browser audit of 18 routes and states at three widths (axe with contrast, focus rings, overflow, console) plus edge widths and long names; motion pass (off, OS reduce, on) clean on every page; bugs fixed: the 404 class typo, a second banner landmark, focus lost at the ends of the binder and the dialog, pixelated artwork in the favorites rail, 1x Compare sprites on phones, cramped Home commands at 1001–1279 px. E2E 5 → 7. D67 recorded. R10B complete. |
 | 2026-11-24 | Post-B&W-8 fixes (D68): evolution chains no longer pile up (duplicate sibling keys), cancelled lookups never write, Enter no longer picks a stale suggestion, card searches retry once and are cached; the proxy worker allows the Pages site and its previews and survives empty upstream bodies (needs deploying). |
+
+| 2026-11-26 | R11 dropped (D69): vanilla app archived (`v1-final`) and its site taken down; `tcg-proxy` moved to its own repo with tests, CI/CD, smoke test and its own token, and the D68 fixes deployed; CORS reduced to this app's Pages pattern and localhost. R10B ticked in the tracker. README, `.env.example` and DEVLOG updated. |
