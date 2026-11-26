@@ -293,20 +293,12 @@ Found and fixed: a misspelled class (lost-rout) that kept the 404's styles from 
 Finished the spec's states: loading dialog, Library Retry, dark Retry, Graphite 404, display PageHeader. Deleted seven unused primitives and the old scope and tokens.
 
 11-24-2026: fixes after B&W-8
-11-24-2026: fixes after B&W-8
-Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
-A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
-Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
-The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a
-
-11-24-2026: fixes after B&W-8
 Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
 A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
 Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
 The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a cache.
 
-11-25-2026: fixes after B&W-8
-Evolution chains piled up because the readout and the cards teaser were siblings with the same key. React only warns about that in development; the warning was in my test output and I missed it.
-A cancelled effect keeps running: the API cache never looks at the abort signal, so the hooks now check "was I cancelled?" after every await.
-Pressing Enter in search could pick a suggestion for the previous text: the list lags the typing by 250 ms.
-The card proxy fails when the card API sends an empty body, and it only allowed exact origins, so every Pages preview was blocked. Fixed in the worker (needs deploying) and softened in the app with one retry and a cache.
+11-26-2026: retiring the vanilla app, the worker gets its own repo
+R11 was going to port the Black & White design back to the vanilla app. The survey said otherwise: the vanilla app is one page with query-string navigation and none of the pages this design is made of, so a port meant rebuilding about 10,000 lines of UI for a design that already ships here, then making every future change twice. I dropped R11 (D69) and archived the vanilla app instead.
+The catch was the card proxy. It lived inside the vanilla repo and that repo's CD deployed it, so archiving first would have left this app's back end impossible to redeploy. It now has its own repo, moved with its history by git subtree split, plus its first tests (16, through its HTTP contract, with fake KV and rate limiter passed in through env) and a pipeline: tests and a dry run on pull requests, deploy and a production smoke test on main. Its first deploy is also what finally shipped the D68 fixes.
+Order was the lesson of the week. Deploys: switch the old deployer off before the new one on, because zero deployers for a few minutes is harmless and two means the last one wins. Shutdown: screenshots, last commit and tag, delete the site, remove its origin from the CORS list, delete secrets and revoke the token, archive. Each step only removes things nothing left depends on.
