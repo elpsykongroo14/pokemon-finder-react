@@ -18,6 +18,14 @@
   * {
     box-sizing: border-box;
   }
+
+  /* mobile browsers paint a translucent blue box over anything tapped.
+     Every control here has its own :active / pressed look (slanted
+     plates, nudges), so the default box only covers it, and on the
+     phone tabs it flashed over the sliding plate */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer base {
