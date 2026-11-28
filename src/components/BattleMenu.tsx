@@ -113,16 +113,18 @@ function LinkCommand({
   );
 }
 
-//a command that needs a Pokémon, while there is none yet (the next wild
-//one is loading). it keeps its row, its words and its place in the list,
-//so the plate never reflows and the primary row stays the first row.
+//a command that does something here (not a link). "Look for another"
+//passes onClick. a row that needs a Pokémon while there is none yet (the
+//next wild one is loading) passes none: it keeps its row, its words and
+//its place, so the plate never reflows and the primary row stays first.
 //aria-disabled, not disabled: a disabled button leaves the Tab order,
 //and in a roving list every row has to stay reachable (APG)
-function PendingCommand({
+function ButtonCommand({
   title,
   hint,
   icon,
   label,
+  onClick,
   primary,
   roving,
 }: {
@@ -131,6 +133,7 @@ function PendingCommand({
   icon: ReactNode;
   //the accessible name when it differs from the title (the team command)
   label?: string;
+  onClick?: () => void;
   primary: boolean;
   roving: RovingProps;
 }) {
@@ -141,10 +144,11 @@ function PendingCommand({
       type="button"
       className="command"
       data-primary={primary || undefined}
-      aria-disabled="true"
+      aria-disabled={onClick ? undefined : true}
       aria-labelledby={label ? undefined : titleId}
       aria-label={label}
       aria-describedby={hintId}
+      onClick={onClick}
       {...roving}
     >
       <CommandBody
@@ -153,38 +157,6 @@ function PendingCommand({
         title={title}
         hint={hint}
         icon={icon}
-      />
-    </button>
-  );
-}
-
-function RerollCommand({
-  onReroll,
-  primary,
-  roving,
-}: {
-  onReroll: () => void;
-  primary: boolean;
-  roving: RovingProps;
-}) {
-  const titleId = useId();
-  const hintId = useId();
-  return (
-    <button
-      type="button"
-      className="command"
-      data-primary={primary || undefined}
-      aria-labelledby={titleId}
-      aria-describedby={hintId}
-      onClick={onReroll}
-      {...roving}
-    >
-      <CommandBody
-        titleId={titleId}
-        hintId={hintId}
-        title={REROLL_COMMAND}
-        hint={REROLL_COMMAND_HINT}
-        icon={<Icon name="shuffle" size={18} />}
       />
     </button>
   );
@@ -288,7 +260,7 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
   const name = pokemon ? encodeURIComponent(pokemon.name) : null;
 
   //always the same four rows. the two that need a Pokémon stand in as
-  //PendingCommand while the next one loads: the list used to drop them,
+  //ButtonCommand without an action while the next one loads: the list used to drop them,
   //and the plate jumped (Compare turned primary, the stack re-centred)
   const commands: Command[] = [];
   commands.push({
@@ -304,7 +276,7 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
           roving={roving}
         />
       ) : (
-        <PendingCommand
+        <ButtonCommand
           title={ENTRY_COMMAND}
           hint={ENTRY_COMMAND_HINT}
           icon={<Icon name="library" size={18} />}
@@ -337,7 +309,7 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
           onNote={setNote}
         />
       ) : (
-        <PendingCommand
+        <ButtonCommand
           title={TEAM_OFF_TEXT}
           hint={teamCommandHint({
             name: "",
@@ -354,7 +326,14 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
   commands.push({
     key: "reroll",
     render: (roving, primary) => (
-      <RerollCommand onReroll={onReroll} primary={primary} roving={roving} />
+      <ButtonCommand
+        title={REROLL_COMMAND}
+        hint={REROLL_COMMAND_HINT}
+        icon={<Icon name="shuffle" size={18} />}
+        onClick={onReroll}
+        primary={primary}
+        roving={roving}
+      />
     ),
   });
 

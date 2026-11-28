@@ -84,7 +84,7 @@
       translate(calc(var(--command-nudge) * -1), var(--border-width-line));
   }
 
-  /* a command waiting for the next Pokémon (PendingCommand): it keeps its
+  /* a command waiting for the next Pokémon (ButtonCommand, no action): it keeps its
      row and its resting look, dimmed. The pointer passes through, so hover
      and press never fire; keyboard focus still reaches it (roving list) */
   .command[aria-disabled="true"] {
