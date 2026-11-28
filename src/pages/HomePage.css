@@ -18,6 +18,24 @@
     --dialog-min-height: 132px;
   }
 
+  /* desktop: the field grows from its 660 px into whatever the window has
+     left above the footer (a white band showed there at 1440 x 900), up
+     to 960 px (a 1080p window), so a very tall one keeps the composition.
+     The horizon and stripes are percentages, so the picture stretches */
+  @media (min-width: 1001px) {
+    .home-page {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .home-page > .encounter-field {
+      flex: 1 0 auto;
+      height: auto;
+      min-height: var(--field-height);
+      max-height: 960px;
+    }
+  }
+
   /* the stage slot stays mounted while its content swaps (skeleton, error,
      Pokémon), so keyboard focus has somewhere to land after Retry. it is a
      landing spot, not a control, so no ring */
