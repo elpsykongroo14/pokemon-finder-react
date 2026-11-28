@@ -9,6 +9,7 @@ import { MessageBox } from "../ui/MessageBox";
 import { PageHeader } from "../ui/PageHeader";
 import { PageTitle } from "../ui/PageTitle";
 import { usePokemon } from "../hooks/usePokemon";
+import { formatSlug } from "../lib/text";
 import { useComparePageState } from "../hooks/useComparePageState";
 import {
   pickForSide,
@@ -103,7 +104,8 @@ export function ComparePage() {
       case "pick-second":
         return (
           <>
-            <h3>Comparing {state.first.name} with...</h3>
+            {/* the API's lowercase slug, written as a name ("Mr Mime") */}
+            <h3>Comparing {formatSlug(state.first.name)} with...</h3>
             {opponentSearch}
           </>
         );

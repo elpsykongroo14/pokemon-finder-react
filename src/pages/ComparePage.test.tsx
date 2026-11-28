@@ -178,7 +178,7 @@ describe("ComparePage", () => {
     renderComparePage("/compare?a=pikachu");
 
     expect(
-      screen.getByRole("heading", { name: "Comparing pikachu with..." }),
+      screen.getByRole("heading", { name: "Comparing Pikachu with..." }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "fake-search-submit" }),
