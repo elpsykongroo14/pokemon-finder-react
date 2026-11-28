@@ -20,7 +20,10 @@
     display: block;
     aspect-ratio: 63 / 88;
     border-radius: var(--radius-card);
-    background: var(--surface-ink);
+    /* what shows until the lazy picture arrives: the skeleton's Mist, so a
+       scrolled-to card reads as "loading" like the grid's skeletons. Ink
+       made every card not yet fetched a solid black slab */
+    background: var(--surface-well);
     box-shadow: var(--shadow-card);
     transform: perspective(900px) rotateX(var(--rx, 0deg))
       rotateY(var(--ry, 0deg));
