@@ -23,6 +23,7 @@ import {
   COMPARE_HEADING,
   COMPARE_SUBTITLE,
   OPPONENT_SEARCH_LABEL,
+  FIRST_SEARCH_LABEL,
 } from "../lib/copy";
 
 export function ComparePage() {
@@ -76,8 +77,18 @@ export function ComparePage() {
 
   function renderState() {
     switch (state.status) {
+      //the empty page starts the comparison right here, instead of only
+      //saying where to go to start one
       case "no-first":
-        return <MessageBox text={EMPTY_COMPARE} />;
+        return (
+          <>
+            <MessageBox text={EMPTY_COMPARE} />
+            <SearchBar
+              onSubmit={(query) => handlePick("a", query)}
+              label={FIRST_SEARCH_LABEL}
+            />
+          </>
+        );
       case "first-loading":
       case "second-loading":
         return <MessageBox text={LOADING_LABEL} />;
