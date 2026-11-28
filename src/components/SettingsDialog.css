@@ -6,10 +6,13 @@
     padding-inline-end: var(--space-6);
   }
 
+  /* the app's heading voice (heavy, wide), like every section heading:
+     at 400 it was the one thin heading in the app */
   .settings__title {
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--weight-heavy);
+    font-stretch: var(--width-heading);
     font-size: var(--text-xl);
     color: var(--text-primary);
   }
