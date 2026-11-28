@@ -4,7 +4,15 @@
    the selected tab (--indicator-x, --indicator-w), so the indicator just
    grew from a 4 px underline to a full-height plate behind the text.
    Order inside transform matters: scale the 1 px plate to the tab's
-   width FIRST, then skew it, or the skew's lean gets stretched too */
+   width FIRST, then skew it, or the skew's lean gets stretched too.
+
+   The labels are white with mix-blend-mode: difference over the strip's
+   white fill, so every pixel of a label is black on white and white on
+   the Ink plate, wherever the plate is. Swapping the label colors on
+   select (as before) could not follow the slide: for its whole length
+   the plate covered labels it was passing (black on black) and the old
+   label turned white on white. This relies on Ink and Paper being pure
+   black and white (primitives.css), which is the whole palette's rule */
 @layer features {
   .tab-list {
     position: relative;
@@ -18,6 +26,8 @@
     inset: 0;
     z-index: -2;
     transform: skewX(var(--slant));
+    /* opaque, so the labels have white to blend against */
+    background: var(--surface-paper);
     box-shadow: inset 0 0 0 var(--border-width-line) var(--border-line);
   }
 
@@ -34,26 +44,20 @@
     font-size: var(--text-chip);
     font-weight: var(--weight-bold);
     font-stretch: var(--width-heading);
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: color var(--dur-fast) var(--ease-standard);
-  }
-
-  .tab[aria-selected="true"] {
     color: var(--surface-paper);
+    mix-blend-mode: difference;
+    cursor: pointer;
   }
 
   /* inside the strip the outer ring would sit on the neighbours: draw it
      inside the tab instead */
+  /* the ring blends like the label: drawn white, it shows black on the
+     strip and white on the plate (an Ink ring would invert to white on
+     white) */
   .tab:focus-visible {
+    outline-color: var(--surface-paper);
     outline-offset: calc(-2 * var(--border-width-thick));
     box-shadow: none;
-  }
-
-  /* the focused tab is usually the selected one (roving tabindex), and
-     an Ink ring on the Ink plate would vanish */
-  .tab[aria-selected="true"]:focus-visible {
-    outline-color: var(--surface-paper);
   }
 
   .tab-indicator {
