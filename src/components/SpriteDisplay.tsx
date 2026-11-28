@@ -1,6 +1,10 @@
 import "./SpriteDisplay.css";
 import { useState, type CSSProperties, type SyntheticEvent } from "react";
-import { resolveSprite, integerScale } from "../lib/sprites";
+import {
+  resolveSprite,
+  integerScale,
+  transparentRowsBelow,
+} from "../lib/sprites";
 import type {
   PokemonSprites,
   ResolvedSprite,
@@ -64,6 +68,7 @@ export function SpriteDisplay({
           box={size}
           lazy={lazy}
           maxScale={maxScale}
+          grounded={plain}
         />
       ) : (
         //decorative: the name next to it already says which Pokémon this
@@ -79,24 +84,57 @@ export function SpriteDisplay({
   );
 }
 
+//the empty rows under the sprite's lowest visible pixel, read off a canvas.
+//0 whenever it cannot be read: no canvas (jsdom), or a tainted one
+function measureFloor(image: HTMLImageElement): number {
+  const { naturalWidth: width, naturalHeight: height } = image;
+  if (!width || !height) return 0;
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) return 0;
+    context.drawImage(image, 0, 0);
+    const { data } = context.getImageData(0, 0, width, height);
+    return transparentRowsBelow(data, width, height);
+  } catch {
+    return 0;
+  }
+}
+
 function SpriteImage({
   sprite,
   alt,
   box,
   lazy,
   maxScale,
+  grounded,
 }: {
   sprite: ResolvedSprite;
   alt: string;
   box: number;
   lazy: boolean;
   maxScale?: number;
+  //true (the "plain" sprites that stand on a platform): move the image
+  //down by its empty bottom rows, so the feet touch the platform instead
+  //of floating over it. reading pixels needs a CORS request; if that
+  //fails, the image loads again the ordinary way and simply stays put
+  grounded: boolean;
 }) {
   const [width, setWidth] = useState<number | undefined>(undefined);
+  const [cors, setCors] = useState(grounded);
+  //how far to move down, in % of the image's own height (translate's %
+  //is relative to the element itself), so it holds at any zoom
+  const [drop, setDrop] = useState(0);
 
   function handleLoad(event: SyntheticEvent<HTMLImageElement>) {
+    const image = event.currentTarget;
+    if (grounded && cors && image.naturalHeight) {
+      setDrop((measureFloor(image) / image.naturalHeight) * 100);
+    }
     if (sprite.kind === "artwork") return;
-    const { naturalWidth, naturalHeight } = event.currentTarget;
+    const { naturalWidth, naturalHeight } = image;
     const scale = integerScale(
       { width: naturalWidth, height: naturalHeight },
       box,
@@ -113,8 +151,19 @@ function SpriteImage({
       alt={alt}
       decoding="async"
       loading={lazy ? "lazy" : undefined}
+      crossOrigin={cors ? "anonymous" : undefined}
       onLoad={handleLoad}
-      style={width ? { width } : undefined}
+      onError={() => {
+        if (cors) setCors(false);
+      }}
+      style={
+        width || drop
+          ? {
+              width,
+              translate: drop ? `0 ${drop.toFixed(2)}%` : undefined,
+            }
+          : undefined
+      }
     />
   );
 }

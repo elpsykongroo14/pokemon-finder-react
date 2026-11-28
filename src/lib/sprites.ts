@@ -96,6 +96,30 @@ export function integerScale(
   return Math.max(1, Math.min(max, Math.floor(box / longest)));
 }
 
+//how many fully transparent rows a sprite has under its lowest visible
+//pixel. PokeAPI sprites sit in a fixed square canvas, so a small Pokémon's
+//feet can end well above the image's bottom edge, and "stand the image on
+//the platform" left it floating. the stage moves the image down by this.
+//pixels: RGBA, row by row (ImageData.data). a pixel counts as visible
+//above alphaThreshold, so stray near-invisible antialiasing does not.
+//an image with no visible pixel at all is left where it is (0)
+export function transparentRowsBelow(
+  pixels: ArrayLike<number>,
+  width: number,
+  height: number,
+  alphaThreshold = 16,
+): number {
+  for (let y = height - 1; y >= 0; y--) {
+    const rowStart = y * width * 4;
+    for (let x = 0; x < width; x++) {
+      if (pixels[rowStart + x * 4 + 3] > alphaThreshold) {
+        return height - 1 - y;
+      }
+    }
+  }
+  return 0;
+}
+
 //PokeAPI names its front sprite files by dex number, so a list that only
 //knows numbers (the autocomplete rows, D51) can show a picture without a
 //details request per row. null for ids that cannot be a Pokémon, so the
