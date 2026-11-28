@@ -26,7 +26,7 @@ vi.mock("../hooks/useFavorites", () => ({
 
 vi.mock("./TypeBadgeList", () => ({ TypeBadgeList: () => null }));
 vi.mock("../hooks/useTeamAction", () => ({ useTeamAction: () => ({}) }));
-vi.mock("../context/TeamButton", () => ({
+vi.mock("./TeamButton", () => ({
   TeamToggle: () => null,
   TeamStatus: () => null,
 }));

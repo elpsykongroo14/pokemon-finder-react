@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
-import { TeamSLots } from "./TeamSlots";
-import { TeamProvider } from "./TeamContext";
-import { PreferencesProvider } from "./PreferencesContext";
+import { TeamSlots } from "./TeamSlots";
+import { TeamProvider } from "../context/TeamContext";
+import { PreferencesProvider } from "../context/PreferencesContext";
 import { MAX_TEAM } from "../lib/teamReducer";
 import type { TeamMember } from "../lib/type";
 
@@ -27,7 +27,7 @@ function renderSlots() {
     <MemoryRouter>
       <PreferencesProvider>
         <TeamProvider>
-          <TeamSLots />
+          <TeamSlots />
         </TeamProvider>
       </PreferencesProvider>
     </MemoryRouter>,
@@ -38,7 +38,7 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-describe("TeamSLots", () => {
+describe("TeamSlots", () => {
   it("renders six empty slots when the team is empty", () => {
     const { container } = renderSlots();
 
