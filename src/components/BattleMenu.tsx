@@ -113,6 +113,51 @@ function LinkCommand({
   );
 }
 
+//a command that needs a Pokémon, while there is none yet (the next wild
+//one is loading). it keeps its row, its words and its place in the list,
+//so the plate never reflows and the primary row stays the first row.
+//aria-disabled, not disabled: a disabled button leaves the Tab order,
+//and in a roving list every row has to stay reachable (APG)
+function PendingCommand({
+  title,
+  hint,
+  icon,
+  label,
+  primary,
+  roving,
+}: {
+  title: string;
+  hint: string;
+  icon: ReactNode;
+  //the accessible name when it differs from the title (the team command)
+  label?: string;
+  primary: boolean;
+  roving: RovingProps;
+}) {
+  const titleId = useId();
+  const hintId = useId();
+  return (
+    <button
+      type="button"
+      className="command"
+      data-primary={primary || undefined}
+      aria-disabled="true"
+      aria-labelledby={label ? undefined : titleId}
+      aria-label={label}
+      aria-describedby={hintId}
+      {...roving}
+    >
+      <CommandBody
+        titleId={titleId}
+        hintId={hintId}
+        title={title}
+        hint={hint}
+        icon={icon}
+      />
+    </button>
+  );
+}
+
 function RerollCommand({
   onReroll,
   primary,
@@ -238,13 +283,18 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
   //in the command itself). a live region: always rendered, text replaced
   const [note, setNote] = useState("");
 
+  const { team } = useTeam();
+
   const name = pokemon ? encodeURIComponent(pokemon.name) : null;
 
+  //always the same four rows. the two that need a Pokémon stand in as
+  //PendingCommand while the next one loads: the list used to drop them,
+  //and the plate jumped (Compare turned primary, the stack re-centred)
   const commands: Command[] = [];
-  if (pokemon && name) {
-    commands.push({
-      key: "entry",
-      render: (roving, primary) => (
+  commands.push({
+    key: "entry",
+    render: (roving, primary) =>
+      pokemon && name ? (
         <LinkCommand
           to={`/pokemon/${name}`}
           title={ENTRY_COMMAND}
@@ -253,9 +303,16 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
           primary={primary}
           roving={roving}
         />
+      ) : (
+        <PendingCommand
+          title={ENTRY_COMMAND}
+          hint={ENTRY_COMMAND_HINT}
+          icon={<Icon name="library" size={18} />}
+          primary={primary}
+          roving={roving}
+        />
       ),
-    });
-  }
+  });
   commands.push({
     key: "compare",
     render: (roving, primary) => (
@@ -269,19 +326,31 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
       />
     ),
   });
-  if (pokemon) {
-    commands.push({
-      key: "team",
-      render: (roving, primary) => (
+  commands.push({
+    key: "team",
+    render: (roving, primary) =>
+      pokemon ? (
         <TeamCommand
           pokemon={pokemon}
           primary={primary}
           roving={roving}
           onNote={setNote}
         />
+      ) : (
+        <PendingCommand
+          title={TEAM_OFF_TEXT}
+          hint={teamCommandHint({
+            name: "",
+            onTeam: false,
+            partySize: team.length,
+          })}
+          icon={<Icon name="plus" size={16} />}
+          label={TEAM_TOGGLE_LABEL}
+          primary={primary}
+          roving={roving}
+        />
       ),
-    });
-  }
+  });
   commands.push({
     key: "reroll",
     render: (roving, primary) => (
@@ -289,9 +358,10 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
     ),
   });
 
-  //the list can shrink (four commands with a Pokémon, two without), and
-  //the remembered position could then point past the end. derived, not
-  //stored: clamping on every render means it can never be out of range
+  //the list is always four rows now, but the clamp costs nothing and keeps
+  //the remembered position in range if a command is ever added or removed.
+  //derived, not stored: clamping on every render means it can never be out
+  //of range
   const current = Math.min(active, commands.length - 1);
 
   function focusItem(index: number) {

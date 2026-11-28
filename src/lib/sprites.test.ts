@@ -5,6 +5,7 @@ import {
   resolveSprite,
   spriteUrlFromId,
   listSpriteUrl,
+  transparentRowsBelow,
 } from "./sprites";
 import type { PokemonSprites } from "./sprites";
 
@@ -206,5 +207,35 @@ describe("listSpriteUrl", () => {
       "art.png",
     );
     expect(listSpriteUrl("artwork", { id: 25, sprite: null })).toBeNull();
+  });
+});
+
+describe("transparentRowsBelow", () => {
+  //an RGBA image from rows of "#" (opaque) and "." (transparent)
+  function image(rows: string[]) {
+    const width = rows[0].length;
+    const pixels = rows.flatMap((row) =>
+      [...row].flatMap((cell) => [0, 0, 0, cell === "#" ? 255 : 0]),
+    );
+    return [pixels, width, rows.length] as const;
+  }
+
+  it("counts the empty rows under the lowest visible pixel", () => {
+    expect(
+      transparentRowsBelow(...image(["....", ".##.", "....", "...."])),
+    ).toBe(2);
+  });
+
+  it("is 0 when the sprite already touches the bottom edge", () => {
+    expect(transparentRowsBelow(...image(["....", "#...", "...#"]))).toBe(0);
+  });
+
+  it("ignores nearly invisible pixels", () => {
+    const pixels = [0, 0, 0, 255, 0, 0, 0, 8];
+    expect(transparentRowsBelow(pixels, 1, 2)).toBe(1);
+  });
+
+  it("leaves an image with nothing visible where it is", () => {
+    expect(transparentRowsBelow(...image(["..", ".."]))).toBe(0);
   });
 });

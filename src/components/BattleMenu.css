@@ -84,6 +84,28 @@
       translate(calc(var(--command-nudge) * -1), var(--border-width-line));
   }
 
+  /* a command waiting for the next Pokémon (PendingCommand): it keeps its
+     row and its resting look, dimmed, and hover or press do nothing */
+  .command[aria-disabled="true"] {
+    cursor: default;
+    opacity: var(--opacity-disabled);
+  }
+
+  .command[aria-disabled="true"]:not([data-primary]):hover {
+    --command-plate: transparent;
+    --command-ink: var(--surface-paper);
+  }
+
+  .command[aria-disabled="true"][data-primary]:hover {
+    --command-plate: var(--surface-paper);
+    --command-ink: var(--surface-ink);
+  }
+
+  .command[aria-disabled="true"]:hover::before,
+  .command[aria-disabled="true"]:active::before {
+    transform: skewX(var(--slant));
+  }
+
   /* focus: the same skewed ring as a Button, white on the black plate */
   .command:focus-visible {
     outline: none;

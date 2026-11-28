@@ -1,4 +1,5 @@
-/* On hover the disc turns half a turn with a springy overshoot. A token
+/* On hover the ball spins a full turn with a springy overshoot (half a
+   turn, as the old disc did, would leave it upside down). A token
    duration, so with motion off it simply does not move */
 @layer features {
   .brand-mark {
@@ -7,7 +8,7 @@
   }
 
   .app-title:hover .brand-mark {
-    transform: rotate(-180deg);
+    transform: rotate(-360deg);
   }
 
   .brand-mark__disc {
@@ -18,5 +19,17 @@
 
   .brand-mark__half {
     fill: var(--surface-ink);
+  }
+
+  .brand-mark__band {
+    fill: none;
+    stroke: var(--surface-ink);
+    stroke-width: 3;
+  }
+
+  .brand-mark__button {
+    fill: var(--surface-paper);
+    stroke: var(--surface-ink);
+    stroke-width: 2.5;
   }
 }

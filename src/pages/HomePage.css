@@ -18,9 +18,29 @@
     --dialog-min-height: 132px;
   }
 
+  /* desktop: the field grows from its 660 px into whatever the window has
+     left above the footer (a white band showed there at 1440 x 900), up
+     to 960 px (a 1080p window), so a very tall one keeps the composition.
+     The horizon and stripes are percentages, so the picture stretches */
+  @media (min-width: 1001px) {
+    .home-page {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .home-page > .encounter-field {
+      flex: 1 0 auto;
+      height: auto;
+      min-height: var(--field-height);
+      max-height: 960px;
+    }
+  }
+
   /* the stage slot stays mounted while its content swaps (skeleton, error,
      Pokémon), so keyboard focus has somewhere to land after Retry. it is a
      landing spot, not a control, so no ring */
+  /* a size container, so the dialog's game text can follow the stage's
+     width (cqi) instead of the window's */
   .home-stage {
     position: absolute;
     top: 0;
@@ -28,6 +48,7 @@
     left: 0;
     z-index: 1;
     width: 56%;
+    container-type: inline-size;
   }
 
   .home-stage:focus {
@@ -54,9 +75,16 @@
     z-index: 2;
   }
 
-  /* the battle dialog at Home's size: 40 px game text, two lines */
+  /* the battle dialog at Home's size: up to 40 px game text, two lines.
+     The size follows the stage's width: a fixed 40 px wrapped "A wild
+     MELMETAL / appeared!" onto three lines on the 50 % stage just above
+     1000 px. 6.2cqi reaches 40 px once the stage is about 645 px wide */
   .home-stage__dialog .message-box {
-    --message-box-size: calc(var(--text-2xl) * 1.25); /* 40 */
+    --message-box-size: clamp(
+      calc(var(--text-2xl) * 0.875),
+      6.2cqi,
+      calc(var(--text-2xl) * 1.25)
+    ); /* 28 to 40 */
 
     min-height: var(--dialog-min-height);
     padding: calc(var(--space-5) - var(--space-1))
@@ -121,8 +149,14 @@
       bottom: calc(var(--command-overlap) + var(--space-4));
     }
 
+    /* 30 px on a tablet, down to 24 px on a 360 px phone, so the ▼ stays
+       on the line it ends */
     .home-stage__dialog .message-box {
-      --message-box-size: calc(var(--text-2xl) - var(--space-1) / 2); /* 30 */
+      --message-box-size: clamp(
+        calc(var(--text-2xl) * 0.75),
+        7.2cqi,
+        calc(var(--text-2xl) - var(--space-1) / 2)
+      ); /* 24 to 30 */
 
       min-height: 0;
       padding: var(--space-4) var(--space-5);

@@ -13,6 +13,11 @@ interface EvolutionNodeProps {
   mode?: SpriteMode;
   //the Pokémon whose page this is: its stage is marked, not linked
   current?: string;
+  //true (default): sprites load when they near the screen (desktop, where
+  //the chain is below the fold). false: they load right away, for the
+  //phone tabs, where a lazy image in a hidden panel only starts loading
+  //once the tab opens, and the panel showed empty for half a second
+  lazy?: boolean;
 }
 
 //a stage sprite is 96 px of pixel art: 2x, a whole-number zoom, so every
@@ -27,17 +32,19 @@ function EvolutionStage({
   sprites,
   mode,
   isCurrent,
+  lazy,
 }: {
   name: string;
   sprites: PokemonSprites | null;
   mode: SpriteMode;
   isCurrent: boolean;
+  lazy: boolean;
 }) {
   const content = (
     <>
       <span className="evolution-stage__sprite">
         {/* decorative: the name is right underneath, as text. never animated
-            (only the stage sprite moves) and lazy, it is below the fold */}
+            (only the stage sprite moves), and lazy unless told otherwise */}
         <SpriteDisplay
           sprites={sprites ?? {}}
           name={name}
@@ -45,7 +52,7 @@ function EvolutionStage({
           mode={mode}
           size={NODE_SPRITE_BOX}
           maxScale={NODE_MAX_SCALE}
-          lazy
+          lazy={lazy}
           plain
           decorative
         />
@@ -81,6 +88,7 @@ export function EvolutionNode({
   sprites,
   mode = "artwork",
   current,
+  lazy = true,
 }: EvolutionNodeProps) {
   const stage = (
     <EvolutionStage
@@ -88,6 +96,7 @@ export function EvolutionNode({
       sprites={sprites[data.name] ?? null}
       mode={mode}
       isCurrent={data.name === current}
+      lazy={lazy}
     />
   );
 
@@ -119,6 +128,7 @@ export function EvolutionNode({
               sprites={sprites}
               mode={mode}
               current={current}
+              lazy={lazy}
             />
           </div>
         ))}
