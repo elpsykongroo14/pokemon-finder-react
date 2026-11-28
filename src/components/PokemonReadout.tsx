@@ -68,7 +68,12 @@ export function PokemonReadout({ pokemon }: PokemonReadoutProps) {
       abilities={pokemon.abilities}
     />
   );
-  const evolution = <EvolutionSection pokemon={pokemon} />;
+  //phones keep it in a hidden tab: its sprites load up front, so the
+  //panel is ready when the tab opens (a lazy image in a hidden panel
+  //waits for the tab)
+  const evolution = (
+    <EvolutionSection pokemon={pokemon} lazySprites={!stacked} />
+  );
   const matchups = <TypeMatchups types={types} />;
 
   if (stacked) {

@@ -29,8 +29,12 @@
       padding: var(--space-5) var(--space-gutter-phone) var(--space-6);
     }
 
+    /* a floor about the height of the Stats panel, so switching to a short
+       panel (Profile, one row of matchups) does not shrink the page under
+       your thumb and jump the scroll */
     .readout .tab-panel,
     .readout [role="tabpanel"] {
+      min-height: 20rem;
       padding-top: var(--space-5);
     }
   }

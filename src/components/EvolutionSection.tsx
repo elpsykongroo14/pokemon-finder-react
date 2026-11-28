@@ -8,9 +8,14 @@ import { EVOLUTION_FAILED, EVOLUTION_LOADING, NO_EVOLUTION } from "../lib/copy";
 
 interface EvolutionSectionProps {
   pokemon: PokemonDetails;
+  //false: load the sprites right away (EvolutionNode's lazy)
+  lazySprites?: boolean;
 }
 
-export function EvolutionSection({ pokemon }: EvolutionSectionProps) {
+export function EvolutionSection({
+  pokemon,
+  lazySprites = true,
+}: EvolutionSectionProps) {
   const { tree, sprites, loading, error } = useEvolutionChain(pokemon);
   //read the preference once here and pass it down, instead of every
   //recursive node reading context n its own
@@ -46,6 +51,7 @@ export function EvolutionSection({ pokemon }: EvolutionSectionProps) {
         sprites={sprites}
         mode={spriteMode}
         current={pokemon.name}
+        lazy={lazySprites}
       />
     </div>
   );
