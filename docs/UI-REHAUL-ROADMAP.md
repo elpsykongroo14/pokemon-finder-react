@@ -283,7 +283,7 @@ Every phase uses the same template: **Goal · Why · Deliverables · Tasks · Ch
 
 **Deliverables**
 
-- `docs/ui-baseline/`: screenshots of every route/state at 375 / 768 / 1440 px
+- `docs/ui-baseline/`: screenshots of every route/state at 375 / 768 / 1440 px (removed on 2026-11-27 after the UI was replaced twice; kept at tag `ui-baseline-r0`)
 - `docs/ui-references/`: your DS-era + pkmn.gg screenshots (local moodboard; **not** deployed)
 - Lighthouse numbers recorded in DEVLOG
 - A sprite-coverage table (spike)
@@ -1072,3 +1072,5 @@ D9 No: no fake console frame around the UI (backlog skin only)
 | 2026-11-24 | Post-B&W-8 fixes (D68): evolution chains no longer pile up (duplicate sibling keys), cancelled lookups never write, Enter no longer picks a stale suggestion, card searches retry once and are cached; the proxy worker allows the Pages site and its previews and survives empty upstream bodies (needs deploying). |
 
 | 2026-11-26 | R11 dropped (D69): vanilla app archived (`v1-final`) and its site taken down; `tcg-proxy` moved to its own repo with tests, CI/CD, smoke test and its own token, and the D68 fixes deployed; CORS reduced to this app's Pages pattern and localhost. R10B ticked in the tracker. README, `.env.example` and DEVLOG updated. |
+
+| 2026-11-27 | Repo tidy: `route-transition.css` loaded again (its import was lost in the redesign) with a test that every stylesheet is loaded; dead `useMenuContext` deleted; `TeamButton` and `TeamSlots` moved from `context/` to `components/` and `TeamSLots` renamed; `docs/ui-baseline/` removed (tag `ui-baseline-r0`), the R1 brief archived, a docs index added. Tests 1319 → 1320. |

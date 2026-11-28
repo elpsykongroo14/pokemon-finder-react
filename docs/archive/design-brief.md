@@ -1,7 +1,7 @@
 # Pokémon Finder: Design Brief (R1)
 
-> Status: draft for sign-off. Refines §3 of UI-REHAUL-ROADMAP.md with what
-> the R0 references actually show.
+> **Archived.** This brief set the DS-era direction for R1–R10. The Black & White
+> redesign (R10B) replaced it: the current design is `docs/redesign/SPEC.md`.
 
 ## 1. Intent (in the owner's words)
 
