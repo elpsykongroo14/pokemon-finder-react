@@ -97,12 +97,48 @@ describe("evolutionCondition (D47)", () => {
     ).toBe("Friendship");
   });
 
-  it("shows no label for a trigger it cannot name", () => {
-    expect(evolutionCondition([{ trigger: trigger("shed") }])).toBeUndefined();
-    //level-up with nothing we model (a move, a place, a time of day)
+  it("says Special for a method it cannot name, rather than nothing", () => {
+    expect(evolutionCondition([{ trigger: trigger("shed") }])).toBe("Special");
+    //level-up with nothing we model (a place, a held item)
+    expect(evolutionCondition([{ trigger: trigger("level-up") }])).toBe(
+      "Special",
+    );
+  });
+
+  it("falls through to a later entry when the first cannot be named", () => {
+    //Leafeon and Glaceon: a special rock in the old games, a stone later
     expect(
-      evolutionCondition([{ trigger: trigger("level-up") }]),
-    ).toBeUndefined();
+      evolutionCondition([
+        { trigger: trigger("level-up") },
+        { trigger: trigger("use-item"), item: { name: "ice-stone", url: "" } },
+      ]),
+    ).toBe("Ice Stone");
+  });
+
+  it("names a move type a level-up needs", () => {
+    //Sylveon: a Fairy move and friendship. the move is what sets it apart
+    expect(
+      evolutionCondition([
+        {
+          trigger: trigger("level-up"),
+          known_move_type: { name: "fairy", url: "" },
+          min_happiness: 160,
+        },
+      ]),
+    ).toBe("Fairy move");
+  });
+
+  it("says the time of day a friendship evolution needs", () => {
+    //Espeon and Umbreon would otherwise both read "Friendship"
+    expect(
+      evolutionCondition([
+        {
+          trigger: trigger("level-up"),
+          min_happiness: 160,
+          time_of_day: "night",
+        },
+      ]),
+    ).toBe("Friendship, night");
   });
 
   it("shows no label for the first stage, which has no details", () => {
