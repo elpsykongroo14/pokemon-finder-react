@@ -1,5 +1,6 @@
 import "./HeaderSearch.css";
 import { useEffect, useId, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { SearchBar } from "./SearchBar";
 import { IconButton } from "../ui/IconButton";
 import { Icon } from "./Icon";
@@ -18,6 +19,16 @@ interface HeaderSearchProps {
 //hiding, and only below 1000 px; desktop never sees the button
 export function HeaderSearch({ onSubmit }: HeaderSearchProps) {
   const [open, setOpen] = useState(false);
+  //the header outlives every page, so "open" stayed true after a bottom
+  //bar tap took you elsewhere: the field hung open over the next page.
+  //a new page closes it. adjusting state while rendering, React's pattern
+  //for "reset when something changes" (no effect, no extra paint)
+  const { pathname } = useLocation();
+  const [lastPath, setLastPath] = useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    setOpen(false);
+  }
   const fieldId = useId();
 
   //opening is a request to type: put the cursor in the field. this is an

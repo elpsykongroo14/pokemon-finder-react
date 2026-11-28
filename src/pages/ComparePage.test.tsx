@@ -9,6 +9,7 @@ import {
   COMPARE_HEADING,
   COMPARE_SUBTITLE,
   EMPTY_COMPARE,
+  FIRST_SEARCH_LABEL,
   LOADING_LABEL,
   OPPONENT_SEARCH_LABEL,
   SELF_COMPARE,
@@ -111,6 +112,21 @@ describe("ComparePage", () => {
     expect(screen.getByRole("status")).toHaveTextContent(EMPTY_COMPARE);
   });
 
+  it("starts a comparison from the empty page: its search picks the first Pokémon", async () => {
+    mockLookups({});
+    const user = userEvent.setup();
+
+    renderComparePage("/compare");
+
+    expect(screen.getByTestId("search-label")).toHaveTextContent(
+      FIRST_SEARCH_LABEL,
+    );
+    await user.click(
+      screen.getByRole("button", { name: "fake-search-submit" }),
+    );
+    expect(screen.getByTestId("search")).toHaveTextContent("?a=charmander");
+  });
+
   it("shows the loading label while Pokemon A is loading", () => {
     mockLookups({ pikachu: { loading: true } });
 
@@ -162,7 +178,7 @@ describe("ComparePage", () => {
     renderComparePage("/compare?a=pikachu");
 
     expect(
-      screen.getByRole("heading", { name: "Comparing pikachu with..." }),
+      screen.getByRole("heading", { name: "Comparing Pikachu with..." }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "fake-search-submit" }),

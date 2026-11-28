@@ -3,6 +3,9 @@
     display: grid;
     gap: var(--space-4);
     max-width: 40rem;
+    /* centred in the page column: pinned left, it left the right half of
+       a wide screen empty */
+    margin-inline: auto;
   }
 
   /* the way out is a button, sized to its words, not a bar */

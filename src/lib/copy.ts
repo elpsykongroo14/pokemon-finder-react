@@ -110,8 +110,10 @@ export function teamCommandHint({
 }
 
 //compare page: the empty state invites, the self compare error says what to do
+//the empty Compare page: its own search picks the first Pokémon
 export const EMPTY_COMPARE =
-  "Search for a Pokémon first, then hit Compare to bring it here.";
+  "Pick a Pokémon to start, or hit Compare on any Pokémon's page.";
+export const FIRST_SEARCH_LABEL = "Choose the first Pokémon";
 export const SELF_COMPARE = "Choose a different Pokémon to compare.";
 
 //compare page: a heading for the page itself (visually hidden, so the headings

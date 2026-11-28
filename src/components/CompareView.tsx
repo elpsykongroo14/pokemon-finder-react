@@ -147,7 +147,9 @@ function CompareVerdict({
     winner === "left" ? primary : winner === "right" ? secondary : null;
 
   return (
-    <p className="compare-verdict" aria-live="polite">
+    //a div, not a p: the sprite box inside is a div, and a div cannot sit
+    //in a paragraph (React warned about it in the console)
+    <div className="compare-verdict" aria-live="polite">
       {champion && (
         <span className="compare-verdict__sprite">
           <SpriteDisplay
@@ -168,7 +170,7 @@ function CompareVerdict({
           { name: secondary.name, total: right },
         )}
       </span>
-    </p>
+    </div>
   );
 }
 

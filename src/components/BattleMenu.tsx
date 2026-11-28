@@ -271,7 +271,7 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
           to={`/pokemon/${name}`}
           title={ENTRY_COMMAND}
           hint={ENTRY_COMMAND_HINT}
-          icon="library"
+          icon="entry"
           primary={primary}
           roving={roving}
         />
@@ -279,7 +279,7 @@ export function BattleMenu({ pokemon, onReroll }: BattleMenuProps) {
         <ButtonCommand
           title={ENTRY_COMMAND}
           hint={ENTRY_COMMAND_HINT}
-          icon={<Icon name="library" size={18} />}
+          icon={<Icon name="entry" size={18} />}
           primary={primary}
           roving={roving}
         />

@@ -14,8 +14,9 @@
     padding: var(--space-5) var(--space-4) 0;
     /* the Graphite field: no data-type here, so the field tokens are
        the neutral ones (B&W-8, spec 7.6) */
+    /* square, like every other field in the app (the round corner is the
+       dialogs' shape: battle dialog, settings sheet, binder) */
     background: var(--field-sky);
-    border-radius: var(--radius-dialog);
     overflow: hidden;
   }
 

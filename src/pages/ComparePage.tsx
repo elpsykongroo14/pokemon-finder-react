@@ -9,6 +9,7 @@ import { MessageBox } from "../ui/MessageBox";
 import { PageHeader } from "../ui/PageHeader";
 import { PageTitle } from "../ui/PageTitle";
 import { usePokemon } from "../hooks/usePokemon";
+import { formatSlug } from "../lib/text";
 import { useComparePageState } from "../hooks/useComparePageState";
 import {
   pickForSide,
@@ -23,6 +24,7 @@ import {
   COMPARE_HEADING,
   COMPARE_SUBTITLE,
   OPPONENT_SEARCH_LABEL,
+  FIRST_SEARCH_LABEL,
 } from "../lib/copy";
 
 export function ComparePage() {
@@ -76,8 +78,18 @@ export function ComparePage() {
 
   function renderState() {
     switch (state.status) {
+      //the empty page starts the comparison right here, instead of only
+      //saying where to go to start one
       case "no-first":
-        return <MessageBox text={EMPTY_COMPARE} />;
+        return (
+          <>
+            <MessageBox text={EMPTY_COMPARE} />
+            <SearchBar
+              onSubmit={(query) => handlePick("a", query)}
+              label={FIRST_SEARCH_LABEL}
+            />
+          </>
+        );
       case "first-loading":
       case "second-loading":
         return <MessageBox text={LOADING_LABEL} />;
@@ -92,7 +104,8 @@ export function ComparePage() {
       case "pick-second":
         return (
           <>
-            <h3>Comparing {state.first.name} with...</h3>
+            {/* the API's lowercase slug, written as a name ("Mr Mime") */}
+            <h3>Comparing {formatSlug(state.first.name)} with...</h3>
             {opponentSearch}
           </>
         );
