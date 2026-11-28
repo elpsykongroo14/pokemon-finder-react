@@ -1,12 +1,14 @@
 import type { PokemonStat } from "./type";
 
+//the order every Pokédex and the games' summary screen use: the two
+//special stats right after their physical pair, Speed last
 export const STAT_ORDER = [
   "hp",
   "attack",
   "defense",
-  "speed",
   "special-attack",
   "special-defense",
+  "speed",
 ] as const;
 
 //the highest base stat any pokemon can have in a single stat, so every
