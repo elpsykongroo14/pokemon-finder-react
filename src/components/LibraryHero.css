@@ -117,6 +117,13 @@
     cursor: pointer;
   }
 
+  /* the stand-in hand while the cards load (LibraryHero.tsx): faint, so
+     it reads as "on its way", not as three blank cards. On the list, not
+     each card, so the overlapping cards do not show through each other */
+  .library-hero__hand[aria-hidden] {
+    opacity: 0.35;
+  }
+
   .library-hero__lift {
     display: block;
     transition: transform var(--dur-base) var(--ease-settle);

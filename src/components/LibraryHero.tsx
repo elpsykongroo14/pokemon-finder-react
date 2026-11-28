@@ -83,6 +83,17 @@ export function LibraryHero({
       <div className="library-hero__field">
         <FieldSky />
         <span className="library-hero__shadow" aria-hidden="true" />
+        {/* while the cards load, three blank card faces (Mist, holo.css)
+            stand in the hand's slots, so the field is not an empty stage */}
+        {status === "loading" && (
+          <ul className="library-hero__hand" aria-hidden="true">
+            {SLOTS.map((slot) => (
+              <li key={slot} className="library-hero__slot" data-slot={slot}>
+                <span className="holo-card" />
+              </li>
+            ))}
+          </ul>
+        )}
         {hand.length > 0 && (
           //keyed by the Pokémon: a new search deals a new hand, so the
           //deal plays again; the same search never re-deals
