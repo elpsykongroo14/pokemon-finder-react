@@ -308,8 +308,9 @@
 
   /* ---- phones (spec 8): a 250 px field with 128 px cards, then the
      plate stacked under it, overlapping by 28 px with a slanted top. The
-     search and buttons step aside: the top bar's search and the toolbar's
-     view switch do those jobs on a phone (the phone design draws none) ---- */
+     buttons step aside (the toolbar's view switch does their job), but the
+     card search stays: the top bar's search opens a Pokémon's page, not
+     its cards, so without this a phone could not look up other cards ---- */
   @media (max-width: 1000px) {
     .library-hero {
       --hero-height: auto;
@@ -357,7 +358,10 @@
       font-size: var(--text-xl);
     }
 
-    .library-hero__search,
+    .library-hero__search {
+      max-width: none;
+    }
+
     .library-hero__actions,
     .library-hero__featured {
       display: none;
