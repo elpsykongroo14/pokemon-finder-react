@@ -335,5 +335,24 @@
     .team-slots {
       padding: var(--space-5) var(--space-4) var(--space-8);
     }
+
+    /* an open slot is a short row here (ball, "Slot 2 is open", the
+       button), not a 470 px card: six empty cards made an empty team
+       about 3500 px of scrolling on a phone */
+    .team-slot--empty {
+      flex-flow: row wrap;
+      min-height: 0;
+      padding: var(--space-4);
+    }
+
+    .team-slot--empty .brand-mark {
+      width: var(--space-7);
+      height: var(--space-7);
+    }
+
+    .team-slot--empty .team-slot__open {
+      flex: 1;
+      text-align: left;
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
+import { fileURLToPath } from "node:url";
 
 //configuration is checked when it is read (at build time), not when it is first used
 //(when someone opens the library in roduction). a missing or
@@ -26,6 +27,18 @@ function requireHttpsUrl(name: string, value: string | undefined): string {
   return value;
 }
 
+//a file of react-router's production build, as an absolute path: the
+//package's "exports" map does not list these files, so a bare
+//"react-router/dist/..." specifier would be refused
+function routerBuild(file: string): string {
+  return fileURLToPath(
+    new URL(
+      `./node_modules/react-router/dist/production/${file}`,
+      import.meta.url,
+    ),
+  );
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {
   //only a build needs the proxy address; `vite` (dev) and `vitest` do not
@@ -38,6 +51,27 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
+    //react-router's package.json only exports its DEVELOPMENT build (dev
+    //warnings and invariant messages included), with the production build
+    //sitting unexported next to it. a production bundle points at that one
+    //instead (about 0.5 kB gzip less). `vite` (dev) and vitest keep the
+    //development build, warnings and all. exact matches only (the $), so
+    //no other react-router subpath is touched
+    resolve:
+      command === "build"
+        ? {
+            alias: [
+              {
+                find: /^react-router$/,
+                replacement: routerBuild("index.mjs"),
+              },
+              {
+                find: /^react-router\/dom$/,
+                replacement: routerBuild("dom-export.mjs"),
+              },
+            ],
+          }
+        : undefined,
     plugins: [
       react(),
       //bundle map, only when asked for: `npm run analyze` builds in a mode

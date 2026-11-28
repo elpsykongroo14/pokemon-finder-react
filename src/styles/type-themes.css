@@ -73,7 +73,6 @@
   --theme-accent-ink: var(--paper);
   --theme-soft-ink: var(--ink);
   --theme-accent-2: var(--theme-accent);
-  --theme-accent-2-deep: var(--theme-accent-deep);
 }
 
 [data-type="normal"] {
@@ -204,92 +203,74 @@
 
 [data-type2="fire"] {
   --theme-accent-2: var(--type-fire);
-  --theme-accent-2-deep: var(--type-fire-deep);
 }
 
 [data-type2="normal"] {
   --theme-accent-2: var(--type-normal);
-  --theme-accent-2-deep: var(--type-normal-deep);
 }
 
 [data-type2="water"] {
   --theme-accent-2: var(--type-water);
-  --theme-accent-2-deep: var(--type-water-deep);
 }
 
 [data-type2="electric"] {
   --theme-accent-2: var(--type-electric);
-  --theme-accent-2-deep: var(--type-electric-deep);
 }
 
 [data-type2="grass"] {
   --theme-accent-2: var(--type-grass);
-  --theme-accent-2-deep: var(--type-grass-deep);
 }
 
 [data-type2="ice"] {
   --theme-accent-2: var(--type-ice);
-  --theme-accent-2-deep: var(--type-ice-deep);
 }
 
 [data-type2="fighting"] {
   --theme-accent-2: var(--type-fighting);
-  --theme-accent-2-deep: var(--type-fighting-deep);
 }
 
 [data-type2="poison"] {
   --theme-accent-2: var(--type-poison);
-  --theme-accent-2-deep: var(--type-poison-deep);
 }
 
 [data-type2="ground"] {
   --theme-accent-2: var(--type-ground);
-  --theme-accent-2-deep: var(--type-ground-deep);
 }
 
 [data-type2="flying"] {
   --theme-accent-2: var(--type-flying);
-  --theme-accent-2-deep: var(--type-flying-deep);
 }
 
 [data-type2="psychic"] {
   --theme-accent-2: var(--type-psychic);
-  --theme-accent-2-deep: var(--type-psychic-deep);
 }
 
 [data-type2="bug"] {
   --theme-accent-2: var(--type-bug);
-  --theme-accent-2-deep: var(--type-bug-deep);
 }
 
 [data-type2="rock"] {
   --theme-accent-2: var(--type-rock);
-  --theme-accent-2-deep: var(--type-rock-deep);
 }
 
 [data-type2="ghost"] {
   --theme-accent-2: var(--type-ghost);
-  --theme-accent-2-deep: var(--type-ghost-deep);
 }
 
 [data-type2="dragon"] {
   --theme-accent-2: var(--type-dragon);
-  --theme-accent-2-deep: var(--type-dragon-deep);
 }
 
 [data-type2="steel"] {
   --theme-accent-2: var(--type-steel);
-  --theme-accent-2-deep: var(--type-steel-deep);
 }
 
 [data-type2="fairy"] {
   --theme-accent-2: var(--type-fairy);
-  --theme-accent-2-deep: var(--type-fairy-deep);
 }
 
 [data-type2="dark"] {
   --theme-accent-2: var(--type-dark);
-  --theme-accent-2-deep: var(--type-dark-deep);
 }
 
 /* ---- The encounter field (spec 4.1) --------------------------------
@@ -327,7 +308,6 @@
    reason as the field block above */
 [data-type]:not([data-type2]) {
   --theme-accent-2: var(--theme-accent);
-  --theme-accent-2-deep: var(--theme-accent-deep);
   --field-stripe: var(--theme-accent-soft);
   --field-stripe-opacity: 0.5;
 }

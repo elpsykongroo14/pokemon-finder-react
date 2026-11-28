@@ -33,6 +33,32 @@
     gap: var(--space-4);
   }
 
+  /* a split chain (Eevee's eight): the branches wrap into a grid, as many
+     columns as fit, and the stage they split from stands centred beside
+     them. One column of eight was a tower about 1000 px tall with Eevee
+     alone at its foot. A straight chain (one branch) is left as it was */
+  /* every row and step with a split anywhere below it centres, so the
+     arrow into a centred stage (Oddish -> Gloom) stays level with it */
+  .evolution-branch-row:has(.evolution-branch-group > :nth-child(2)),
+  .evolution-step:has(.evolution-branch-group > :nth-child(2)) {
+    align-items: center;
+  }
+
+  .evolution-branch-group:has(> :nth-child(2)):not(
+      :has(.evolution-branch-row)
+    ) {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        var(--branch-width, calc(var(--step-width) + var(--stage-width))),
+        1fr
+      )
+    );
+    min-width: 0;
+  }
+
   .evolution-stage {
     position: relative;
     display: flex;
@@ -112,10 +138,22 @@
 
   /* narrow screens: the chain reads top to bottom, the arrow points down */
   @media (max-width: 480px) {
+    /* a branch is just a stage wide here (the arrow sits above it), so
+       two fit side by side */
+    .evolution-chain {
+      --branch-width: var(--stage-width);
+    }
+
     .evolution-branch-row,
     .evolution-step {
       flex-direction: column;
       align-items: center;
+    }
+
+    .evolution-branch-group:has(> :nth-child(2)):not(
+        :has(.evolution-branch-row)
+      ) {
+      width: 100%;
     }
 
     /* the next sprite rises --stage-sprite-lift above its stage: leave
@@ -124,7 +162,11 @@
       padding: var(--space-3) 0 calc(var(--stage-sprite-lift) + var(--space-3));
     }
 
+    /* rotate does not change the layout box: the turned 48 x 14 arrow
+       pokes (48 - 14) / 2 = 17 px out of it top and bottom, through the
+       condition text. The margin gives it that room */
     .evolution-step__how .icon {
+      margin-block: calc((var(--space-7) - var(--step-arrow-height)) / 2);
       rotate: 90deg;
     }
   }

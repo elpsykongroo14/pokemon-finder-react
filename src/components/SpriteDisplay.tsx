@@ -93,7 +93,7 @@ function measureFloor(image: HTMLImageElement): number {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    const context = canvas.getContext("2d", { willReadFrequently: true });
+    const context = canvas.getContext("2d");
     if (!context) return 0;
     context.drawImage(image, 0, 0);
     const { data } = context.getImageData(0, 0, width, height);

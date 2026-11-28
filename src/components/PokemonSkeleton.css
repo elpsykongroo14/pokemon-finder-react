@@ -4,4 +4,36 @@
     border-radius: 50%;
     background: var(--surface-well);
   }
+
+  /* after a failed lookup (the Pokémon page's failed state, where the
+     message after it is live, not aria-hidden as while loading): still,
+     dim, and a "?" where the Pokémon would stand */
+  .pokemon-skeleton:has(+ .encounter-field__message:not([aria-hidden]))
+    .skeleton {
+    display: inline-grid;
+    place-items: center;
+    animation: none;
+    opacity: 0.3;
+  }
+
+  .pokemon-skeleton:has(+ .encounter-field__message:not([aria-hidden]))
+    .skeleton::after {
+    content: "?";
+    font-family: var(--font-game);
+    font-size: 10rem;
+    line-height: 1;
+    color: var(--surface-ink);
+  }
+
+  /* phones: the dialog takes most of the 370 px field, so the "?" stands
+     smaller, from the top */
+  @media (max-width: 1000px) {
+    .pokemon-skeleton:has(+ .encounter-field__message:not([aria-hidden]))
+      .stage__sprite {
+      top: var(--space-5);
+      bottom: auto;
+      scale: 0.6;
+      transform-origin: top;
+    }
+  }
 }

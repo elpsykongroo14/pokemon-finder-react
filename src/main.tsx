@@ -1,8 +1,6 @@
 import "@fontsource/jersey-10/latin-400.css";
-//"standard" = the weight AND width axes (D40); the plain import has weight only,
-//and the display style needs font-stretch: 125%
-import "@fontsource-variable/archivo/standard.css";
-import "@fontsource-variable/archivo/standard-italic.css";
+//Archivo, Latin only (upright + italic): see the file for why
+import "./styles/fonts.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";

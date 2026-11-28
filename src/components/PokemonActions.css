@@ -31,6 +31,16 @@
     margin: calc(var(--space-1) * -1) 0 0;
   }
 
+  /* phones: the plate is not centred in a fixed field any more, it ends
+     where its content ends, so the reserved empty row (plus the grid gap)
+     read as a dead black band under the buttons. Collapse it until there
+     is something to say: the plate grows one line when you act */
+  @media (max-width: 1000px) {
+    .pokemon-actions__note:empty {
+      display: none;
+    }
+  }
+
   .pokemon-actions__note-line {
     display: inline-flex;
     align-items: center;

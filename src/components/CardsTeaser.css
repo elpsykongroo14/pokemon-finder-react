@@ -12,9 +12,10 @@
     --fan-turn-open: 16deg;
     --fan-height: 300px;
 
-    width: min(100%, var(--measure-page));
+    /* the readout's column (PokemonReadout.css) */
+    width: min(100% - 2 * var(--space-gutter), var(--measure-page));
     margin-inline: auto;
-    padding: 0 var(--space-7) calc(var(--space-7) + var(--space-2));
+    padding: 0 0 calc(var(--space-7) + var(--space-2));
   }
 
   .cards-teaser__body {
@@ -85,6 +86,7 @@
       --fan-spread-open: 92px;
       --fan-height: 210px;
 
+      width: 100%;
       padding: 0 var(--space-gutter-phone) var(--space-7);
     }
 

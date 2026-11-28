@@ -90,6 +90,9 @@ export interface EvolutionDetail {
   min_level?: number | null;
   item?: NamedAPIResource | null;
   min_happiness?: number | null;
+  //"day" / "night", or "" when it does not matter
+  time_of_day?: string;
+  known_move_type?: NamedAPIResource | null;
 }
 
 //evolution_details is optional: the root of a chain has an empty list, and

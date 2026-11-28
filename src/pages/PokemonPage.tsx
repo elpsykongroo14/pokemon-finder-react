@@ -69,14 +69,19 @@ export function PokemonPage() {
           </>
         );
       case "failed":
+        //the empty platform stays, with a "?" where the Pokémon would
+        //stand (PokemonSkeleton.css), so the field is not a bare grey sky
         return (
-          <div className="encounter-field__message">
-            <FailureMessage
-              kind={state.kind}
-              query={state.name}
-              onRetry={handleRetry}
-            />
-          </div>
+          <>
+            <PokemonSkeleton decorative />
+            <div className="encounter-field__message">
+              <FailureMessage
+                kind={state.kind}
+                query={state.name}
+                onRetry={handleRetry}
+              />
+            </div>
+          </>
         );
       case "ready":
         //key: a new Pokémon is a NEW encounter layer, so the encounter

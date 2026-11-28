@@ -125,7 +125,7 @@
      letters */
   .versus-field__vs {
     position: absolute;
-    top: 44%;
+    top: var(--versus-vs-top, 44%);
     left: 50%;
     z-index: 2;
     margin: 0;
@@ -291,6 +291,12 @@
      plate, the hover and the focus ring); here it only becomes a 60 px
      square, and its icon spins a half turn on hover (a response, on a
      token, so it stops with motion off) */
+  /* level with the two pickers (the band's bottom row), not floating
+     between the name rows */
+  .versus-band__swap {
+    align-self: end;
+  }
+
   .versus-band__swap .btn {
     width: var(--versus-swap-size);
     height: var(--versus-swap-size);
@@ -344,15 +350,20 @@
       --versus-height: 380px;
       --versus-cut: 44px;
       --versus-seam: 24px;
-      --versus-vs-size: 76px;
+      --versus-vs-size: 64px;
       --versus-vs-stroke: 4px;
+      /* above the sprites: each half is only ~195 px wide, so at mid
+         height the VS sat on top of both Pokémon */
+      --versus-vs-top: 17%;
     }
 
+    /* narrower than half the screen, so the two platforms no longer run
+       into each other across the cut */
     .versus-stage .stage {
-      --platform-width: 200px;
-      --platform-height: 48px;
+      --platform-width: 156px;
+      --platform-height: 40px;
       --platform-bottom: 52px;
-      --shadow-width: 96px;
+      --shadow-width: 84px;
       --shadow-height: 16px;
       --shadow-bottom: 68px;
       --sprite-bottom: 72px;

@@ -107,6 +107,12 @@
   }
 
   @media (max-width: 1000px) {
+    /* the plate spans the screen here: on a tablet a 460 px bar and
+       button grid left the right 40 % of it empty */
+    .name-plate {
+      --plate-measure: none;
+    }
+
     .name-plate__inner {
       gap: calc(var(--space-3) + var(--space-1) / 2);
     }

@@ -6,9 +6,12 @@
     /* the stat bars wait for the encounter's plate (spec 6.1) */
     --stat-head-start: 380ms;
 
-    width: min(100%, var(--measure-page));
+    /* the same column as every other page (Layout.css's main): 1240 px
+       inside the page gutter, so the headings line up with Compare's or
+       Team's. 48 px of side padding used to start them 48 px further in */
+    width: min(100% - 2 * var(--space-gutter), var(--measure-page));
     margin-inline: auto;
-    padding: calc(var(--space-7) + var(--space-2)) var(--space-7)
+    padding: calc(var(--space-7) + var(--space-2)) 0
       calc(var(--space-6) + var(--space-2));
   }
 
@@ -26,6 +29,7 @@
 
   @media (max-width: 1000px) {
     .readout {
+      width: 100%;
       padding: var(--space-5) var(--space-gutter-phone) var(--space-6);
     }
 

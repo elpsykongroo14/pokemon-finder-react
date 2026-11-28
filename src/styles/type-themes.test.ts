@@ -42,13 +42,12 @@ describe("type-themes.css", () => {
     expect(css).toContain(`[data-type2="${type}"]`);
   });
 
-  it("every secondary block sets both secondary variables", () => {
+  it("every secondary block sets the secondary accent", () => {
     const blocks = css.match(/\[data-type2="[a-z]+"\]\s*\{[^}]*\}/g) ?? [];
 
     expect(blocks).toHaveLength(TYPES.length);
     for (const block of blocks) {
       expect(block).toContain("--theme-accent-2:");
-      expect(block).toContain("--theme-accent-2-deep:");
     }
   });
 
@@ -61,7 +60,6 @@ describe("type-themes.css", () => {
 
   it("defaults the secondary accent to the primary one", () => {
     expect(css).toContain("--theme-accent-2: var(--theme-accent);");
-    expect(css).toContain("--theme-accent-2-deep: var(--theme-accent-deep);");
   });
 
   //text on the soft tint (panels, versus halves) must be readable for every type

@@ -18,7 +18,7 @@ function makeStat(name: string, base_stat: number): PokemonStat {
 }
 
 describe("StatBarChart", () => {
-  it("renders stats in the canonical  HP/Atk/Def/Spd/SpA/SpD regardless of input order", () => {
+  it("renders stats in the canonical HP/Atk/Def/SpA/SpD/Spe regardless of input order", () => {
     const stats = [
       makeStat("speed", 90),
       makeStat("hp", 35),
@@ -37,9 +37,9 @@ describe("StatBarChart", () => {
       "HP",
       "Attack",
       "Defense",
-      "Speed",
       "Sp. Atk",
       "Sp. Def",
+      "Speed",
     ]);
   });
 
