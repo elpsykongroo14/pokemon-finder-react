@@ -100,17 +100,34 @@ describe("BattleMenu", () => {
     );
   });
 
-  it("offers only what still makes sense while there is no Pokémon", () => {
+  it("keeps all four rows while there is no Pokémon, the two that need one disabled", () => {
     renderMenu(null);
 
     expect(compare()).toHaveAttribute("href", "/compare");
     expect(reroll()).toBeInTheDocument();
+    //no link to an entry that does not exist yet...
     expect(
       screen.queryByRole("link", { name: "Check its entry" }),
     ).not.toBeInTheDocument();
+    //...but the row stays, so the plate does not reflow
     expect(
-      screen.queryByRole("button", { name: "Team" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: "Check its entry" }),
+    ).toHaveAttribute("aria-disabled", "true");
+    expect(team()).toHaveAttribute("aria-disabled", "true");
+    expect(team()).not.toHaveAttribute("aria-pressed");
+    expect(screen.getAllByRole("listitem")).toHaveLength(4);
+  });
+
+  it("does nothing when a waiting row is selected", async () => {
+    const user = userEvent.setup();
+    renderMenu(null);
+
+    await user.click(team());
+
+    expect(JSON.parse(localStorage.getItem("pokemon_team") ?? "[]")).toEqual(
+      [],
+    );
+    expect(onReroll).not.toHaveBeenCalled();
   });
 
   it("asks for another wild Pokémon, and keeps focus on the command", async () => {
@@ -255,9 +272,9 @@ describe("BattleMenu", () => {
       expect(entry()).toHaveFocus();
     });
 
-    //"Look for another" while loading: the list shrinks to two commands.
-    //the remembered position must still point at a command that exists
-    it("keeps exactly one command tabbable when the list gets shorter", async () => {
+    //"Look for another" while loading: the rows that need a Pokémon go
+    //into waiting, and the remembered position stays on the reroll row
+    it("keeps exactly one command tabbable while the next Pokémon loads", async () => {
       const user = userEvent.setup();
       const view = renderMenu();
       await user.click(reroll());
