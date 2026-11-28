@@ -17,7 +17,7 @@ import {
 } from "../lib/copy";
 import type { PokemonDetails } from "../lib/type";
 import { PopIcon } from "../ui/PopIcon";
-import { Icon } from "../components/Icon";
+import { Icon } from "./Icon";
 
 //the visible celebration: six pips lighting up one after another, like the
 //party counter filling, decorative: the words are announced by the live region

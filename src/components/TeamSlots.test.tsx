@@ -3,8 +3,8 @@ import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { TeamSLots } from "./TeamSlots";
-import { TeamProvider } from "./TeamContext";
-import { PreferencesProvider } from "./PreferencesContext";
+import { TeamProvider } from "../context/TeamContext";
+import { PreferencesProvider } from "../context/PreferencesContext";
 import { MAX_TEAM } from "../lib/teamReducer";
 import type { TeamMember } from "../lib/type";
 

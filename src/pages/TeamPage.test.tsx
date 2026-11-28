@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { TeamPage } from "./TeamPage";
 import { TeamProvider } from "../context/TeamContext";
 
-vi.mock("../context/TeamSlots", () => ({
+vi.mock("../components/TeamSlots", () => ({
   TeamSLots: () => <div data-testid="team-slots">team-slots</div>,
 }));
 

@@ -10,11 +10,11 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { BrandMark } from "../components/BrandMark";
-import { FieldSky } from "../components/EncounterField";
-import { Icon } from "../components/Icon";
-import { TransitionLink } from "../components/TransitionLink";
-import { TypeBadge } from "../components/TypeBadge";
+import { BrandMark } from "./BrandMark";
+import { FieldSky } from "./EncounterField";
+import { Icon } from "./Icon";
+import { TransitionLink } from "./TransitionLink";
+import { TypeBadge } from "./TypeBadge";
 import { IconButton } from "../ui/IconButton";
 import { useTeam } from "../hooks/useTeam";
 import { usePreferences } from "../hooks/usePreferences";

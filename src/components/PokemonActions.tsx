@@ -3,7 +3,7 @@ import { useId, useState } from "react";
 import { FavoriteButton } from "./FavoriteButton";
 import { HeartBurst } from "./HeartBurst";
 import { Icon } from "./Icon";
-import { TeamStatus, TeamToggle } from "../context/TeamButton";
+import { TeamStatus, TeamToggle } from "./TeamButton";
 import { useTeamAction } from "../hooks/useTeamAction";
 import { useFavoriteAction } from "../hooks/useFavoriteAction";
 import { usePreferences } from "../hooks/usePreferences";

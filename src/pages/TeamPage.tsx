@@ -1,4 +1,4 @@
-import { TeamSLots } from "../context/TeamSlots";
+import { TeamSLots } from "../components/TeamSlots";
 import { TeamBand } from "../components/TeamBand";
 import { useTeamBackfill } from "../hooks/useTeamBackfill";
 
