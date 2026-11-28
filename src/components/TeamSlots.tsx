@@ -1,4 +1,4 @@
-//TeamSLots.tsx is the party display (spec 7.5)
+//TeamSlots.tsx is the party display (spec 7.5)
 //it always renders exactly MAX_TEAM (6) <li>s, filled or empty, instead of team.map(...),
 //so the screen's shape never depends on how many members there are.
 //slot 1 is the "lead": it says so with a tag next to its dex number
@@ -38,7 +38,7 @@ import type { TeamMember } from "../lib/type";
 //tab was in the background, the stylesheet failed), remove the member anyway
 const EXIT_FALLBACK_MS = 600;
 
-export function TeamSLots() {
+export function TeamSlots() {
   const { team, removeFromTeam } = useTeam();
   const { animationsEnabled } = usePreferences();
 

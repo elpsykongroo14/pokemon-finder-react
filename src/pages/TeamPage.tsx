@@ -1,4 +1,4 @@
-import { TeamSLots } from "../components/TeamSlots";
+import { TeamSlots } from "../components/TeamSlots";
 import { TeamBand } from "../components/TeamBand";
 import { useTeamBackfill } from "../hooks/useTeamBackfill";
 
@@ -12,7 +12,7 @@ export function TeamPage() {
   return (
     <section className="team-page page--bleed">
       <TeamBand />
-      <TeamSLots />
+      <TeamSlots />
     </section>
   );
 }

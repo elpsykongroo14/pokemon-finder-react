@@ -4,7 +4,7 @@ import { TeamPage } from "./TeamPage";
 import { TeamProvider } from "../context/TeamContext";
 
 vi.mock("../components/TeamSlots", () => ({
-  TeamSLots: () => <div data-testid="team-slots">team-slots</div>,
+  TeamSlots: () => <div data-testid="team-slots">team-slots</div>,
 }));
 
 const { fetchPokemon } = vi.hoisted(() => ({ fetchPokemon: vi.fn() }));
@@ -19,7 +19,7 @@ describe("TeamPage", () => {
   //changed in B&W-6: "Your Team" became "Your team" (spec 9's copy, the
   //sentence case every other heading uses). the heading now comes from
   //the title band
-  it("renders the team heading and delegates the roster to TeamSLots", () => {
+  it("renders the team heading and delegates the roster to TeamSlots", () => {
     render(
       <TeamProvider>
         <TeamPage />
@@ -84,6 +84,6 @@ describe("TeamPage", () => {
   });
 });
 
-//TeamSLots already has its own dedicated test file (Teamslots.test.tsx)
+//TeamSlots already has its own dedicated test file (TeamSlots.test.tsx)
 //covering the roster's real rendering logic. TeamPage's only job is to show the heading
 //mount the roster, and start the backfill, so those are the only things this file needs to prove
