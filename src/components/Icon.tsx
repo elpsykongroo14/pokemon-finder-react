@@ -18,6 +18,7 @@ export type IconName =
   | "team"
   | "discord"
   | "documentation"
+  | "entry"
   | "grid"
   | "list"
   | "github"
