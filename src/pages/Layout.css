@@ -23,11 +23,15 @@
     padding-bottom: var(--bottom-bar);
   }
 
+  /* one row at every desktop width: the search field is the part that
+     gives (HeaderSearch.css). With flex-wrap the end group used to drop
+     to a second row between about 1000 and 1230 px, out of line with
+     the nav */
   .app-header {
     position: relative;
     z-index: var(--z-sticky);
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: var(--space-3) var(--space-6);
     min-height: 72px;
@@ -51,9 +55,20 @@
 
   .app-header__end {
     display: flex;
+    flex: 1 1 auto;
+    justify-content: flex-end;
     align-items: center;
     gap: calc(var(--space-3) + var(--space-1) / 2);
+    min-width: 0;
     margin-left: auto;
+  }
+
+  /* the narrow end of desktop: tighter gaps, so brand, nav and a usable
+     search still share one row down to 1001 px */
+  @media (max-width: 1200px) {
+    .app-header {
+      column-gap: var(--space-4);
+    }
   }
 
   .app-main {

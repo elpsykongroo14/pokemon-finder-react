@@ -3,13 +3,17 @@
    closed field is display: none, which also takes it out of the Tab order
    and the accessibility tree, exactly what "collapsed" should mean */
 @layer features {
+  /* 360 px when there is room, shrinking down to 180 px before anything
+     else in the header has to move */
   .header-search {
     display: flex;
+    flex: 0 1 360px;
     align-items: center;
+    min-width: 180px;
   }
 
   .header-search__field {
-    width: min(360px, 30vw);
+    width: 100%;
   }
 
   .header-search__toggle {
@@ -17,6 +21,12 @@
   }
 
   @media (max-width: 1000px) {
+    /* only the toggle lives in the bar on phones */
+    .header-search {
+      flex: none;
+      min-width: 0;
+    }
+
     .header-search__toggle {
       display: inline-flex;
     }

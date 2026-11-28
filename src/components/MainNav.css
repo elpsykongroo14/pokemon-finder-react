@@ -68,6 +68,14 @@
     display: none;
   }
 
+  /* the narrow end of desktop: slimmer links leave the header search
+     room for its placeholder (the header stays one row, Layout.css) */
+  @media (min-width: 1001px) and (max-width: 1100px) {
+    .main-nav a {
+      padding: 0 var(--space-3);
+    }
+  }
+
   @media (max-width: 1000px) {
     .main-nav {
       position: fixed;

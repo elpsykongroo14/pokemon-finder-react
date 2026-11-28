@@ -58,12 +58,15 @@
     }
   }
 
-  /* phones: the top bar shows the pips only; the word stays for the name */
   @media (max-width: 1000px) {
     .party-counter {
       padding: 0 var(--space-1);
     }
+  }
 
+  /* phones and the narrow end of desktop show the pips only, so the
+     header keeps to one row; the word stays for the accessible name */
+  @media (max-width: 1200px) {
     .party-counter__word {
       position: absolute;
       width: 1px;
